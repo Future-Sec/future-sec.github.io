@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.future-sec.com/"/>
-  <updated>2017-07-10T13:45:10.315Z</updated>
+  <updated>2017-07-10T17:53:49.852Z</updated>
   <id>http://www.future-sec.com/</id>
   
   <author>
@@ -16,42 +16,11 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>中间件漏洞检测框架(F-MiddlewareScan)</title>
-    <link href="http://www.future-sec.com/year/03/16/f-middlewarescan.html"/>
-    <id>http://www.future-sec.com/year/03/16/f-middlewarescan.html</id>
-    <published>2016-03-16T16:00:00.000Z</published>
-    <updated>2017-07-10T13:45:10.315Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h2><p>实现针对中间件的自动化检测，端口探测-&gt;中间件识别-&gt;漏洞检测-&gt;获取webshell<br>参数说明<br>-h 必须输入的参数，支持ip(192.168.1.1)，ip段（192.168.1），ip范围指定（192.168.1.1-192.168.1.254），最多限制一次可扫描65535个IP。<br>-p 指定要扫描端口列表，多个端口使用,隔开 例如：7001,8080,9999。未指定即使用内置默认端口进行扫描(80,4848,7001,7002,8000,8001,8080,8081,8888,9999,9043,9080)<br>-m 指定线程数量 默认100线程<br>-t 指定HTTP请求超时时间，默认为10秒，端口扫描超时为值的1/2。<br>例子：</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">python F-MiddlewareScan.py -h <span class="number">10.111</span><span class="number">.1</span></div><div class="line">python F-MiddlewareScan.py -h <span class="number">192.168</span><span class="number">.1</span><span class="number">.1</span><span class="number">-192.168</span><span class="number">.2</span><span class="number">.111</span></div><div class="line">python F-MiddlewareScan.py -h <span class="number">10.111</span><span class="number">.1</span><span class="number">.22</span> -p <span class="number">80</span>,<span class="number">7001</span>,<span class="number">8080</span> -m <span class="number">200</span> -t <span class="number">6</span></div></pre></td></tr></table></figure>
-<p>效果图：</p>
-<p><img src="/images/640.jpg" alt="img"></p>
-<p>漏洞检测脚本以插件形式存在，可以自定义添加修改漏洞插件，存放于plugins目录，插件标准非常简单，只需对传入的IP，端口，超时进行操作，成功返回“YES|要打印出来的信息”即可。<br>新增插件需要在 plugin_config.ini配置文件中新增关联（多个漏洞插件以逗号隔开）。<br>中间件识别在discern_config.ini文件中配置（支持文件内容和header识别）</p>
-<p>目前内置了19个漏洞插件，希望大家可以一起编写更多的插件，目前还缺少weblogic自动部署和反序列化探测以及中间件的反序列化自动获取webshell的插件等等。</p>
-<p>下载地址：<a href="http://down.future-sec.com/F-MiddlewareScan.rar" rel="external nofollow noopener noreferrer" target="_blank">http://down.future-sec.com/F-MiddlewareScan.rar</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Setup&quot;&gt;&lt;a href=&quot;#Setup&quot; class=&quot;headerlink&quot; title=&quot;Setup&quot;&gt;&lt;/a&gt;Setup&lt;/h2&gt;&lt;p&gt;实现针对中间件的自动化检测，端口探测-&amp;gt;中间件识别-&amp;gt;漏洞检测-&amp;gt;获取webshell&lt;br&gt;参数
-    
-    </summary>
-    
-      <category term="web安全" scheme="http://www.future-sec.com/categories/web%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="python" scheme="http://www.future-sec.com/tags/python/"/>
-    
-      <category term="自动化检测" scheme="http://www.future-sec.com/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%A3%80%E6%B5%8B/"/>
-    
-  </entry>
-  
-  <entry>
     <title>简单验证码识别及工具编写思路</title>
-    <link href="http://www.future-sec.com/year/03/06/verification_code.html"/>
-    <id>http://www.future-sec.com/year/03/06/verification_code.html</id>
-    <published>2016-03-06T16:00:00.000Z</published>
-    <updated>2017-07-10T14:30:55.789Z</updated>
+    <link href="http://www.future-sec.com/year/06/23/verification_code.html"/>
+    <id>http://www.future-sec.com/year/06/23/verification_code.html</id>
+    <published>2017-06-23T16:00:00.000Z</published>
+    <updated>2017-07-10T17:53:49.852Z</updated>
     
     <content type="html"><![CDATA[<p>注：此文章只适合简单验证码，最后也将编写的工具附上以及关键部分代码和使用说明文档。</p>
 <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>虽然验证码发展到如今有许多人类都难以识别的状态了，但人有部分老系统使用的验证码异常的简单。还有一些网站由于程序员本身的素质或者缺乏相关图像相关的知识，所以并没有自己写验证码的生成程序，而是直接在网上随便复制粘贴一个Demo级别的代码来用，以达到网站有验证码的目的，而忽略了验证码的强弱性，导致很多网站的验证码都是爆款弱验证码。<br>如：<br><img src="/images/69145828_1.png" alt="img"><br> 还有更糟糕的比如：<br><img src="/images/69145828_2.png" alt="img"><br>   直接就能复制的…这种是完全不知道验证码的意义或者为了应付而做的验证码</p>
@@ -86,11 +55,42 @@
   </entry>
   
   <entry>
+    <title>中间件漏洞检测框架(F-MiddlewareScan)</title>
+    <link href="http://www.future-sec.com/year/06/16/f-middlewarescan.html"/>
+    <id>http://www.future-sec.com/year/06/16/f-middlewarescan.html</id>
+    <published>2017-06-16T16:00:00.000Z</published>
+    <updated>2017-07-10T17:53:48.754Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h2><p>实现针对中间件的自动化检测，端口探测-&gt;中间件识别-&gt;漏洞检测-&gt;获取webshell<br>参数说明<br>-h 必须输入的参数，支持ip(192.168.1.1)，ip段（192.168.1），ip范围指定（192.168.1.1-192.168.1.254），最多限制一次可扫描65535个IP。<br>-p 指定要扫描端口列表，多个端口使用,隔开 例如：7001,8080,9999。未指定即使用内置默认端口进行扫描(80,4848,7001,7002,8000,8001,8080,8081,8888,9999,9043,9080)<br>-m 指定线程数量 默认100线程<br>-t 指定HTTP请求超时时间，默认为10秒，端口扫描超时为值的1/2。<br>例子：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">python F-MiddlewareScan.py -h <span class="number">10.111</span><span class="number">.1</span></div><div class="line">python F-MiddlewareScan.py -h <span class="number">192.168</span><span class="number">.1</span><span class="number">.1</span><span class="number">-192.168</span><span class="number">.2</span><span class="number">.111</span></div><div class="line">python F-MiddlewareScan.py -h <span class="number">10.111</span><span class="number">.1</span><span class="number">.22</span> -p <span class="number">80</span>,<span class="number">7001</span>,<span class="number">8080</span> -m <span class="number">200</span> -t <span class="number">6</span></div></pre></td></tr></table></figure>
+<p>效果图：</p>
+<p><img src="/images/640.jpg" alt="img"></p>
+<p>漏洞检测脚本以插件形式存在，可以自定义添加修改漏洞插件，存放于plugins目录，插件标准非常简单，只需对传入的IP，端口，超时进行操作，成功返回“YES|要打印出来的信息”即可。<br>新增插件需要在 plugin_config.ini配置文件中新增关联（多个漏洞插件以逗号隔开）。<br>中间件识别在discern_config.ini文件中配置（支持文件内容和header识别）</p>
+<p>目前内置了19个漏洞插件，希望大家可以一起编写更多的插件，目前还缺少weblogic自动部署和反序列化探测以及中间件的反序列化自动获取webshell的插件等等。</p>
+<p>下载地址：<a href="http://down.future-sec.com/F-MiddlewareScan.rar" rel="external nofollow noopener noreferrer" target="_blank">http://down.future-sec.com/F-MiddlewareScan.rar</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Setup&quot;&gt;&lt;a href=&quot;#Setup&quot; class=&quot;headerlink&quot; title=&quot;Setup&quot;&gt;&lt;/a&gt;Setup&lt;/h2&gt;&lt;p&gt;实现针对中间件的自动化检测，端口探测-&amp;gt;中间件识别-&amp;gt;漏洞检测-&amp;gt;获取webshell&lt;br&gt;参数
+    
+    </summary>
+    
+      <category term="web安全" scheme="http://www.future-sec.com/categories/web%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="python" scheme="http://www.future-sec.com/tags/python/"/>
+    
+      <category term="自动化检测" scheme="http://www.future-sec.com/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%A3%80%E6%B5%8B/"/>
+    
+  </entry>
+  
+  <entry>
     <title>一维条形码攻击技术(Badbarcode)</title>
-    <link href="http://www.future-sec.com/year/02/24/badbarcode.html"/>
-    <id>http://www.future-sec.com/year/02/24/badbarcode.html</id>
-    <published>2016-02-24T16:00:00.000Z</published>
-    <updated>2017-07-10T16:53:19.955Z</updated>
+    <link href="http://www.future-sec.com/year/05/24/badbarcode.html"/>
+    <id>http://www.future-sec.com/year/05/24/badbarcode.html</id>
+    <published>2017-05-24T16:00:00.000Z</published>
+    <updated>2017-07-10T17:53:47.434Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在日常生活中，条形码随处可见，特别在超市，便利店，物流业，但你们扫的条形码真的安全吗？之前TK教主在PacSec介绍的条形码攻<br>击和twitter上的demo视频太炫酷，所以就自己买了个扫码器自己研究了一下 ，在研究时候也找遍了国内外所有资料，但是都没有对可以执行的攻击技术完整的文章，故有此文分享。</p>
 <h2 id="条形码介绍"><a href="#条形码介绍" class="headerlink" title="条形码介绍"></a>条形码介绍</h2><p><img src="/images/N7NjIvr.png" alt="img"><br>条形码(barcode)是将宽度不等的多个黑条和空白，按照一定的编码规则排列，用以表达一组信息的图形标识符。常见的条形码是由反射率相差很大的黑条（简称条）和白条（简称空）排成的平行线图案。<br>常见的条形码类型有code39 code128 code93 EAN128 EAN13QR等，前面大部分是一维条形码，而QR则是二维条形码，本文重点针对支持一维条形码的扫码器。其中code128是使用最广泛，支持字符最多的一种类<br>型，一般都利用code128条形码进行攻击。</p>
