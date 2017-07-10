@@ -33,59 +33,14 @@ $(function () {
             separator: ',',
             decimal: '.'
         };
-        $.ajax({
-            url: '',
-            success: function (data) {
-                data = JSON.parse(data);
-
-                if (data.Success) {
-                    var nowDate = new Date(new Date() - 24 * 60 * 60 * 1000);
-                    var today = Date.parse(nowDate.getFullYear() + '/' + (nowDate.getMonth() + 1) + '/' + (nowDate.getDate()));
-                    var InterNum = data.EventIncrease / (24 * 60 * 60 * 1000);
-                    var startNum = data.EventTotal + InterNum * ((new Date()).getTime() - today);
-                    var time = 1000;
-
-                    var demo = new CountUp("countUp", startNum, startNum, 0, 2.5, options);
-                    var timer = setTimeout(autoNum, time);
-
-                    function autoNum() {
-                        time = Math.floor(Math.random() * 10000 / 2);
-
-                        demo.update(data.EventTotal + InterNum * ((new Date()).getTime() - today));
-
-                        timer = null;
-                        timer = setTimeout(autoNum, time);
-                    }
-
-                    $('.num-columns-left .num-columns-num').text((data.UserTotal || 0).toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,'));
-                    $('.num-columns-right .num-columns-num').text((data.VirusTotal || 0).toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,'));
-                }
-            }
-        });
+       
     }
 
     if ($('body.events')[0]) {
         $('#event-section1, #event-section2').height($(window).height());
 
-        $.ajax({
-            url: '/eventSummary',
-            success: function (data) {
-                data = JSON.parse(data);
-
-                var nowDate = new Date(new Date() - 24 * 60 * 60 * 1000);
-                var today = Date.parse(nowDate.getFullYear() + '/' + (nowDate.getMonth() + 1) + '/' + (nowDate.getDate()));
-                var InterNum = data.EventIncrease / (24 * 60 * 60 * 1000);
-                var startNum = data.EventTotal + InterNum * ((new Date()).getTime() - today);
-
-                if (data.Success) {
-                    $('table.event-globe-desc td:eq(0) span.event-globe-desc-num').text(((data.UserTotal || 0) / 1000000).toFixed(0).toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,'));
-                    $('table.event-globe-desc td:eq(1) span.event-globe-desc-num').text(((startNum || 0) / 1000000).toFixed(0).toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,'));
-                    $('table.event-globe-desc td:eq(2) span.event-globe-desc-num').text(((data.VirusTotal || 0) / 1000000).toFixed(0).toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,'));
-                }
-            }
-        });
-
-        $.when($.ajax({url: '/mobileVirusMap'}), $.ajax({url: '/mobileTopVirus'}), $.ajax({url: '/mobileVirusIncrease'}))
+      
+        $.when($.ajax({url: '#'}), $.ajax({url: '/mobileTopVirus'}), $.ajax({url: '#'}))
             .then(function (data1, data2, data3) {
                 var _data_10, min1, max1, min2, max2, min3, max3 = 0;
                 var country = [
