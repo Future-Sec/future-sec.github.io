@@ -51,7 +51,7 @@
     <link href="http://www.future-sec.com/verification_code.html"/>
     <id>http://www.future-sec.com/verification_code.html</id>
     <published>2016-03-06T16:00:00.000Z</published>
-    <updated>2017-07-10T18:59:41.138Z</updated>
+    <updated>2017-07-10T19:39:19.295Z</updated>
     
     <content type="html"><![CDATA[<p>注：此文章只适合简单验证码，最后也将编写的工具附上以及关键部分代码和使用说明文档。</p>
 <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>虽然验证码发展到如今有许多人类都难以识别的状态了，但人有部分老系统使用的验证码异常的简单。还有一些网站由于程序员本身的素质或者缺乏相关图像相关的知识，所以并没有自己写验证码的生成程序，而是直接在网上随便复制粘贴一个Demo级别的代码来用，以达到网站有验证码的目的，而忽略了验证码的强弱性，导致很多网站的验证码都是爆款弱验证码。<br>如：</p>
@@ -141,7 +141,7 @@
     <link href="http://www.future-sec.com/badbarcode.html"/>
     <id>http://www.future-sec.com/badbarcode.html</id>
     <published>2016-02-24T16:00:00.000Z</published>
-    <updated>2017-07-10T18:59:47.761Z</updated>
+    <updated>2017-07-10T19:39:08.835Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在日常生活中，条形码随处可见，特别在超市，便利店，物流业，但你们扫的条形码真的安全吗？之前TK教主在PacSec介绍的条形码攻<br>击和twitter上的demo视频太炫酷，所以就自己买了个扫码器自己研究了一下 ，在研究时候也找遍了国内外所有资料，但是都没有对可以执行的攻击技术完整的文章，故有此文分享。</p>
 <h2 id="条形码介绍"><a href="#条形码介绍" class="headerlink" title="条形码介绍"></a>条形码介绍</h2><p><img src="/images/N7NjIvr.png" alt="img"><br>条形码(barcode)是将宽度不等的多个黑条和空白，按照一定的编码规则排列，用以表达一组信息的图形标识符。常见的条形码是由反射率相差很大的黑条（简称条）和白条（简称空）排成的平行线图案。<br>常见的条形码类型有code39 code128 code93 EAN128 EAN13QR等，前面大部分是一维条形码，而QR则是二维条形码，本文重点针对支持一维条形码的扫码器。其中code128是使用最广泛，支持字符最多的一种类<br>型，一般都利用code128条形码进行攻击。</p>
