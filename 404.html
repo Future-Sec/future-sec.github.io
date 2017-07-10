@@ -72,8 +72,8 @@
     <div class="header-navigation pull-right font-transform-inherit">
       <ul>
 	
-	<li class="active">
-	  <a href="/">Home</a>
+	<li class="">
+	  <a href="/home.html">Home</a>
 	</li>
 	
 	<li class="">
@@ -225,6 +225,21 @@
 	new WOW().init();
     });
 </script>
+ <script>
+        // 给图片添加链接
+        $(document).ready(function() {
+            $("p img").each(function() {
+                var strA = "<a class='fancybox' href='" + this.src + "'></a>";
+                $(this).wrapAll(strA);
+            });
+        });
+    
+        // fancybox
+        $(".fancybox").fancybox({
+                                  openEffect    : 'elastic',
+                                  closeEffect   : 'elastic',
+                              });
+    </script>
 <!-- END CORE PLUGINS -->
 
 <!-- BEGIN PAGE-SPECIFIC PLUGINS --> 

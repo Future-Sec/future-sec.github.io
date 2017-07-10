@@ -16,7 +16,7 @@
 <meta name="keywords" content="python,验证码">
 <meta property="og:type" content="article">
 <meta property="og:title" content="简单验证码识别及工具编写思路">
-<meta property="og:url" content="http://www.future-sec.com/year/03/06/2016-03-07-qrcode.html">
+<meta property="og:url" content="http://www.future-sec.com/year/03/06/verification_code.html">
 <meta property="og:site_name" content="伏宸安全实验室-Future-Sec Information Security Lab">
 <meta property="og:description" content="注：此文章只适合简单验证码，最后也将编写的工具附上以及关键部分代码和使用说明文档。 简介虽然验证码发展到如今有许多人类都难以识别的状态了，但人有部分老系统使用的验证码异常的简单。还有一些网站由于程序员本身的素质或者缺乏相关图像相关的知识，所以并没有自己写验证码的生成程序，而是直接在网上随便复制粘贴一个Demo级别的代码来用，以达到网站有验证码的目的，而忽略了验证码的强弱性，导致很多网站的验证码都是">
 <meta property="og:image" content="http://www.future-sec.com/images/69145828_1.png">
@@ -48,7 +48,7 @@
 <meta property="og:image" content="http://www.future-sec.com/images/69145828_26.png">
 <meta property="og:image" content="http://www.future-sec.com/images/69145828_27.png">
 <meta property="og:image" content="http://www.future-sec.com/images/69145828_28.png">
-<meta property="og:updated_time" content="2017-07-07T03:58:57.608Z">
+<meta property="og:updated_time" content="2017-07-10T14:30:55.789Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="简单验证码识别及工具编写思路">
 <meta name="twitter:description" content="注：此文章只适合简单验证码，最后也将编写的工具附上以及关键部分代码和使用说明文档。 简介虽然验证码发展到如今有许多人类都难以识别的状态了，但人有部分老系统使用的验证码异常的简单。还有一些网站由于程序员本身的素质或者缺乏相关图像相关的知识，所以并没有自己写验证码的生成程序，而是直接在网上随便复制粘贴一个Demo级别的代码来用，以达到网站有验证码的目的，而忽略了验证码的强弱性，导致很多网站的验证码都是">
@@ -104,7 +104,7 @@
       <ul>
 	
 	<li class="">
-	  <a href="/">Home</a>
+	  <a href="/home.html">Home</a>
 	</li>
 	
 	<li class="">
@@ -147,13 +147,13 @@
   <section id="main">
     
     <h2 itemprop="name">
-      <a class="article-title" href="/year/03/06/2016-03-07-qrcode.html">简单验证码识别及工具编写思路</a>
+      <a class="article-title" href="/year/03/06/verification_code.html">简单验证码识别及工具编写思路</a>
     </h2>
 
 
     <div class="row">
 <div class="col-md-9 col-sm-9 blog-posts">
-<article id="post-2016-03-07-qrcode" class="article article-type-post blog-item" itemscope="" itemprop="blogPost">
+<article id="post-verification_code" class="article article-type-post blog-item" itemscope="" itemprop="blogPost">
   <div class="article-meta">
   </div>
   <div class="article-inner">
@@ -167,7 +167,7 @@
 
 	</li>
 	<li class="hidden-xs"><i class="fa fa-comments"></i>
-	  <a href="http://www.future-sec.com/year/03/06/2016-03-07-qrcode.html#disqus_thread" class="article-comment-link">Comments</a>
+	  <a href="http://www.future-sec.com/year/03/06/verification_code.html#disqus_thread" class="article-comment-link">Comments</a>
 	</li>
 	<li class="hidden-xs"><i class="fa fa-tags"></i> 
 	  
@@ -186,7 +186,7 @@
     Category: 
     
     Categories:
-    <a class="article-category-link" href="/categories/net/">.net</a>
+    <a class="article-category-link" href="/categories/web安全/">web安全</a>
   </div>
   <br>
 
@@ -224,7 +224,7 @@
     
 <nav id="article-nav">
   
-    <a href="/year/03/16/2016-03-17-MiddlewareScan.html" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/year/03/16/f-middlewarescan.html" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
@@ -234,7 +234,7 @@
     </a>
   
   
-    <a href="/year/02/24/2016-02-25-Badbarcode.html" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/year/02/24/badbarcode.html" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
       <div class="article-nav-title">一维条形码攻击技术(Badbarcode)</div>
     </a>
@@ -258,15 +258,11 @@
     <ul class="nav sidebar-categories margin-bottom-40">
       
 	<li>
-	  <a href="/categories/net/">.net (1)</a>
+	  <a href="/categories/硬件安全/">硬件安全 (1)</a>
 	</li>
       
 	<li>
-	  <a href="/categories/条形码/">条形码 (1)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/Python/">Python (1)</a>
+	  <a href="/categories/web安全/">web安全 (2)</a>
 	</li>
       
     </ul>
@@ -398,6 +394,21 @@
 	new WOW().init();
     });
 </script>
+ <script>
+        // 给图片添加链接
+        $(document).ready(function() {
+            $("p img").each(function() {
+                var strA = "<a class='fancybox' href='" + this.src + "'></a>";
+                $(this).wrapAll(strA);
+            });
+        });
+    
+        // fancybox
+        $(".fancybox").fancybox({
+                                  openEffect    : 'elastic',
+                                  closeEffect   : 'elastic',
+                              });
+    </script>
 <!-- END CORE PLUGINS -->
 
 <!-- BEGIN PAGE-SPECIFIC PLUGINS --> 

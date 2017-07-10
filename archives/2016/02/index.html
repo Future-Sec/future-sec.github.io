@@ -72,7 +72,7 @@
       <ul>
 	
 	<li class="">
-	  <a href="/">Home</a>
+	  <a href="/home.html">Home</a>
 	</li>
 	
 	<li class="">
@@ -132,7 +132,7 @@
   
     
     <h2 itemprop="name">
-      <a class="archive-article-title" href="/year/02/24/2016-02-25-Badbarcode.html">一维条形码攻击技术(Badbarcode)</a>
+      <a class="archive-article-title" href="/year/02/24/badbarcode.html">一维条形码攻击技术(Badbarcode)</a>
     </h2>
 
 
@@ -143,7 +143,7 @@
 
       </li>
       <li><i class="fa fa-comments"></i>
-        <a href="http://www.future-sec.com/year/02/24/2016-02-25-Badbarcode.html#disqus_thread" class="article-comment-link">Comments</a>
+        <a href="http://www.future-sec.com/year/02/24/badbarcode.html#disqus_thread" class="article-comment-link">Comments</a>
       </li>
       <li>
 	<i class="fa fa-tags"></i>
@@ -164,7 +164,7 @@
     </div>
     <br>
     <br>
-    <a href="http://www.future-sec.com/year/02/24/2016-02-25-Badbarcode.html" class="more">Read more <i class="icon-angle-right"></i></a>
+    <a href="http://www.future-sec.com/year/02/24/badbarcode.html" class="more">Read more <i class="icon-angle-right"></i></a>
   </div>
 </div>
 <hr class="blog-post-sep">
@@ -189,15 +189,11 @@
     <ul class="nav sidebar-categories margin-bottom-40">
       
 	<li>
-	  <a href="/categories/net/">.net (1)</a>
+	  <a href="/categories/硬件安全/">硬件安全 (1)</a>
 	</li>
       
 	<li>
-	  <a href="/categories/条形码/">条形码 (1)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/Python/">Python (1)</a>
+	  <a href="/categories/web安全/">web安全 (2)</a>
 	</li>
       
     </ul>
@@ -330,6 +326,21 @@
 	new WOW().init();
     });
 </script>
+ <script>
+        // 给图片添加链接
+        $(document).ready(function() {
+            $("p img").each(function() {
+                var strA = "<a class='fancybox' href='" + this.src + "'></a>";
+                $(this).wrapAll(strA);
+            });
+        });
+    
+        // fancybox
+        $(".fancybox").fancybox({
+                                  openEffect    : 'elastic',
+                                  closeEffect   : 'elastic',
+                              });
+    </script>
 <!-- END CORE PLUGINS -->
 
 <!-- BEGIN PAGE-SPECIFIC PLUGINS --> 

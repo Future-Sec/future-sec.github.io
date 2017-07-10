@@ -3067,3 +3067,29 @@ Styler Panel
 .fancybox-opened {
   z-index: 100001;
 }
+.toc-article {
+    border: 1px solid #bbb;
+    border-radius: 7px;
+    margin: 1.1em 0 0 2em;
+    max-width: 40%;
+    padding: 0.7em 0.7em 0;
+}
+.toc-title {
+    font-size: 120%;
+}
+#toc {
+    float: right;
+    line-height: 1em;
+}
+#toc .toc {
+    line-height: 1.8em;
+    margin: 0.5em;
+    padding: 0;
+}
+#toc .toc li {
+    list-style-type: none;
+}
+#toc .toc-child {
+    margin-left: 1em;
+    padding-left: 0;
+}

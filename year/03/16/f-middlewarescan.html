@@ -16,11 +16,11 @@
 <meta name="keywords" content="python,自动化检测">
 <meta property="og:type" content="article">
 <meta property="og:title" content="中间件漏洞检测框架(F-MiddlewareScan)">
-<meta property="og:url" content="http://www.future-sec.com/year/03/16/2016-03-17-MiddlewareScan.html">
+<meta property="og:url" content="http://www.future-sec.com/year/03/16/f-middlewarescan.html">
 <meta property="og:site_name" content="伏宸安全实验室-Future-Sec Information Security Lab">
 <meta property="og:description" content="Setup实现针对中间件的自动化检测，端口探测-&amp;gt;中间件识别-&amp;gt;漏洞检测-&amp;gt;获取webshell参数说明-h 必须输入的参数，支持ip(192.168.1.1)，ip段（192.168.1），ip范围指定（192.168.1.1-192.168.1.254），最多限制一次可扫描65535个IP。-p 指定要扫描端口列表，多个端口使用,隔开 例如：7001,8080,9999。未指">
 <meta property="og:image" content="http://www.future-sec.com/images/640.jpg">
-<meta property="og:updated_time" content="2017-07-07T03:32:50.574Z">
+<meta property="og:updated_time" content="2017-07-10T13:45:10.315Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="中间件漏洞检测框架(F-MiddlewareScan)">
 <meta name="twitter:description" content="Setup实现针对中间件的自动化检测，端口探测-&amp;gt;中间件识别-&amp;gt;漏洞检测-&amp;gt;获取webshell参数说明-h 必须输入的参数，支持ip(192.168.1.1)，ip段（192.168.1），ip范围指定（192.168.1.1-192.168.1.254），最多限制一次可扫描65535个IP。-p 指定要扫描端口列表，多个端口使用,隔开 例如：7001,8080,9999。未指">
@@ -76,7 +76,7 @@
       <ul>
 	
 	<li class="">
-	  <a href="/">Home</a>
+	  <a href="/home.html">Home</a>
 	</li>
 	
 	<li class="">
@@ -119,13 +119,13 @@
   <section id="main">
     
     <h2 itemprop="name">
-      <a class="article-title" href="/year/03/16/2016-03-17-MiddlewareScan.html">中间件漏洞检测框架(F-MiddlewareScan)</a>
+      <a class="article-title" href="/year/03/16/f-middlewarescan.html">中间件漏洞检测框架(F-MiddlewareScan)</a>
     </h2>
 
 
     <div class="row">
 <div class="col-md-9 col-sm-9 blog-posts">
-<article id="post-2016-03-17-MiddlewareScan" class="article article-type-post blog-item" itemscope="" itemprop="blogPost">
+<article id="post-f-middlewarescan" class="article article-type-post blog-item" itemscope="" itemprop="blogPost">
   <div class="article-meta">
   </div>
   <div class="article-inner">
@@ -139,7 +139,7 @@
 
 	</li>
 	<li class="hidden-xs"><i class="fa fa-comments"></i>
-	  <a href="http://www.future-sec.com/year/03/16/2016-03-17-MiddlewareScan.html#disqus_thread" class="article-comment-link">Comments</a>
+	  <a href="http://www.future-sec.com/year/03/16/f-middlewarescan.html#disqus_thread" class="article-comment-link">Comments</a>
 	</li>
 	<li class="hidden-xs"><i class="fa fa-tags"></i> 
 	  
@@ -158,7 +158,7 @@
     Category: 
     
     Categories:
-    <a class="article-category-link" href="/categories/Python/">Python</a>
+    <a class="article-category-link" href="/categories/web安全/">web安全</a>
   </div>
   <br>
 
@@ -190,7 +190,7 @@
 <nav id="article-nav">
   
   
-    <a href="/year/03/06/2016-03-07-qrcode.html" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/year/03/06/verification_code.html" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
       <div class="article-nav-title">简单验证码识别及工具编写思路</div>
     </a>
@@ -214,15 +214,11 @@
     <ul class="nav sidebar-categories margin-bottom-40">
       
 	<li>
-	  <a href="/categories/net/">.net (1)</a>
+	  <a href="/categories/硬件安全/">硬件安全 (1)</a>
 	</li>
       
 	<li>
-	  <a href="/categories/条形码/">条形码 (1)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/Python/">Python (1)</a>
+	  <a href="/categories/web安全/">web安全 (2)</a>
 	</li>
       
     </ul>
@@ -354,6 +350,21 @@
 	new WOW().init();
     });
 </script>
+ <script>
+        // 给图片添加链接
+        $(document).ready(function() {
+            $("p img").each(function() {
+                var strA = "<a class='fancybox' href='" + this.src + "'></a>";
+                $(this).wrapAll(strA);
+            });
+        });
+    
+        // fancybox
+        $(".fancybox").fancybox({
+                                  openEffect    : 'elastic',
+                                  closeEffect   : 'elastic',
+                              });
+    </script>
 <!-- END CORE PLUGINS -->
 
 <!-- BEGIN PAGE-SPECIFIC PLUGINS --> 

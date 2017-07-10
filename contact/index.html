@@ -73,7 +73,7 @@
       <ul>
 	
 	<li class="">
-	  <a href="/">Home</a>
+	  <a href="/home.html">Home</a>
 	</li>
 	
 	<li class="">
@@ -270,6 +270,21 @@
 	new WOW().init();
     });
 </script>
+ <script>
+        // 给图片添加链接
+        $(document).ready(function() {
+            $("p img").each(function() {
+                var strA = "<a class='fancybox' href='" + this.src + "'></a>";
+                $(this).wrapAll(strA);
+            });
+        });
+    
+        // fancybox
+        $(".fancybox").fancybox({
+                                  openEffect    : 'elastic',
+                                  closeEffect   : 'elastic',
+                              });
+    </script>
 <!-- END CORE PLUGINS -->
 
 <!-- BEGIN PAGE-SPECIFIC PLUGINS --> 
