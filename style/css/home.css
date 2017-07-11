@@ -10,7 +10,6 @@
 @font-face {
     font-family: Roboto-Regular;
     src: url('../fonts/Roboto-Regular.ttf') format('truetype');
-    src: url('../fonts/Roboto-Regular.woff');
 }
 
 @font-face {
@@ -767,7 +766,7 @@ ul.album-carousel-list li img {
     height: 200px;
     top: 50%;
     left: 100%;
-    margin-top: -78px;
+    margin-top: -100px;
 }
 
 .current #index-slide-5 {
