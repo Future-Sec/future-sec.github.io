@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <title>BROADCOM WI-FI芯片漏洞分析一 | 伏宸安全实验室-Future-Sec Information Security Lab</title>
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <meta name="description" content="前言Android Wi-Fi驱动一直是众多安全研究员关注的重点，Android Wi-Fi驱动中曾经被发现大量root提权漏洞。 但这些漏洞都是存在于WEXT(Wireless-Extensions)接口中的，WEXT是一种即将被淘汰的Wi-Fi配置接口。取而代之的是基于nl80211协议的cfg80211接口。本篇文章主要介绍了基于nl80211协议的cfg80211怎么触发Wi-Fi芯片中的">
+<meta name="keywords" content="Poc,BROADCOM WI-FI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BROADCOM WI-FI芯片漏洞分析一">
+<meta property="og:url" content="http://www.future-sec.com/broadcom-wifi-1.html">
+<meta property="og:site_name" content="伏宸安全实验室-Future-Sec Information Security Lab">
+<meta property="og:description" content="前言Android Wi-Fi驱动一直是众多安全研究员关注的重点，Android Wi-Fi驱动中曾经被发现大量root提权漏洞。 但这些漏洞都是存在于WEXT(Wireless-Extensions)接口中的，WEXT是一种即将被淘汰的Wi-Fi配置接口。取而代之的是基于nl80211协议的cfg80211接口。本篇文章主要介绍了基于nl80211协议的cfg80211怎么触发Wi-Fi芯片中的">
+<meta property="og:image" content="http://www.future-sec.com/images/wifi1.png">
+<meta property="og:image" content="http://www.future-sec.com/images/wifi2.png">
+<meta property="og:image" content="http://www.future-sec.com/images/wifi3.png">
+<meta property="og:image" content="http://www.future-sec.com/images/wifi4.png">
+<meta property="og:image" content="http://www.future-sec.com/images/wifi5.png">
+<meta property="og:updated_time" content="2017-08-30T09:01:14.453Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="BROADCOM WI-FI芯片漏洞分析一">
+<meta name="twitter:description" content="前言Android Wi-Fi驱动一直是众多安全研究员关注的重点，Android Wi-Fi驱动中曾经被发现大量root提权漏洞。 但这些漏洞都是存在于WEXT(Wireless-Extensions)接口中的，WEXT是一种即将被淘汰的Wi-Fi配置接口。取而代之的是基于nl80211协议的cfg80211接口。本篇文章主要介绍了基于nl80211协议的cfg80211怎么触发Wi-Fi芯片中的">
+<meta name="twitter:image" content="http://www.future-sec.com/images/wifi1.png">
+  
+    <link rel="alternative" href="/atom.xml" title="伏宸安全实验室-Future-Sec Information Security Lab" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  
+
+  <!-- Global styles START -->   
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END --> 
+   
+  <!-- Page level plugin styles START -->
+  <link rel="stylesheet" href="/metronic/assets/pages/css/animate.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/owl.carousel/assets/owl.carousel.css">
+  <!-- Page level plugin styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/pages/css/components.css">
+  <link rel="stylesheet" href="/metronic/assets/pages/css/slider.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/pages/css/portfolio.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/red.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END -->
+</head>
+</html>
+<body class="corporate">
+  <!-- BEGIN HEADER -->
+<div class="header">
+  <div class="container">
+    <!--<a class="site-logo" href="/" id="logo">伏宸安全实验室-Future-Sec Information Security Lab</a>-->
+
+    <a class="site-logo" href="/">
+      <img src="/metronic/assets/corporate/img/logos/logo-corp-red.png" alt="Metronic FrontEnd">
+    </a>
+
+    <a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+
+    <!-- BEGIN NAVIGATION -->
+    <div class="header-navigation pull-right font-transform-inherit">
+      <ul>
+	
+	<li class="">
+	  <a href="/index.html">Home</a>
+	</li>
+	
+	<li class="">
+	  <a href="/archives/">Blog</a>
+	</li>
+	
+	<li class="">
+	  <a href="/vulnerabilities.html">Vulnerabilities</a>
+	</li>
+	
+	<li class="">
+	  <a href="/about/">About</a>
+	</li>
+	
+	<!-- BEGIN TOP SEARCH -->
+	<li class="menu-search">
+	  <span class="sep"></span>
+	  <i class="fa fa-search search-btn"></i>
+	  <div class="search-box">
+	   
+	    <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank" class="search-form">
+    <div class="input-group">
+		<input placeholder="Search" class="form-control st-default-search-input" name="word" maxlength="20" type="search">
+		  <input name="si" value="future-sec.com" type="hidden">
+  <input name="tn" value="bds" type="hidden">
+  <input name="cl" value="3" type="hidden">
+  <input name="ct" value="2097152" type="hidden">
+  <input name="s" value="on" type="hidden">
+		<span class="input-group-btn">
+		  <button class="btn btn-primary" type="submit">Search</button>
+		</span>
+	      </div>
+</form>
+	  </div> 
+	</li>
+	<!-- END TOP SEARCH -->
+      </ul>
+    </div>
+    <!-- END NAVIGATION -->
+  </div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/archives/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/broadcom-wifi-1.html">BROADCOM WI-FI芯片漏洞分析一</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-broadcom-wifi-1" class="article article-type-post blog-item" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> Crystal</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2017-08-29T16:00:00.000Z" itemprop="datePublished">2017/08/30</time>
+
+	</li>
+	<li class="hidden-xs"><i class="fa fa-comments"></i>
+	  <a href="http://www.future-sec.com/broadcom-wifi-1.html#disqus_thread" class="article-comment-link">Comments</a>
+	</li>
+	<li class="hidden-xs"><i class="fa fa-tags"></i> 
+	  
+  
+    <a href="/tags/Poc/" title="Poc">Poc</a>,
+  
+    <a href="/tags/BROADCOM-WI-FI/" title="BROADCOM WI-FI">BROADCOM WI-FI</a>
+  
+
+
+	</li>
+      </ul>
+      
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/BROADCOM-WI-FI/">BROADCOM WI-FI</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      <!-- Table of Contents -->
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么研究Wi-Fi？"><span class="toc-number">2.</span> <span class="toc-text">为什么研究Wi-Fi？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#读懂Poc需要哪些前提知识"><span class="toc-number">3.</span> <span class="toc-text">读懂Poc需要哪些前提知识</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#JNI"><span class="toc-number">3.1.</span> <span class="toc-text">JNI</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Netlink-Protocol-Library-Suite-（libnl）"><span class="toc-number">3.2.</span> <span class="toc-text">Netlink Protocol Library Suite （libnl）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Netlink"><span class="toc-number">3.3.</span> <span class="toc-text">Netlink</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#cfg80211-nl80211"><span class="toc-number">3.4.</span> <span class="toc-text">cfg80211/nl80211</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TDLS-协议"><span class="toc-number">3.5.</span> <span class="toc-text">TDLS 协议</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#POC-的分析过程"><span class="toc-number">4.</span> <span class="toc-text">POC 的分析过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#NDK环境搭建"><span class="toc-number">4.1.</span> <span class="toc-text">NDK环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#编译POC"><span class="toc-number">4.2.</span> <span class="toc-text">编译POC</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#测试POC"><span class="toc-number">4.3.</span> <span class="toc-text">测试POC</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Wifi芯片代码分析"><span class="toc-number">5.</span> <span class="toc-text">Wifi芯片代码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#怎么找到Wi-Fi固件？"><span class="toc-number">5.1.</span> <span class="toc-text">怎么找到Wi-Fi固件？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#什么时候产生漏洞？"><span class="toc-number">5.2.</span> <span class="toc-text">什么时候产生漏洞？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#定位固件中漏洞位置"><span class="toc-number">5.3.</span> <span class="toc-text">定位固件中漏洞位置</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#漏洞触发场景复现"><span class="toc-number">6.</span> <span class="toc-text">漏洞触发场景复现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">7.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考链接"><span class="toc-number">8.</span> <span class="toc-text">参考链接</span></a></li></ol>
+  </div>
+
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Android Wi-Fi驱动一直是众多安全研究员关注的重点，Android Wi-Fi驱动中曾经被发现大量root提权漏洞。 但这些漏洞都是存在于WEXT(Wireless-Extensions)接口中的，WEXT是一种即将被淘汰的Wi-Fi配置接口。取而代之的是基于nl80211协议的cfg80211接口。本篇文章主要介绍了基于nl80211协议的cfg80211怎么触发Wi-Fi芯片中的漏洞。以及相关漏洞的定位和分析。</p>
+<h2 id="为什么研究Wi-Fi？"><a href="#为什么研究Wi-Fi？" class="headerlink" title="为什么研究Wi-Fi？"></a>为什么研究Wi-Fi？</h2><p>Wi-Fi的使用已经与生活密不可分，Wi-Fi安全问题也应该受到更大的重视。在最近的一次移动安全峰会上，有一个议题是关于Wi-Fi芯片漏洞远程代码执行的。借此，重点研究了一下Wi-Fi芯片漏洞。</p>
+<h2 id="读懂Poc需要哪些前提知识"><a href="#读懂Poc需要哪些前提知识" class="headerlink" title="读懂Poc需要哪些前提知识"></a>读懂Poc需要哪些前提知识</h2><h3 id="JNI"><a href="#JNI" class="headerlink" title="JNI"></a>JNI</h3><pre><code>poc 是jni语言编写的，那什么是jni呢?
+</code></pre><p>JNI全称为java native interface,Java本地开发接口,JNI是一个协议,这个协议可以用来沟通Java代码和本地的c/c++代码 让两者可以相互的调用<br>在poc的文件结构中我们可以看到一个jni文件都包含下面三个文件：<br>•    Android.mk文件是在使用NDK编译C代码时必须的文件。Android.mk文件中描述了哪些C文件将被编译且指明了如何编译。<br>•    Application.mk目的是描述在你的应用程序中所需要的模块(即静态库或动态库)。<br>•    Pwn.c是触发漏洞的测试代码。</p>
+<h3 id="Netlink-Protocol-Library-Suite-（libnl）"><a href="#Netlink-Protocol-Library-Suite-（libnl）" class="headerlink" title="Netlink Protocol Library Suite （libnl）"></a>Netlink Protocol Library Suite （libnl）</h3><p>主要用来套接字的处理、发送和接收数据、消息的构造和解析。</p>
+<h3 id="Netlink"><a href="#Netlink" class="headerlink" title="Netlink"></a>Netlink</h3><p>Netlink协议是基于套接字的进程间通信（IPC）机制，它可用于用户空间进程和内核之间或者用户空间进程之间的通信。Netlink 协议基于 BSD 套接字并使用 AF_NETLINK 地址簇。每一个 Netlink协议都有自己的协议号（比如：NETLINK_ROUTE，NETLINK_NETFILTER，等等）。<br>它的寻址方案是基于 32 位的端口号（之前被称为 PID），这个端口号用来唯一的标识每一个对等通信节点。<br>-nl_send_auto_complete()消息和数据的发送函数<br>poc中主要使用nl_send_auto_complete函数来发送数据，这个是libnl封装好的。最终还是调用nl_send_auto() 函数来发送数据。参考一个翻译的官方文档：<a href="http://blog.guorongfei.com/2015/01/27/libnl-translation-part4/" rel="external nofollow noopener noreferrer" target="_blank">http://blog.guorongfei.com/2015/01/27/libnl-translation-part4/</a><br>-nla_put()数据封装函数<br>nla_put() 函数以 nla_reserve()函数为基础，只不过它还接收一个指向包含属性载荷的缓冲区的指针。这个函数会自动把数据从缓冲区拷贝到消息中去。会利用嵌套属性进行数据包封装，属性的嵌套是通过在代码前后分别调用nla_nest_start() 和 nla_nest_end() 来完成的。<br>nla_nest_start() 函数会在消息中添加一个没有实际载荷的属性头部，在此之后添加的数据都会成为容器属性的载荷部分直到调用 nla_nest_end()为止，它的调用“关闭”了容器属性并校正它的载荷长度以包含所有的数据长度。</p>
+<h3 id="cfg80211-nl80211"><a href="#cfg80211-nl80211" class="headerlink" title="cfg80211/nl80211"></a>cfg80211/nl80211</h3><p>nl80211是供用户空间进程使用，操作利用cfg80211 API 开发无线网卡驱动。cfg80211是开发驱动的接口。</p>
+<h3 id="TDLS-协议"><a href="#TDLS-协议" class="headerlink" title="TDLS 协议"></a>TDLS 协议</h3><p>TDLS旨在提供一种不依赖AP的Wi-Fi网络上的对等通信方式。 TDLS是基于IEEE 802.11z标准。TDLS自动链接配置主要通过几个过程来完成<br>•    TDLS Discovery过程<br>TDLS Discovery过程不是必要选项。一个TDLS STA设备可以选择直接发起TDLS建立过程。 TDLS Discovery 过程由一部STA设备通过AP或Go(群组拥有者) 向另外一部STA设备发送一个TDLS Discovery请求帧开始。如果目标设备也兼容TDLS，它将直接向该发送设备回复TDLS Discovery 响应帧，并提供有关设备本身的能力信息。包括所有支持速率及信道。TDLS Discovery 过程除了提供目标STA确实支援TDLS的相关能力信息外，TDLS Discovery过程的帧交互亦可以用作AP与目标TDLS STA设备的相对信号强度的测量。发起的STA能够判断与目标STA间的直接连接是否有利于提供有效信息。通过对比分別由目标STA设备与AP设备收到的信号强度，发起的STA设备可以评估建立直接连接是否会比通过AP发送数据包更为有效。<br>•    TDLS Setup过程<br>TDLS Setup过程需要进行一系列的帧交换。发起设备首先发送一个TDLS传输请求，通过AP信道传输至目标设备。封装帧包括发送设备的性能信息。目标设备之后会回复TDLS Setup 建立响应，同样通过AP信道传送其性能信息，另外附加一个状态代码，表示接受或者拒绝该建立请求。如果接受Setup请求，发送设备将会通过AP传送一个TDLS 确认帧（Confirm Frame）。至此，两部设备之间开始进行直接通讯。<br>•    TDLS Teardown过程<br>发送方或接受方设备均可向另外一方直接发送TDLS拆解帧（Teardown Frame），而如果未处于讯号范围內，该帧则可以通过AP信道传输。</p>
+<h2 id="POC-的分析过程"><a href="#POC-的分析过程" class="headerlink" title="POC 的分析过程"></a>POC 的分析过程</h2><h3 id="NDK环境搭建"><a href="#NDK环境搭建" class="headerlink" title="NDK环境搭建"></a>NDK环境搭建</h3><p>网上有很多参考，这里就不再赘述。</p>
+<h3 id="编译POC"><a href="#编译POC" class="headerlink" title="编译POC"></a>编译POC</h3><p>在这次研究过程中，POC的编译过程花费了大量时间。主要是不了解libnl库的正确使用方法，然后找了很多资料都是安卓开发ndk的，没有怎么使用libnl库的。最后经过大量资料参考，终于找到了一种暂时可行的方法，在那篇博文中作者称目前android自身没有携带libnl库，所以如果用到libnl库就需要把libnl一起移植到安卓上。我们就根据他所描述的方法，从github上down下来了一份已经移植好的安卓平台的libnl库。<br>具体命令如下：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">git <span class="keyword">clone</span> https:<span class="comment">//github.com/dschuermann/libnl-3-android</span></div><div class="line">cd libnl<span class="number">-3</span>-android/lib</div><div class="line">cd ../android_toolchain</div><div class="line">gvim jni/Android.mk(前文有该文件的相关介绍)</div><div class="line">gvim jni/Applcation.mk (前文有该文件的相关介绍)</div></pre></td></tr></table></figure></p>
+<p>在Android.mk的最后部分加上这一段：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">include</span> $(CLEAR_VARS)  LOCAL_MODULE := pwn  LOCAL_SRC_FILES :=  $(call <span class="keyword">list</span>-all,$(LOCAL_PATH),pwn.c)  LOCAL_SHARED_LIBRARIES := nl<span class="number">-3</span> nl-genl<span class="number">-3</span>  <span class="keyword">include</span> $(BUILD_EXECUTABLE)</div></pre></td></tr></table></figure></p>
+<p>修改好之后将pwn.c文件拷贝到lib文件就可以编译了。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cd ../../android_toolchain</div><div class="line">ndk-build</div></pre></td></tr></table></figure></p>
+<p>编译好后将libs文件夹下的libnl-3.so，libnl-genl-3.so，pwn 利用adb命令将libs文件下的lib-3.so、lib-genl-3.so、pwn拷贝到已经root后的支持nl80211协议的测试机中，执行编译好的pwn就可以测试poc是否可用了。</p>
+<h3 id="测试POC"><a href="#测试POC" class="headerlink" title="测试POC"></a>测试POC</h3><p>分别在华为、小米、nexus 6p手机上进行了poc的测试。poc具体执行情况在小米手机上执行所有poc都是no such file or directory 。在华为手机上发送数据后的返回值为success。nexus手机测试结果也是success。 因为没有过wifi漏洞分析经验，不知道触发漏洞后正确的返回值应该是什么？所以接下来要透彻了解漏洞是否触发还需要大量的固件分析，漏洞定位，利用漏洞复现工作。</p>
+<h2 id="Wifi芯片代码分析"><a href="#Wifi芯片代码分析" class="headerlink" title="Wifi芯片代码分析"></a>Wifi芯片代码分析</h2><p>经过一系列的各种折腾，终于开始慢慢切入正题。分析的芯片是nexus 6p 6.0 版本。</p>
+<h3 id="怎么找到Wi-Fi固件？"><a href="#怎么找到Wi-Fi固件？" class="headerlink" title="怎么找到Wi-Fi固件？"></a>怎么找到Wi-Fi固件？</h3><p>要分析漏洞的成因，需要找到Wi-Fi芯片中与应用层通信部分代码。那接下来要怎么做才能将手机中的固件代码导出来呢？<br>第一步：我们需要了解Wi-Fi芯片在安卓系统内存中的加载位置。关于这个问题我们参考了Project Zero 的博客中分析的有关Wi-Fi芯片架构的知识，在Broadcom Wi-Fi芯片组相关的数据手册中，ARM内核具有用于保存固件代码的640KB ROM，以及用于数据处理（例如堆）和存储固件代码补丁的768KB RAM。</p>
+<p>RAM的位置可以通过读取主机驱动程序中的初始化代码，找到包含RAM内容的文件是上图所示fw_bcmdhd.bin文件（实际上，通过驱动程序的代码，我们找到了BCMDHD_FW_PATH配置，其用于表示驱动程序将内容上传到RAM的文件的位置。）</p>
+<p>ROM转存则可以通过Broadcom提供的一个非常强大的命令行实用程序dhdutil，可用于通过bcmdhd驱动程序与芯片进行交互。命令： ./dhdutil -i wlan0 membytes r 0x0 0xA0000 &gt; /sdcard/rom.bin</p>
+<h3 id="什么时候产生漏洞？"><a href="#什么时候产生漏洞？" class="headerlink" title="什么时候产生漏洞？"></a>什么时候产生漏洞？</h3><p>  利用上述方法转存出来bin文件之后，我们首先要了解bug产生的原因，才能下一步更好的定位漏洞位置。根据Project Zero提供的技巧，Wi-Fi管理帧以小的“标记”数据块（称为信息元素（IE））对大多数信息进行编码，传输的大部分信息也是利用IE进行编码的，所以这应该是我们逆向分析的一个好的出发点，有数据交互才可能出现漏洞。分析了漏洞利用可行性之后确定了在进行TDLS连接过程中会触发漏洞。有关TDLS前文中有描述。</p>
+<h3 id="定位固件中漏洞位置"><a href="#定位固件中漏洞位置" class="headerlink" title="定位固件中漏洞位置"></a>定位固件中漏洞位置</h3><p>根据Project Zero的提示在brcmsmac驱动程序可以找到Broadcom是使用一个函数从bcm_parse_tlvs帧提取IE。那接下来我们需要做的就是定位这个函数。搜索附近字符串提示我们首先定位到了bcm_parse_tlvs函数位置。<br><img src="/images/wifi1.png" alt="img"><br>然后通过交叉参考分析最终找到漏洞函数，要探索该漏洞的成因，首先要知道TDLS建立确认帧的函数处理流程。这个函数首先会执行一些验证，以确保请求是合法的。其查询内部数据结构，以确保确实正在与请求对等体建立TDLS连接。然后，其验证Link-ID IE（通过检查其编码的BSSID与当前网络的匹配），并且还验证32字节的发起者随机数（“Snonce”）值（通过将其与存储的初始随机数进行比较）。 建立对请求可能确实是合法的一定程度的置信度后，该函数开始调用一个内部帮助函数，任务是计算MIC并确保其与编码在帧中的一致。固件还包括该函数的名称(“wlc_tdls_cal_mic_chk”)。我们先看MIC通过编码在握手帧中的计算。<br><img src="/images/wifi2.png" alt="img"></p>
+<p>我们对固件逆向后也定位到了这个函数，如下图所示，反编译后伪代码中提示信息可以看到在标记的第二段代码进行了IE长度的校验，后续的IE就没有校验了。因此，将RSN-IE的长度设置为较大的值将导致Timeout Interval和Fast Transition IE越界复制，从而溢出缓冲区。<br><img src="/images/wifi3.png" alt="img"></p>
+<p>接下来看断开连接时mic计算。<br><img src="/images/wifi4.png" alt="img"></p>
+<p>伪代码中的在断开帧时没有对FT-IE进行溢出校验，如果构造好FT-IE数据就能触发溢出。<br><img src="/images/wifi5.png" alt="img"></p>
+<h2 id="漏洞触发场景复现"><a href="#漏洞触发场景复现" class="headerlink" title="漏洞触发场景复现"></a>漏洞触发场景复现</h2><p>知道了漏洞是怎么产生的，接下来就是测试漏洞是否按照我们预期的那样能够触发。<br>首先，准备了同时支持TDLS 协议的TL-WN722N无线网卡，跟nexus 6p。<br>第二步，为了测试漏洞，需要修改wpa_supplicant，以使我们能发送包含过大FTIE的TDLS断开帧。查看wpa_supplicant的代码可快速识别负责生成和发送断开帧的函数wpa_tdls_send_teardown。通过对该函数添加一些小的更改（绿色），我们应该能够在收到断开帧时触发溢出，导致超写25个字节的0xAB，修改后make编译一下。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> int wpa_tdls_send_teardown(struct wpa_sm *sm, <span class="keyword">const</span> u8 *addr, u16 reason_code)</div><div class="line">&#123;</div><div class="line">...</div><div class="line">ftie = (struct wpa_tdls_ftie *) pos;</div><div class="line">ftie-&gt;ie_type = WLAN_EID_FAST_BSS_TRANSITION;</div><div class="line">ftie-&gt;ie_len = <span class="number">255</span>;</div><div class="line">os_memset(pos + <span class="number">2</span>, <span class="number">0x00</span>, ftie-&gt;ie_len);</div><div class="line">os_memset(pos + ftie-&gt;ie_len + <span class="number">2</span> - <span class="number">0x19</span>, <span class="number">0xAB</span>, <span class="number">0x19</span>); <span class="comment">//Overflowing with 0xAB</span></div><div class="line"></div><div class="line">os_memcpy(ftie-&gt;Anonce, peer-&gt;rnonce, WPA_NONCE_LEN);</div><div class="line">os_memcpy(ftie-&gt;Snonce, peer-&gt;inonce, WPA_NONCE_LEN);</div><div class="line">pos += ftie-&gt;ie_len + <span class="number">2</span>;</div><div class="line">...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>第三步，执行TDLS命令去触发。这种情况是可以触发漏洞的，但是呢并没有明显现象的原因是Broadcom堆实现背后的逻辑。深入分析分配算符的逻辑，我们发现其非常简单，其是一个简单的“最适合”分配算符，其执行向前和向后合并，并保持一个空闲块单链表。当分配块时，从最适合空闲块（足够大的最小块）的末端（最高地址）对其进行切取。在断开连接后，空闲列表中的其中一个块的大小突然异常大。回想一下，由于分配算符使用“最适合”，这意味着只要存在其他足够大的空闲块，后续分配将不会被放置在此块中。这也意味着固件不会崩溃，实际上会继续正常运行。如果我们不可视化堆的状态，我们就根本无法确定发生了什么事。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">TDLS_DISCOVER – 发送“TDLS发现请求”帧并列出响应</div><div class="line">TDLS_SETUP - 建立与具有给定MAC地址的对等体的TDLS连接</div><div class="line">TDLS_TEARDOWN - 断开与具有给定MAC地址的对等体的TDLS连接</div></pre></td></tr></table></figure></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>最近两周的分析过程中，确实遇到了很多问题，比如最开始编译poc的过程中对libnl库不会用，花了很长时间，最终的可行方法也不知道是不是最适合的。poc代码中使用了内核通信netlink协议，之前并没有接触过，这次也只是花了两天时间粗略看了poc中用到的函数。有关netlink相关知识后续还要深入学习。接下来编译测试poc之后，poc测试返回success但是并没有明显的触发漏洞现象。<br>基于此，参考了Project Zero的博客复现了CVE-2017-0561漏洞，整个过程从Wi-Fi芯片固件的知识开始了解，到怎么定位漏洞位置，怎么找到漏洞，怎么利用漏洞触发漏洞。这个过程也学到了很多知识。比如，Wi-Fi帧格式、TDLS协议、Broadcom堆实现、支持TDLS协议的wpa_supplicant开源工具等这些的理解。接下来要想利用漏洞就需要深入的去理解Wi-Fi的通信过程，netlink协议，以及动态的分析过程。</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>1、 <a href="http://bobao.360.cn/learning/detail/3742.html" rel="external nofollow noopener noreferrer" target="_blank">http://bobao.360.cn/learning/detail/3742.html</a><br>2、 <a href="https://googleprojectzero.blogspot.jp/2017/04/over-air-exploiting-broadcoms-wi-fi_4.html" rel="external nofollow noopener noreferrer" target="_blank">https://googleprojectzero.blogspot.jp/2017/04/over-air-exploiting-broadcoms-wi-fi_4.html</a></p>
+
+      
+    </div>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/broadcom-wifi-2.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">BROADCOM WI-FI芯片漏洞分析二</div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+
+
+
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- CATEGORIES START -->
+<h2 class="no-top-space">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/硬件安全/">硬件安全 (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/web安全/">web安全 (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/BROADCOM-WI-FI/">BROADCOM WI-FI (2)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- BEGIN BLOG TAGS -->
+<div class="blog-tags margin-bottom-20">
+  <h2>Tags</h2>
+  
+  <div class="widget-wrap">
+    <div class="widget">
+      
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
+    </div>
+  </div>
+
+
+</div>
+<!-- END BLOG TAGS -->
+
+
+<!-- BEGIN FEATURED POSTS -->                            
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->                            
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>伏宸安全实验室<br><br> 伏宸安全实验室是广东安创信息科技开发有限公司旗下的以网络安全研究为核心的专业实验室，主攻前沿安全技术，包括：渗透测试、黑产对抗、威胁情报、智能硬件与无线电安全等。</p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              广州市越秀区寺右新马路108号丰伟大厦15B、C单元<br>
+              BC 15/F Fengwei Buiding NO.108 Siyouxinma Road<br>
+              Guangzhou,China Code:510600<br>
+              Phone: 020-87392713<br>
+              Email: <a href="mailto:admin@future-sec.com" rel="external nofollow noopener noreferrer" target="_blank">admin@future-sec.com</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2017 伏宸安全实验室-Future-Sec Information Security Lab<br>
+ <a href="javascript:;">Future-sec</a> | <a href="javascript:;">广东安创信息科技开发有限公司</a>
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      <li><a href="https://github.com/Future-Sec/" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-github"></i></a></li>
+    
+      <li><a href="https://weibo.com/futures-sec" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weibo"></i></a></li>
+    
+      <li><a href="https://mp.weixin.qq.com/s/QuDKBrMist8GL16EEO-u4Q" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weixin"></i></a></li>
+    
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+    
+  </ul>  
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]--> 
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/plugins/owl.carousel/owl.carousel.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/wow.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();    
+        Layout.initOWL();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling(); 
+	new WOW().init();
+    });
+</script>
+ <script>
+        // 给图片添加链接
+        $(document).ready(function() {
+            $("p img").each(function() {
+                var strA = "<a class='fancybox' href='" + this.src + "'></a>";
+                $(this).wrapAll(strA);
+            });
+        });
+    
+        // fancybox
+        $(".fancybox").fancybox({
+                                  openEffect    : 'elastic',
+                                  closeEffect   : 'elastic',
+                              });
+    </script>
+    <script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?9e36ea61528e32ab9a0bc86aa61db5f7";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- END CORE PLUGINS -->
+
+<!-- BEGIN PAGE-SPECIFIC PLUGINS --> 
+
+
+
+
+
+
+
+<!-- END PAGE-SPECIFIC PLUGINS --> 
+
+<!-- BEGIN INTEGRATIONS -->
+
+
+
+
+
+<!-- END INTEGRATIONS -->
+
+</body>
+
