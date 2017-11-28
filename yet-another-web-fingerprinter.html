@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <title>浅谈现代化指纹识别及工具编写 | 伏宸安全实验室-Future-Sec Information Security Lab</title>
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <meta name="description" content="前言对于庞大的网络空间来说，存在着各式各样的应用、设备等等资产，而对这些资产进行识别，无论拿来做扫描器还是批量分析，都是非常有价值的，高效的应用指纹识别是一个长久可研究的课题，本文主要探讨如何建立高效可靠的指纹识别方法。 传统的指纹识别一些扫描器里面使用的比较多的都是通过特殊路径  静态文件的md5 值或者大小 关键词等，例如使用比较广泛的一个指纹数据库 。 存在几个问题  效率太低，每一个路径都">
+<meta name="keywords" content="指纹识别">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅谈现代化指纹识别及工具编写">
+<meta property="og:url" content="http://www.future-sec.com/yet-another-web-fingerprinter.html">
+<meta property="og:site_name" content="伏宸安全实验室-Future-Sec Information Security Lab">
+<meta property="og:description" content="前言对于庞大的网络空间来说，存在着各式各样的应用、设备等等资产，而对这些资产进行识别，无论拿来做扫描器还是批量分析，都是非常有价值的，高效的应用指纹识别是一个长久可研究的课题，本文主要探讨如何建立高效可靠的指纹识别方法。 传统的指纹识别一些扫描器里面使用的比较多的都是通过特殊路径  静态文件的md5 值或者大小 关键词等，例如使用比较广泛的一个指纹数据库 。 存在几个问题  效率太低，每一个路径都">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/15047737007020.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/15109122240334.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/15109123220322.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171127191426.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171127191240.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171127191233.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171127191224.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/15109322329056.jpg">
+<meta property="og:updated_time" content="2017-11-27T11:19:40.481Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="浅谈现代化指纹识别及工具编写">
+<meta name="twitter:description" content="前言对于庞大的网络空间来说，存在着各式各样的应用、设备等等资产，而对这些资产进行识别，无论拿来做扫描器还是批量分析，都是非常有价值的，高效的应用指纹识别是一个长久可研究的课题，本文主要探讨如何建立高效可靠的指纹识别方法。 传统的指纹识别一些扫描器里面使用的比较多的都是通过特殊路径  静态文件的md5 值或者大小 关键词等，例如使用比较广泛的一个指纹数据库 。 存在几个问题  效率太低，每一个路径都">
+<meta name="twitter:image" content="http://ozuqqvmm5.bkt.clouddn.com/15047737007020.jpg">
+  
+    <link rel="alternative" href="/atom.xml" title="伏宸安全实验室-Future-Sec Information Security Lab" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  
+
+  <!-- Global styles START -->   
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END --> 
+   
+  <!-- Page level plugin styles START -->
+  <link rel="stylesheet" href="/metronic/assets/pages/css/animate.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/owl.carousel/assets/owl.carousel.css">
+  <!-- Page level plugin styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/pages/css/components.css">
+  <link rel="stylesheet" href="/metronic/assets/pages/css/slider.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/pages/css/portfolio.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/red.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END -->
+</head>
+</html>
+<body class="corporate">
+  <!-- BEGIN HEADER -->
+<div class="header">
+  <div class="container">
+    <!--<a class="site-logo" href="/" id="logo">伏宸安全实验室-Future-Sec Information Security Lab</a>-->
+
+    <a class="site-logo" href="/">
+      <img src="/metronic/assets/corporate/img/logos/logo-corp-red.png" alt="Metronic FrontEnd">
+    </a>
+
+    <a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+
+    <!-- BEGIN NAVIGATION -->
+    <div class="header-navigation pull-right font-transform-inherit">
+      <ul>
+	
+	<li class="">
+	  <a href="/index.html">Home</a>
+	</li>
+	
+	<li class="">
+	  <a href="/archives/">Blog</a>
+	</li>
+	
+	<li class="">
+	  <a href="/vulnerabilities.html">Vulnerabilities</a>
+	</li>
+	
+	<li class="">
+	  <a href="/about/">About</a>
+	</li>
+	
+	<!-- BEGIN TOP SEARCH -->
+	<li class="menu-search">
+	  <span class="sep"></span>
+	  <i class="fa fa-search search-btn"></i>
+	  <div class="search-box">
+	   
+	    <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank" class="search-form">
+    <div class="input-group">
+		<input placeholder="Search" class="form-control st-default-search-input" name="word" maxlength="20" type="search">
+		  <input name="si" value="future-sec.com" type="hidden">
+  <input name="tn" value="bds" type="hidden">
+  <input name="cl" value="3" type="hidden">
+  <input name="ct" value="2097152" type="hidden">
+  <input name="s" value="on" type="hidden">
+		<span class="input-group-btn">
+		  <button class="btn btn-primary" type="submit">Search</button>
+		</span>
+	      </div>
+</form>
+	  </div> 
+	</li>
+	<!-- END TOP SEARCH -->
+      </ul>
+    </div>
+    <!-- END NAVIGATION -->
+  </div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/archives/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/yet-another-web-fingerprinter.html">浅谈现代化指纹识别及工具编写</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-yet-another-web-fingerprinter" class="article article-type-post blog-item" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> yaseng</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2017-11-26T16:00:00.000Z" itemprop="datePublished">2017/11/27</time>
+
+	</li>
+	<li class="hidden-xs"><i class="fa fa-comments"></i>
+	  <a href="http://www.future-sec.com/yet-another-web-fingerprinter.html#disqus_thread" class="article-comment-link">Comments</a>
+	</li>
+	<li class="hidden-xs"><i class="fa fa-tags"></i> 
+	  
+  
+    <a href="/tags/指纹识别/" title="指纹识别">指纹识别</a>
+  
+
+
+	</li>
+      </ul>
+      
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/web安全/">web安全</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      <!-- Table of Contents -->
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#传统的指纹识别"><span class="toc-number">2.</span> <span class="toc-text">传统的指纹识别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#现代化指纹识别"><span class="toc-number">3.</span> <span class="toc-text">现代化指纹识别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#现代化指纹识别方案"><span class="toc-number">4.</span> <span class="toc-text">现代化指纹识别方案</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#指纹库设计"><span class="toc-number">4.1.</span> <span class="toc-text">指纹库设计</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#数据库结构"><span class="toc-number">4.1.1.</span> <span class="toc-text">数据库结构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#指纹规则"><span class="toc-number">4.1.2.</span> <span class="toc-text">指纹规则</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#web-header-contain"><span class="toc-number">4.1.2.1.</span> <span class="toc-text">web_header_contain</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#web-index-contain"><span class="toc-number">4.1.2.2.</span> <span class="toc-text">web_index_contain</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#web-url-contain"><span class="toc-number">4.1.2.3.</span> <span class="toc-text">web_url_contain</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#程序编写"><span class="toc-number">4.2.</span> <span class="toc-text">程序编写</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#单独识别"><span class="toc-number">4.3.</span> <span class="toc-text">单独识别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#批量识别"><span class="toc-number">4.4.</span> <span class="toc-text">批量识别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#指纹结果"><span class="toc-number">4.5.</span> <span class="toc-text">指纹结果</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#yafinger"><span class="toc-number">5.</span> <span class="toc-text">yafinger</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#issue"><span class="toc-number">6.</span> <span class="toc-text">issue</span></a></li></ol>
+  </div>
+
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>对于庞大的网络空间来说，存在着各式各样的应用、设备等等资产，而对这些资产进行识别，无论拿来做扫描器还是批量分析，都是非常有价值的，高效的应用指纹识别是一个长久可研究的课题，本文主要探讨如何建立高效可靠的指纹识别方法。</p>
+<h2 id="传统的指纹识别"><a href="#传统的指纹识别" class="headerlink" title="传统的指纹识别"></a>传统的指纹识别</h2><p>一些扫描器里面使用的比较多的都是通过特殊路径  静态文件的md5 值或者大小 关键词等，例如使用比较广泛的一个指纹数据库 。</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/15047737007020.jpg" alt="img"><br>存在几个问题</p>
+<ol>
+<li>效率太低，每一个路径都需要访问一次。容易被waf拦截</li>
+<li>目前很多网站的静态资源 cdn于gzip 压缩，md5 其实是不一样的 ，识别率很低 </li>
+</ol>
+<h2 id="现代化指纹识别"><a href="#现代化指纹识别" class="headerlink" title="现代化指纹识别"></a>现代化指纹识别</h2><p>怎么来快速的精确的指纹识别，观察了大部分的web系统发现，访问首页并且获取response header  能识别出80% 的app<br>例如WordPress，discuz  会把独特的cookie放到header 里面。<br>discuz  的关键词  _saltkey=<br><img src="http://ozuqqvmm5.bkt.clouddn.com/15109122240334.jpg" alt="img"></p>
+<p>默认首页也会有很多固定的关键词，  WordPress   wp-conetnt<br><img src="http://ozuqqvmm5.bkt.clouddn.com/15109123220322.jpg" alt="img"></p>
+<p>剩下的指纹再去特殊url提取，这样效率和准确率会提高很多很多。</p>
+<h2 id="现代化指纹识别方案"><a href="#现代化指纹识别方案" class="headerlink" title="现代化指纹识别方案"></a>现代化指纹识别方案</h2><h3 id="指纹库设计"><a href="#指纹库设计" class="headerlink" title="指纹库设计"></a>指纹库设计</h3><h4 id="数据库结构"><a href="#数据库结构" class="headerlink" title="数据库结构"></a>数据库结构</h4><p><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171127191426.jpg" alt="img"><br>指纹库类型目前有3种 ，当然后续还需要加上正则。<br>finger 规则是一个 string 之后的python 字典,里面有例如状态吗,规则等字段,例如  weblogic 的指纹规则</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123;<span class="string">'port'</span>:<span class="number">7001</span>,<span class="string">'url'</span>: <span class="string">'/console/login/LoginForm.jsp'</span>, <span class="string">'code'</span>: <span class="number">200</span>, <span class="string">'grep'</span>: <span class="string">'WebLogic Server'</span>&#125;</div></pre></td></tr></table></figure>
+<p>下面介绍每一种指纹库实例</p>
+<h4 id="指纹规则"><a href="#指纹规则" class="headerlink" title="指纹规则"></a>指纹规则</h4><h5 id="web-header-contain"><a href="#web-header-contain" class="headerlink" title="web_header_contain"></a>web_header_contain</h5><p>首页 response 里面的 header 查找特征符<br>速度最快,优先极最高。很多web cms 都会写特殊的cookie 键值。<br>例如 discuz,jboss,wordpress 等。<br>规则编写,以discuz 为例 </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">➜  tools  curl  -I    www.cctry.com</div><div class="line">HTTP/1.1 200 OK</div><div class="line">Server: Microsoft-IIS/6.0</div><div class="line">Connection: keep-alive</div><div class="line">Date: Thu, 07 Jan 2016 18:22:34 GMT</div><div class="line">Content-Type: text/html; charset=gbk</div><div class="line">Content-Length: 0</div><div class="line">X-Powered-By: PHP/5.2.17</div><div class="line">Set-Cookie: Vguy_2132_saltkey=O6srsEYk; expires=Sat, 06-Feb-2016 18:22:22 GMT; path=/; httponly</div><div class="line">Set-Cookie: Vguy_2132_lastvisit=1452187342; expires=Sat, 06-Feb-2016 18:22:22 GMT; path=/</div><div class="line">Set-Cookie: Vguy_2132_sid=MwE6e0; expires=Fri, 08-Jan-2016 18:22:22 GMT; path=/</div><div class="line">Set-Cookie: Vguy_2132_lastact=1452190942%09index.php%09; expires=Fri, 08-Jan-2016 18:22:22 GMT; path=/</div><div class="line">X-Daa-Tunnel: hop_count=1</div></pre></td></tr></table></figure>
+<p>经过分析,字符串 _saltkey=  为discuz  header 中的规则<br>具体规则如下<br><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171127191240.jpg" alt="img"></p>
+<h5 id="web-index-contain"><a href="#web-index-contain" class="headerlink" title="web_index_contain"></a>web_index_contain</h5><p>在缓存的首页里面查找关键词或者正则匹配<br>优先级次之,只需要 get请求一次即可。<br>例如Office Anywhere   指纹 编写流程<br>数据包分析</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">➜  tools  curl  http://125.91.218.186:8000/   |  grep   <span class="string">'/images/tongda.ico'</span></div><div class="line">  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current</div><div class="line">                                 Dload  Upload   Total   Spent    Left  Speed</div><div class="line">100  2001  100  2001    0     0  11795      0 --:--:-- --:--:-- --:--:-- 11840</div><div class="line">&lt;link rel=<span class="string">"shortcut icon"</span> href=<span class="string">"/images/tongda.ico"</span>&gt;</div></pre></td></tr></table></figure>
+<p>规则编写<br><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171127191233.jpg" alt="img"></p>
+<h5 id="web-url-contain"><a href="#web-url-contain" class="headerlink" title="web_url_contain"></a>web_url_contain</h5><p>特殊url 查找指定的关键词(返回状态码也指定)。<br>优先级最低。<br>例如  weblogic 的指纹 finger 过程<br>数据包分析</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">➜  tools  curl  -I     http://202.97.194.9:7001/console/login/LoginForm.jsp</div><div class="line">HTTP/1.1 200 OK</div><div class="line">Cache-Control: no-cache</div><div class="line">Date: Thu, 07 Jan 2016 18:53:28 GMT</div><div class="line">Pragma: no-cache</div><div class="line">Content-Type: text/html; charset=UTF-8</div><div class="line">Expires: Thu, 01 Jan 1970 00:00:00 GMT</div><div class="line">Set-Cookie: ADMINCONSOLESESSION=XQXrWT0LQTvpf8Jv75nMnQB9vN0cGppy7bTfJxfH9S673VTGP1Wl!1715621632; path=/</div><div class="line">Content-Language: zh-CN</div><div class="line">X-Powered-By: Servlet/2.5 JSP/2.1</div></pre></td></tr></table></figure>
+<p>规则</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123;<span class="string">'url'</span>: <span class="string">'/console/login/LoginForm.jsp'</span>, <span class="string">'code'</span>: <span class="number">200</span>, <span class="string">'grep'</span>: <span class="string">'WebLogic Server'</span>&#125;</div></pre></td></tr></table></figure>
+<p>表<br><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171127191224.jpg" alt="img"></p>
+<h3 id="程序编写"><a href="#程序编写" class="headerlink" title="程序编写"></a>程序编写</h3><p>指纹识别模块代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># coding:utf-8</span></div><div class="line"><span class="string">"""</span></div><div class="line"> *@Projet  Yafinger</div><div class="line"> *@Author  yaseng@uauc.net</div><div class="line"> *@Desc    playweb finger modules</div><div class="line">"""</div><div class="line"><span class="keyword">import</span> ast,time</div><div class="line"><span class="keyword">import</span> config</div><div class="line"><span class="keyword">from</span>   lib                <span class="keyword">import</span> util</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_web_app</span><span class="params">(url)</span>:</span></div><div class="line">    rsp_index = util.http_get(url)</div><div class="line">    str_index = <span class="string">""</span></div><div class="line">    <span class="keyword">if</span> rsp_index == <span class="keyword">None</span> :</div><div class="line">        <span class="keyword">return</span> <span class="keyword">None</span></div><div class="line">    list_app=[]</div><div class="line">    fingers=config.get(<span class="string">'fingers'</span>);</div><div class="line">    <span class="keyword">for</span>  finger  <span class="keyword">in</span>   fingers :</div><div class="line">        rule = ast.literal_eval(finger[<span class="string">'finger'</span>])</div><div class="line">        <span class="keyword">if</span> finger[<span class="string">'type'</span>] == <span class="string">'web_index_contain'</span>: </div><div class="line">            <span class="comment"># limit header and  body and code  exp : &#123;'header':'jsessionid=','code': 200, 'grep': '.action'&#125;</span></div><div class="line">            <span class="keyword">if</span> rule.has_key(<span class="string">'header'</span>) <span class="keyword">and</span>  rule[<span class="string">'header'</span>] <span class="keyword">not</span> <span class="keyword">in</span>   str(rsp_index[<span class="string">'headers'</span>]).lower()  : </div><div class="line">                <span class="keyword">continue</span></div><div class="line">            <span class="keyword">if</span> rsp_index[<span class="string">'code'</span>] == rule[<span class="string">'code'</span>] <span class="keyword">and</span>  rule[<span class="string">'grep'</span>]  <span class="keyword">in</span> rsp_index[<span class="string">'data'</span>] :</div><div class="line">                list_app.append(&#123;<span class="string">'app_id'</span>:finger[<span class="string">'id'</span>], <span class="string">'url'</span>:url&#125;)</div><div class="line">                util.log(<span class="string">"url:%s app:%s"</span> % (url, finger[<span class="string">'app_name'</span>]))</div><div class="line">    </div><div class="line">        <span class="keyword">elif</span> finger[<span class="string">'type'</span>] == <span class="string">'web_url_contain'</span> :</div><div class="line">             rsp_tmp = util.http_get(url + rule[<span class="string">'url'</span>])</div><div class="line">             <span class="keyword">if</span> rsp_tmp == <span class="keyword">None</span> :</div><div class="line">                 <span class="keyword">continue</span></div><div class="line">             <span class="keyword">if</span> rsp_tmp[<span class="string">'code'</span>] == rule[<span class="string">'code'</span>] <span class="keyword">and</span>  rule[<span class="string">'grep'</span>]  <span class="keyword">in</span> rsp_tmp[<span class="string">'data'</span>] :</div><div class="line">                 list_app.append(&#123;<span class="string">'app_id'</span>:finger[<span class="string">'id'</span>], <span class="string">'url'</span>:url&#125;)</div><div class="line">                 util.log(<span class="string">"url:%s app:%s"</span> % (url + rule[<span class="string">'url'</span>], finger[<span class="string">'app_name'</span>]))</div><div class="line">        <span class="keyword">elif</span>  finger[<span class="string">'type'</span>] == <span class="string">'web_header_contain'</span> :</div><div class="line"></div><div class="line">            <span class="keyword">if</span>  rule[<span class="string">'grep'</span>]  <span class="keyword">in</span>  str(rsp_index[<span class="string">'headers'</span>]).lower() :</div><div class="line">                list_app.append(&#123;<span class="string">'app_id'</span>:finger[<span class="string">'id'</span>], <span class="string">'url'</span>:url&#125;)</div><div class="line">                util.log(<span class="string">"url:%s app:%s"</span> % (url , finger[<span class="string">'app_name'</span>]))</div><div class="line">                        </div><div class="line">            </div><div class="line">        time.sleep(<span class="number">0.01</span>)</div><div class="line">    <span class="keyword">return</span>  list_app</div></pre></td></tr></table></figure>
+<h3 id="单独识别"><a href="#单独识别" class="headerlink" title="单独识别"></a>单独识别</h3><p>简单调用指纹识别模块代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># coding:utf-8</span></div><div class="line"><span class="string">"""</span></div><div class="line"> *@Projet  Yafinger</div><div class="line"> *@Author  yaseng@uauc.net</div><div class="line"> *@Desc    yafinger test </div><div class="line">     __    __            ___                                         </div><div class="line">    /\ \  /\ \         /'___\  __                                    </div><div class="line">    \ `\`\\/'/   __   /\ \__/ /\_\     ___       __       __   _ __  </div><div class="line">     `\ `\ /'  /'__`\ \ \ ,__\\/\ \  /' _ `\   /'_ `\   /'__`\/\`'__\</div><div class="line">       `\ \ \ /\ \L\.\_\ \ \_/ \ \ \ /\ \/\ \ /\ \L\ \ /\  __/\ \ \/ </div><div class="line">         \ \_\\ \__/.\_\\ \_\   \ \_\\ \_\ \_\\ \____ \\ \____\\ \_\ </div><div class="line">          \/_/ \/__/\/_/ \/_/    \/_/ \/_/\/_/ \/___L\ \\/____/ \/_/ </div><div class="line">                                                 /\____/             </div><div class="line">                                                 \_/__/ </div><div class="line">"""</div><div class="line"><span class="keyword">import</span>   os, time, sys, Queue, threading, ast</div><div class="line"><span class="keyword">import</span> config</div><div class="line"><span class="keyword">from</span>   lib                <span class="keyword">import</span> util</div><div class="line"><span class="keyword">from</span>   lib.db             <span class="keyword">import</span> *</div><div class="line"><span class="keyword">from</span>   optparse           <span class="keyword">import</span> OptionParser</div><div class="line"><span class="keyword">from</span>   modules            <span class="keyword">import</span> finger</div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</div><div class="line">    usage= <span class="string">'''%prog --host  host --port  port --finger  &lt;all|app_name&gt;   \r\nExample:%prog  --url  http://127.0.0.1    --finger phpmyadmin  '''</span></div><div class="line">    parser = OptionParser(usage=usage)</div><div class="line">    parser.add_option(<span class="string">"-u"</span>, <span class="string">"--url"</span>, dest=<span class="string">"url"</span>, help=<span class="string">"target url"</span>)</div><div class="line">    parser.add_option(<span class="string">"-f"</span>, <span class="string">"--finger"</span>, dest=<span class="string">"finger"</span>, help=<span class="string">"finger_db app_name,default all "</span>, default=<span class="string">"all"</span>)</div><div class="line">    options, arguments = parser.parse_args()</div><div class="line">    <span class="keyword">if</span> options.url == <span class="keyword">None</span> :</div><div class="line">        parser.print_help() </div><div class="line">        exit(<span class="number">0</span>)</div><div class="line">    db = MySQL(config.db_config)</div><div class="line">    sql_finger_where=<span class="string">' '</span>  <span class="keyword">if</span> options.finger == <span class="string">'all'</span> <span class="keyword">else</span> <span class="string">"  and  app_name='%s' "</span>  % options.finger</div><div class="line">    db.query(<span class="string">"SELECT  * from  pw_finger_db  where  `enable`=1   %s "</span>  % sql_finger_where)</div><div class="line">    fingers = db.fetch_all()</div><div class="line">    <span class="keyword">if</span> len(fingers) == <span class="number">0</span> :</div><div class="line">        util.log(<span class="string">'finger app_name %s not found'</span> % options.finger ,<span class="number">3</span>,<span class="string">'finger'</span>) </div><div class="line">    config.set(<span class="string">"fingers"</span>,fingers)</div><div class="line">    util.log(<span class="string">"load fingers count %d"</span> % len(fingers),<span class="number">1</span>,<span class="string">'finger'</span>)</div><div class="line">    finger.get_web_app(options.url)</div></pre></td></tr></table></figure>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/15109322329056.jpg" alt="img"></p>
+<h3 id="批量识别"><a href="#批量识别" class="headerlink" title="批量识别"></a>批量识别</h3><p> 可以使用线程池来实现批量指纹识别。</p>
+<h3 id="指纹结果"><a href="#指纹结果" class="headerlink" title="指纹结果"></a>指纹结果</h3><p>融合到系统中指纹保存在数据库中，本模块可以快速整合到扫描器或者其他项目中。</p>
+<h2 id="yafinger"><a href="#yafinger" class="headerlink" title="yafinger"></a>yafinger</h2><p>yet another  web  fingerprinter<br><a href="https://github.com/yaseng/yafinger" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/yaseng/yafinger</a></p>
+<h2 id="issue"><a href="#issue" class="headerlink" title="issue"></a>issue</h2><ol>
+<li>指纹库需要补充</li>
+<li>可以不局限于web指纹</li>
+<li>某些情况可能目前的指纹规则不符合，还需要添加新的指纹规则，例如正则</li>
+</ol>
+
+      
+    </div>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/iot-security-hardware-obtain.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">物联网硬件安全分析基础-固件提取</div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+
+
+
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- CATEGORIES START -->
+<h2 class="no-top-space">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/硬件安全/">硬件安全 (4)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/BROADCOM-WI-FI/">BROADCOM WI-FI (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/web安全/">web安全 (4)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/系统安全/">系统安全 (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- BEGIN BLOG TAGS -->
+<div class="blog-tags margin-bottom-20">
+  <h2>Tags</h2>
+  
+  <div class="widget-wrap">
+    <div class="widget">
+      
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/"><i class="fa fa-tags"></i>Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网渗透/"><i class="fa fa-tags"></i>内网渗透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/指纹识别/"><i class="fa fa-tags"></i>指纹识别</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/智能锁/"><i class="fa fa-tags"></i>智能锁</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件分析/"><i class="fa fa-tags"></i>硬件分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/蓝牙攻击/"><i class="fa fa-tags"></i>蓝牙攻击</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程代码执行/"><i class="fa fa-tags"></i>远程代码执行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
+    </div>
+  </div>
+
+
+</div>
+<!-- END BLOG TAGS -->
+
+
+<!-- BEGIN FEATURED POSTS -->                            
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->                            
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>伏宸安全实验室<br><br> 伏宸安全实验室是广东安创信息科技开发有限公司旗下的以网络安全研究为核心的专业实验室，主攻前沿安全技术，包括：渗透测试、黑产对抗、威胁情报、智能硬件与无线电安全等。</p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              广州市越秀区寺右新马路108号丰伟大厦15B、C单元<br>
+              BC 15/F Fengwei Buiding NO.108 Siyouxinma Road<br>
+              Guangzhou,China Code:510600<br>
+              Phone: 020-87392713<br>
+              Email: <a href="mailto:admin@future-sec.com" rel="external nofollow noopener noreferrer" target="_blank">admin@future-sec.com</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2017 伏宸安全实验室-Future-Sec Information Security Lab<br>
+ <a href="javascript:;">Future-sec</a> | <a href="javascript:;">广东安创信息科技开发有限公司</a>
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      <li><a href="https://github.com/Future-Sec/" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-github"></i></a></li>
+    
+      <li><a href="https://weibo.com/futuresec" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weibo"></i></a></li>
+    
+      <li><a href="https://mp.weixin.qq.com/s/QuDKBrMist8GL16EEO-u4Q" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weixin"></i></a></li>
+    
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+    
+  </ul>  
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]--> 
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/plugins/owl.carousel/owl.carousel.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/wow.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();    
+        Layout.initOWL();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling(); 
+	new WOW().init();
+    });
+</script>
+ <script>
+        // 给图片添加链接
+        $(document).ready(function() {
+            $("p img").each(function() {
+                var strA = "<a class='fancybox' href='" + this.src + "'></a>";
+                $(this).wrapAll(strA);
+            });
+        });
+    
+        // fancybox
+        $(".fancybox").fancybox({
+                                  openEffect    : 'elastic',
+                                  closeEffect   : 'elastic',
+                              });
+    </script>
+    <script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?9e36ea61528e32ab9a0bc86aa61db5f7";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- END CORE PLUGINS -->
+
+<!-- BEGIN PAGE-SPECIFIC PLUGINS --> 
+
+
+
+
+
+
+
+<!-- END PAGE-SPECIFIC PLUGINS --> 
+
+<!-- BEGIN INTEGRATIONS -->
+
+
+
+
+
+<!-- END INTEGRATIONS -->
+
+</body>
+

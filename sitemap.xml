@@ -2,6 +2,34 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://www.future-sec.com/yet-another-web-fingerprinter.html</loc>
+    
+    <lastmod>2017-11-27T11:19:40.481Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/how-to-crack-a-ble-lock.html</loc>
+    
+    <lastmod>2017-11-27T11:01:32.347Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/iot-security-hardware-obtain.html</loc>
+    
+    <lastmod>2017-11-27T11:00:50.268Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/iot-security-hardware-analysis.html</loc>
+    
+    <lastmod>2017-11-27T03:04:25.544Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://www.future-sec.com/network-penetration.html</loc>
     
     <lastmod>2017-11-20T08:29:04.175Z</lastmod>
@@ -16,9 +44,9 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/iot-security-hardware-analysis.html</loc>
+    <loc>http://www.future-sec.com/f-middlewarescan.html</loc>
     
-    <lastmod>2017-11-20T07:08:43.333Z</lastmod>
+    <lastmod>2017-11-20T07:46:13.395Z</lastmod>
     
   </url>
   
@@ -51,13 +79,6 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/f-middlewarescan.html</loc>
-    
-    <lastmod>2017-07-10T18:59:50.592Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://www.future-sec.com/about/index.html</loc>
     
     <lastmod>2017-07-07T03:57:31.778Z</lastmod>
@@ -86,7 +107,7 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/about/index.html</loc>
+    <loc>http://www.future-sec.com/404.html</loc>
     
     <lastmod>2016-04-26T13:44:54.000Z</lastmod>
     
@@ -100,7 +121,7 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/projects/index.html</loc>
+    <loc>http://www.future-sec.com/about/index.html</loc>
     
     <lastmod>2016-04-26T13:44:54.000Z</lastmod>
     
@@ -114,7 +135,7 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/404.html</loc>
+    <loc>http://www.future-sec.com/projects/index.html</loc>
     
     <lastmod>2016-04-26T13:44:54.000Z</lastmod>
     

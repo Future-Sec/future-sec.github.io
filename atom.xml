@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.future-sec.com/"/>
-  <updated>2017-11-20T07:52:22.019Z</updated>
+  <updated>2017-11-27T11:19:40.481Z</updated>
   <id>http://www.future-sec.com/</id>
   
   <author>
@@ -14,6 +14,178 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>浅谈现代化指纹识别及工具编写</title>
+    <link href="http://www.future-sec.com/yet-another-web-fingerprinter.html"/>
+    <id>http://www.future-sec.com/yet-another-web-fingerprinter.html</id>
+    <published>2017-11-26T16:00:00.000Z</published>
+    <updated>2017-11-27T11:19:40.481Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>对于庞大的网络空间来说，存在着各式各样的应用、设备等等资产，而对这些资产进行识别，无论拿来做扫描器还是批量分析，都是非常有价值的，高效的应用指纹识别是一个长久可研究的课题，本文主要探讨如何建立高效可靠的指纹识别方法。</p>
+<h2 id="传统的指纹识别"><a href="#传统的指纹识别" class="headerlink" title="传统的指纹识别"></a>传统的指纹识别</h2><p>一些扫描器里面使用的比较多的都是通过特殊路径  静态文件的md5 值或者大小 关键词等，例如使用比较广泛的一个指纹数据库 。</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/15047737007020.jpg" alt="img"><br>存在几个问题</p>
+<ol>
+<li>效率太低，每一个路径都需要访问一次。容易被waf拦截</li>
+<li>目前很多网站的静态资源 cdn于gzip 压缩，md5 其实是不一样的 ，识别率很低 </li>
+</ol>
+<h2 id="现代化指纹识别"><a href="#现代化指纹识别" class="headerlink" title="现代化指纹识别"></a>现代化指纹识别</h2><p>怎么来快速的精确的指纹识别，观察了大部分的web系统发现，访问首页并且获取response header  能识别出80% 的app<br>例如WordPress，discuz  会把独特的cookie放到header 里面。<br>discuz  的关键词  _saltkey=<br><img src="http://ozuqqvmm5.bkt.clouddn.com/15109122240334.jpg" alt="img"></p>
+<p>默认首页也会有很多固定的关键词，  WordPress   wp-conetnt<br><img src="http://ozuqqvmm5.bkt.clouddn.com/15109123220322.jpg" alt="img"></p>
+<p>剩下的指纹再去特殊url提取，这样效率和准确率会提高很多很多。</p>
+<h2 id="现代化指纹识别方案"><a href="#现代化指纹识别方案" class="headerlink" title="现代化指纹识别方案"></a>现代化指纹识别方案</h2><h3 id="指纹库设计"><a href="#指纹库设计" class="headerlink" title="指纹库设计"></a>指纹库设计</h3><h4 id="数据库结构"><a href="#数据库结构" class="headerlink" title="数据库结构"></a>数据库结构</h4><p><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171127191426.jpg" alt="img"><br>指纹库类型目前有3种 ，当然后续还需要加上正则。<br>finger 规则是一个 string 之后的python 字典,里面有例如状态吗,规则等字段,例如  weblogic 的指纹规则</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123;<span class="string">'port'</span>:<span class="number">7001</span>,<span class="string">'url'</span>: <span class="string">'/console/login/LoginForm.jsp'</span>, <span class="string">'code'</span>: <span class="number">200</span>, <span class="string">'grep'</span>: <span class="string">'WebLogic Server'</span>&#125;</div></pre></td></tr></table></figure>
+<p>下面介绍每一种指纹库实例</p>
+<h4 id="指纹规则"><a href="#指纹规则" class="headerlink" title="指纹规则"></a>指纹规则</h4><h5 id="web-header-contain"><a href="#web-header-contain" class="headerlink" title="web_header_contain"></a>web_header_contain</h5><p>首页 response 里面的 header 查找特征符<br>速度最快,优先极最高。很多web cms 都会写特殊的cookie 键值。<br>例如 discuz,jboss,wordpress 等。<br>规则编写,以discuz 为例 </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">➜  tools  curl  -I    www.cctry.com</div><div class="line">HTTP/1.1 200 OK</div><div class="line">Server: Microsoft-IIS/6.0</div><div class="line">Connection: keep-alive</div><div class="line">Date: Thu, 07 Jan 2016 18:22:34 GMT</div><div class="line">Content-Type: text/html; charset=gbk</div><div class="line">Content-Length: 0</div><div class="line">X-Powered-By: PHP/5.2.17</div><div class="line">Set-Cookie: Vguy_2132_saltkey=O6srsEYk; expires=Sat, 06-Feb-2016 18:22:22 GMT; path=/; httponly</div><div class="line">Set-Cookie: Vguy_2132_lastvisit=1452187342; expires=Sat, 06-Feb-2016 18:22:22 GMT; path=/</div><div class="line">Set-Cookie: Vguy_2132_sid=MwE6e0; expires=Fri, 08-Jan-2016 18:22:22 GMT; path=/</div><div class="line">Set-Cookie: Vguy_2132_lastact=1452190942%09index.php%09; expires=Fri, 08-Jan-2016 18:22:22 GMT; path=/</div><div class="line">X-Daa-Tunnel: hop_count=1</div></pre></td></tr></table></figure>
+<p>经过分析,字符串 _saltkey=  为discuz  header 中的规则<br>具体规则如下<br><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171127191240.jpg" alt="img"></p>
+<h5 id="web-index-contain"><a href="#web-index-contain" class="headerlink" title="web_index_contain"></a>web_index_contain</h5><p>在缓存的首页里面查找关键词或者正则匹配<br>优先级次之,只需要 get请求一次即可。<br>例如Office Anywhere   指纹 编写流程<br>数据包分析</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">➜  tools  curl  http://125.91.218.186:8000/   |  grep   <span class="string">'/images/tongda.ico'</span></div><div class="line">  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current</div><div class="line">                                 Dload  Upload   Total   Spent    Left  Speed</div><div class="line">100  2001  100  2001    0     0  11795      0 --:--:-- --:--:-- --:--:-- 11840</div><div class="line">&lt;link rel=<span class="string">"shortcut icon"</span> href=<span class="string">"/images/tongda.ico"</span>&gt;</div></pre></td></tr></table></figure>
+<p>规则编写<br><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171127191233.jpg" alt="img"></p>
+<h5 id="web-url-contain"><a href="#web-url-contain" class="headerlink" title="web_url_contain"></a>web_url_contain</h5><p>特殊url 查找指定的关键词(返回状态码也指定)。<br>优先级最低。<br>例如  weblogic 的指纹 finger 过程<br>数据包分析</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">➜  tools  curl  -I     http://202.97.194.9:7001/console/login/LoginForm.jsp</div><div class="line">HTTP/1.1 200 OK</div><div class="line">Cache-Control: no-cache</div><div class="line">Date: Thu, 07 Jan 2016 18:53:28 GMT</div><div class="line">Pragma: no-cache</div><div class="line">Content-Type: text/html; charset=UTF-8</div><div class="line">Expires: Thu, 01 Jan 1970 00:00:00 GMT</div><div class="line">Set-Cookie: ADMINCONSOLESESSION=XQXrWT0LQTvpf8Jv75nMnQB9vN0cGppy7bTfJxfH9S673VTGP1Wl!1715621632; path=/</div><div class="line">Content-Language: zh-CN</div><div class="line">X-Powered-By: Servlet/2.5 JSP/2.1</div></pre></td></tr></table></figure>
+<p>规则</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123;<span class="string">'url'</span>: <span class="string">'/console/login/LoginForm.jsp'</span>, <span class="string">'code'</span>: <span class="number">200</span>, <span class="string">'grep'</span>: <span class="string">'WebLogic Server'</span>&#125;</div></pre></td></tr></table></figure>
+<p>表<br><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171127191224.jpg" alt="img"></p>
+<h3 id="程序编写"><a href="#程序编写" class="headerlink" title="程序编写"></a>程序编写</h3><p>指纹识别模块代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># coding:utf-8</span></div><div class="line"><span class="string">"""</span></div><div class="line"> *@Projet  Yafinger</div><div class="line"> *@Author  yaseng@uauc.net</div><div class="line"> *@Desc    playweb finger modules</div><div class="line">"""</div><div class="line"><span class="keyword">import</span> ast,time</div><div class="line"><span class="keyword">import</span> config</div><div class="line"><span class="keyword">from</span>   lib                <span class="keyword">import</span> util</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_web_app</span><span class="params">(url)</span>:</span></div><div class="line">    rsp_index = util.http_get(url)</div><div class="line">    str_index = <span class="string">""</span></div><div class="line">    <span class="keyword">if</span> rsp_index == <span class="keyword">None</span> :</div><div class="line">        <span class="keyword">return</span> <span class="keyword">None</span></div><div class="line">    list_app=[]</div><div class="line">    fingers=config.get(<span class="string">'fingers'</span>);</div><div class="line">    <span class="keyword">for</span>  finger  <span class="keyword">in</span>   fingers :</div><div class="line">        rule = ast.literal_eval(finger[<span class="string">'finger'</span>])</div><div class="line">        <span class="keyword">if</span> finger[<span class="string">'type'</span>] == <span class="string">'web_index_contain'</span>: </div><div class="line">            <span class="comment"># limit header and  body and code  exp : &#123;'header':'jsessionid=','code': 200, 'grep': '.action'&#125;</span></div><div class="line">            <span class="keyword">if</span> rule.has_key(<span class="string">'header'</span>) <span class="keyword">and</span>  rule[<span class="string">'header'</span>] <span class="keyword">not</span> <span class="keyword">in</span>   str(rsp_index[<span class="string">'headers'</span>]).lower()  : </div><div class="line">                <span class="keyword">continue</span></div><div class="line">            <span class="keyword">if</span> rsp_index[<span class="string">'code'</span>] == rule[<span class="string">'code'</span>] <span class="keyword">and</span>  rule[<span class="string">'grep'</span>]  <span class="keyword">in</span> rsp_index[<span class="string">'data'</span>] :</div><div class="line">                list_app.append(&#123;<span class="string">'app_id'</span>:finger[<span class="string">'id'</span>], <span class="string">'url'</span>:url&#125;)</div><div class="line">                util.log(<span class="string">"url:%s app:%s"</span> % (url, finger[<span class="string">'app_name'</span>]))</div><div class="line">    </div><div class="line">        <span class="keyword">elif</span> finger[<span class="string">'type'</span>] == <span class="string">'web_url_contain'</span> :</div><div class="line">             rsp_tmp = util.http_get(url + rule[<span class="string">'url'</span>])</div><div class="line">             <span class="keyword">if</span> rsp_tmp == <span class="keyword">None</span> :</div><div class="line">                 <span class="keyword">continue</span></div><div class="line">             <span class="keyword">if</span> rsp_tmp[<span class="string">'code'</span>] == rule[<span class="string">'code'</span>] <span class="keyword">and</span>  rule[<span class="string">'grep'</span>]  <span class="keyword">in</span> rsp_tmp[<span class="string">'data'</span>] :</div><div class="line">                 list_app.append(&#123;<span class="string">'app_id'</span>:finger[<span class="string">'id'</span>], <span class="string">'url'</span>:url&#125;)</div><div class="line">                 util.log(<span class="string">"url:%s app:%s"</span> % (url + rule[<span class="string">'url'</span>], finger[<span class="string">'app_name'</span>]))</div><div class="line">        <span class="keyword">elif</span>  finger[<span class="string">'type'</span>] == <span class="string">'web_header_contain'</span> :</div><div class="line"></div><div class="line">            <span class="keyword">if</span>  rule[<span class="string">'grep'</span>]  <span class="keyword">in</span>  str(rsp_index[<span class="string">'headers'</span>]).lower() :</div><div class="line">                list_app.append(&#123;<span class="string">'app_id'</span>:finger[<span class="string">'id'</span>], <span class="string">'url'</span>:url&#125;)</div><div class="line">                util.log(<span class="string">"url:%s app:%s"</span> % (url , finger[<span class="string">'app_name'</span>]))</div><div class="line">                        </div><div class="line">            </div><div class="line">        time.sleep(<span class="number">0.01</span>)</div><div class="line">    <span class="keyword">return</span>  list_app</div></pre></td></tr></table></figure>
+<h3 id="单独识别"><a href="#单独识别" class="headerlink" title="单独识别"></a>单独识别</h3><p>简单调用指纹识别模块代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># coding:utf-8</span></div><div class="line"><span class="string">"""</span></div><div class="line"> *@Projet  Yafinger</div><div class="line"> *@Author  yaseng@uauc.net</div><div class="line"> *@Desc    yafinger test </div><div class="line">     __    __            ___                                         </div><div class="line">    /\ \  /\ \         /'___\  __                                    </div><div class="line">    \ `\`\\/'/   __   /\ \__/ /\_\     ___       __       __   _ __  </div><div class="line">     `\ `\ /'  /'__`\ \ \ ,__\\/\ \  /' _ `\   /'_ `\   /'__`\/\`'__\</div><div class="line">       `\ \ \ /\ \L\.\_\ \ \_/ \ \ \ /\ \/\ \ /\ \L\ \ /\  __/\ \ \/ </div><div class="line">         \ \_\\ \__/.\_\\ \_\   \ \_\\ \_\ \_\\ \____ \\ \____\\ \_\ </div><div class="line">          \/_/ \/__/\/_/ \/_/    \/_/ \/_/\/_/ \/___L\ \\/____/ \/_/ </div><div class="line">                                                 /\____/             </div><div class="line">                                                 \_/__/ </div><div class="line">"""</div><div class="line"><span class="keyword">import</span>   os, time, sys, Queue, threading, ast</div><div class="line"><span class="keyword">import</span> config</div><div class="line"><span class="keyword">from</span>   lib                <span class="keyword">import</span> util</div><div class="line"><span class="keyword">from</span>   lib.db             <span class="keyword">import</span> *</div><div class="line"><span class="keyword">from</span>   optparse           <span class="keyword">import</span> OptionParser</div><div class="line"><span class="keyword">from</span>   modules            <span class="keyword">import</span> finger</div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</div><div class="line">    usage= <span class="string">'''%prog --host  host --port  port --finger  &lt;all|app_name&gt;   \r\nExample:%prog  --url  http://127.0.0.1    --finger phpmyadmin  '''</span></div><div class="line">    parser = OptionParser(usage=usage)</div><div class="line">    parser.add_option(<span class="string">"-u"</span>, <span class="string">"--url"</span>, dest=<span class="string">"url"</span>, help=<span class="string">"target url"</span>)</div><div class="line">    parser.add_option(<span class="string">"-f"</span>, <span class="string">"--finger"</span>, dest=<span class="string">"finger"</span>, help=<span class="string">"finger_db app_name,default all "</span>, default=<span class="string">"all"</span>)</div><div class="line">    options, arguments = parser.parse_args()</div><div class="line">    <span class="keyword">if</span> options.url == <span class="keyword">None</span> :</div><div class="line">        parser.print_help() </div><div class="line">        exit(<span class="number">0</span>)</div><div class="line">    db = MySQL(config.db_config)</div><div class="line">    sql_finger_where=<span class="string">' '</span>  <span class="keyword">if</span> options.finger == <span class="string">'all'</span> <span class="keyword">else</span> <span class="string">"  and  app_name='%s' "</span>  % options.finger</div><div class="line">    db.query(<span class="string">"SELECT  * from  pw_finger_db  where  `enable`=1   %s "</span>  % sql_finger_where)</div><div class="line">    fingers = db.fetch_all()</div><div class="line">    <span class="keyword">if</span> len(fingers) == <span class="number">0</span> :</div><div class="line">        util.log(<span class="string">'finger app_name %s not found'</span> % options.finger ,<span class="number">3</span>,<span class="string">'finger'</span>) </div><div class="line">    config.set(<span class="string">"fingers"</span>,fingers)</div><div class="line">    util.log(<span class="string">"load fingers count %d"</span> % len(fingers),<span class="number">1</span>,<span class="string">'finger'</span>)</div><div class="line">    finger.get_web_app(options.url)</div></pre></td></tr></table></figure>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/15109322329056.jpg" alt="img"></p>
+<h3 id="批量识别"><a href="#批量识别" class="headerlink" title="批量识别"></a>批量识别</h3><p> 可以使用线程池来实现批量指纹识别。</p>
+<h3 id="指纹结果"><a href="#指纹结果" class="headerlink" title="指纹结果"></a>指纹结果</h3><p>融合到系统中指纹保存在数据库中，本模块可以快速整合到扫描器或者其他项目中。</p>
+<h2 id="yafinger"><a href="#yafinger" class="headerlink" title="yafinger"></a>yafinger</h2><p>yet another  web  fingerprinter<br><a href="https://github.com/yaseng/yafinger" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/yaseng/yafinger</a></p>
+<h2 id="issue"><a href="#issue" class="headerlink" title="issue"></a>issue</h2><ol>
+<li>指纹库需要补充</li>
+<li>可以不局限于web指纹</li>
+<li>某些情况可能目前的指纹规则不符合，还需要添加新的指纹规则，例如正则</li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;对于庞大的网络空间来说，存在着各式各样的应用、设备等等资产，而对这些资产进行识别，无论拿来做扫描器还是批量分析，都是非常有价值的，高效的应用
+    
+    </summary>
+    
+      <category term="web安全" scheme="http://www.future-sec.com/categories/web%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="指纹识别" scheme="http://www.future-sec.com/tags/%E6%8C%87%E7%BA%B9%E8%AF%86%E5%88%AB/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>物联网硬件安全分析基础-固件提取</title>
+    <link href="http://www.future-sec.com/iot-security-hardware-obtain.html"/>
+    <id>http://www.future-sec.com/iot-security-hardware-obtain.html</id>
+    <published>2017-11-26T16:00:00.000Z</published>
+    <updated>2017-11-27T11:00:50.268Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上篇初步介绍一些硬件基础知识和分析硬件所需要的基本工具，本篇将讲述利用编程器直接读取芯片固件的方法。</p>
+<h2 id="编程器读取"><a href="#编程器读取" class="headerlink" title="编程器读取"></a>编程器读取</h2><p>通过夹具夹住芯片引脚，然后连接编程器读取芯片内容，通过编程器连接芯片需要注意引脚的顺序，在IC芯片上都会有一个小点，大多数情况下，小点对应的引脚即为芯片的第一脚，而连接编程器的导线也需要插入编程器上相应的引脚。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image36.jpg" alt="img"></p>
+<h3 id="案例一：读取中控F7门禁固件"><a href="#案例一：读取中控F7门禁固件" class="headerlink" title="案例一：读取中控F7门禁固件"></a>案例一：读取中控F7门禁固件</h3><p>拆掉门禁外壳，通过电路图和芯片印字分析，在主板上有一颗FM25F04A存储芯片，通过夹具连接芯片到编程器，在通过专用编程器软件，对该芯片进行读取。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image37.jpg" alt="img"></p>
+<p>连接完成，确定引脚接线正确后，打开编程器对应软件，通过智能识别芯片ID，即可开始读取固件工作。<br>如无法识别，可根据印字说明，尝试类似的型号，一般情况下兼容。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image38.jpg" alt="img"></p>
+<p>点击读取，即可开始固件提取，成功之后会保存为BIN格式文件，打开即可看到16进制的内容，为下一步分析提供基础。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image39.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image40.jpg" alt="img"></p>
+<h3 id="案例二：读取某智能摄像头固件"><a href="#案例二：读取某智能摄像头固件" class="headerlink" title="案例二：读取某智能摄像头固件"></a>案例二：读取某智能摄像头固件</h3><p>拆掉摄像头外壳，通过分析PCB上的各个IC，找到Flash存储芯片。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image41.jpg" alt="img"></p>
+<p>在显微镜下，可以看到是一颗25L64型号的Flash芯片。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image118.jpg" alt="img"></p>
+<p>用夹具连接各引脚，并和编程器连接，进行固件读取。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image42.jpg" alt="img"></p>
+<p>识别到芯片型号为GD25Q64，点击读取，读取完毕后按照提示保存到文件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image43.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image44.jpg" alt="img"></p>
+<p>打开保存的BIN文件或者查看缓冲区，即可看到固件内容。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image45.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image46.jpg" alt="img"></p>
+<p>在Ubuntu中，用binwalk解包固件，做进一步分析。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image116.jpg" alt="img"></p>
+<h3 id="案例三：读取某智能摄像头固件"><a href="#案例三：读取某智能摄像头固件" class="headerlink" title="案例三：读取某智能摄像头固件"></a>案例三：读取某智能摄像头固件</h3><p>打开外壳，在PCB背面发现一颗FLASH存储芯片<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image47.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image48.jpg" alt="img"></p>
+<p>通过显微镜发现芯片型号为25L128。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image120.jpg" alt="img"></p>
+<p>连接编程器读取固件并保存。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image49.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image50.jpg" alt="img"></p>
+<h3 id="案例四：读取某路由器固件"><a href="#案例四：读取某路由器固件" class="headerlink" title="案例四：读取某路由器固件"></a>案例四：读取某路由器固件</h3><p>打开外壳，发现PCB上有一颗Flash存储器，但厂商出于安全考虑，把芯片印字涂抹掉了。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image52.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image119.jpg" alt="img"></p>
+<p>在不知道芯片型号的情况下，我们连接该芯片，让编程器去尝试读取。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image51.jpg" alt="img"></p>
+<p>通过智能识别，发现编程器无法识别出具体型号，而因为Flash存储芯片的种类多样，通过查找又无法获得该路由器的具体参数，这时我们通过UART串口，读取出UBOOT启动信息，串口输出里面发现了该芯片型号为W25Q128BV。（下一篇将会重点介绍关于串口调试的方法）<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image54.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image53.jpg" alt="img"></p>
+<p>在编程器中选择该型号，成功提取出固件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image55.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image56.jpg" alt="img"></p>
+<p>用binwalk解包固件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image115.jpg" alt="img"></p>
+<h3 id="案例五：读取某智能电饭锅固件"><a href="#案例五：读取某智能电饭锅固件" class="headerlink" title="案例五：读取某智能电饭锅固件"></a>案例五：读取某智能电饭锅固件</h3><p>拆掉外壳，背面嵌有一块PCB，反面是WIFI处理芯片，正面为存储器，连接编程器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image57.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image58.jpg" alt="img"></p>
+<p>通过印字分析为25芯片，存储大小为2M字节，尝试该型号芯片，成功读取固件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image59.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image60.jpg" alt="img"></p>
+<h3 id="案例六：读取某网络监控摄像机固件"><a href="#案例六：读取某网络监控摄像机固件" class="headerlink" title="案例六：读取某网络监控摄像机固件"></a>案例六：读取某网络监控摄像机固件</h3><p>在PCB上找到一块25L128型号的Flash存储芯片。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image62.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image121.jpg" alt="img"></p>
+<p>通过夹具连接编程器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image61.jpg" alt="img"></p>
+<p>识别到芯片为MX25L128，选择其中一种，成功提取固件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image63.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image64.jpg" alt="img"></p>
+<p>用binwalk解包固件内容。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image117.jpg" alt="img"></p>
+<h2 id="拆焊芯片读取固件"><a href="#拆焊芯片读取固件" class="headerlink" title="拆焊芯片读取固件"></a>拆焊芯片读取固件</h2><p>对于某些机器，芯片引脚采用点锡丝网焊接在背面，引脚太小或没有暴露出引脚，就需要通过拆焊芯片来读取固件了。<br>通过热风枪和锡焊配合，很容易从PCB上把芯片拆焊出来，但在拆焊过程中，可能存在芯片因为过热被损坏，PCB上其他元器件被损坏，电路无法接通等风险，需要酌情考虑。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image92.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image93.jpg" alt="img"></p>
+<h3 id="热风枪和锡焊拆焊芯片读取固件"><a href="#热风枪和锡焊拆焊芯片读取固件" class="headerlink" title="热风枪和锡焊拆焊芯片读取固件"></a>热风枪和锡焊拆焊芯片读取固件</h3><p>设置热风枪温度为400度，拆焊掉的芯片，通过转接座与编程器连接，同样需要注意芯片的引脚方向。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image94.jpg" alt="img"></p>
+<p>读取芯片固件并导出。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image95.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image46.jpg" alt="img"></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;上篇初步介绍一些硬件基础知识和分析硬件所需要的基本工具，本篇将讲述利用编程器直接读取芯片固件的方法。&lt;/p&gt;
+&lt;h2 id=&quot;编程器读取&quot;&gt;
+    
+    </summary>
+    
+      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
+    
+      <category term="硬件分析" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%88%86%E6%9E%90/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>如何破解一个蓝牙锁</title>
+    <link href="http://www.future-sec.com/how-to-crack-a-ble-lock.html"/>
+    <id>http://www.future-sec.com/how-to-crack-a-ble-lock.html</id>
+    <published>2017-11-26T16:00:00.000Z</published>
+    <updated>2017-11-27T11:01:32.347Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>随着物联网各类技术的逐步进步，越来越多的智能设备出现在我们生活中，智能锁在锁具市场上所占的份额将会越来越大，甚至超过传统锁，成为主流。而在智能锁中，因为低功耗蓝牙技术的推广，以及受外部环境限制小，通过手机APP交互方便等特点，很多智能锁采用的就是以BLE蓝牙芯片作为控制单元，控制电机或锁簧转动的模式，实现开关锁功能。与其他的安全问题相比，锁具的被破解，可能造成的危害更大，本文通过以破解某型号蓝牙锁，来展示目前蓝牙智能锁可能面临的安全风险。</p>
+<h2 id="蓝牙锁介绍"><a href="#蓝牙锁介绍" class="headerlink" title="蓝牙锁介绍"></a>蓝牙锁介绍</h2><p> 蓝牙锁由于不受外部环境限制，功耗较低，和手机交互方便，目前用的比较多,形状也五花八门，例如目前使用最广泛的一些智能蓝牙锁。</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage9.jpg" alt="img"></p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage10.jpg" alt="img"></p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage11.jpg" alt="img"></p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage12.jpg" alt="img"></p>
+<h2 id="如何去破解一个蓝牙锁"><a href="#如何去破解一个蓝牙锁" class="headerlink" title="如何去破解一个蓝牙锁"></a>如何去破解一个蓝牙锁</h2><p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage13.jpg" alt="img"></p>
+<h3 id="目标介绍"><a href="#目标介绍" class="headerlink" title="目标介绍"></a>目标介绍</h3><p>这个属于低功耗蓝牙锁，使用app 绑定之后可以开启，还能共享密码，修改密码。</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage14.jpg" alt="img"></p>
+<h3 id="内部构架"><a href="#内部构架" class="headerlink" title="内部构架"></a>内部构架</h3><p>显微镜查看电路板<br><img src="http://ozuqqvmm5.bkt.clouddn.com/IMG_2214.jpg" alt="img"></p>
+<p>拆解<br><img src="http://ozuqqvmm5.bkt.clouddn.com/IMG_2216.jpg" alt="img"></p>
+<p>蓝牙锁内部搭载了一块CC2541蓝牙芯片，通过控制电机驱动芯片，带动卡榫运转，从而形成拉锁的开关。CC2541是TI推出的一款专门适用于BLE和专用的2.4GHz应用的SOC芯片解决方案,CC254X在目前物联网蓝牙通信解决方案中，市场占有率很高，应用场景非常广泛。</p>
+<h3 id="探测"><a href="#探测" class="headerlink" title="探测"></a>探测</h3><p>使用app初步连接探测，可以看到</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage16.jpg" alt="img"></p>
+<h3 id="开锁流程"><a href="#开锁流程" class="headerlink" title="开锁流程"></a>开锁流程</h3><p>Logcat 查看app日志</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage17.jpg" alt="img"></p>
+<p>流程为</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171123170725.jpg" alt="img"></p>
+<h3 id="攻击方式"><a href="#攻击方式" class="headerlink" title="攻击方式"></a>攻击方式</h3><p>一般对于蓝牙锁的攻击方式有三种</p>
+<p>1、重放攻击<br>2、暴力破解(6位数字)<br>3、云端漏洞</p>
+<h3 id="重放攻击"><a href="#重放攻击" class="headerlink" title="重放攻击"></a>重放攻击</h3><p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage18.jpg" alt="img"></p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage19.jpg" alt="img"></p>
+<p>通过蓝牙抓包分析，发现通信过程没有加密，可以重放获取认证密码，但如果要模拟真实的智能锁攻击场景，显然不能通过如此显眼的方式，真实环境中往往很难有一个给我们抓包或劫持的场景，所以最好的方式是远程无接触开锁，需要去找云端的漏洞。</p>
+<h3 id="云端漏洞"><a href="#云端漏洞" class="headerlink" title="云端漏洞"></a>云端漏洞</h3><p>云端是Thinkphp5 写的，稍微看了一下,存在有两个漏洞。无认证可以遍历所有id拿到所有锁的信息</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage20.jpg" alt="img"></p>
+<p>没有关闭调试模式会泄露信息,传入一个空的id会吧所有锁的信息报错显示出来，泄露所有锁的密码以及绑定的电话号码mac地址等信息。</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage21.jpg" alt="img"></p>
+<h3 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h3><p>对于真实的破解锁场景，最好用一个手机app来开锁掩人耳目，综合以上分析，编写一个开锁Android app 。<br>工作流程为</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171123170725.jpg" alt="img"></p>
+<p>利用 com.inuker.bluetooth 库快速开发</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage22.jpg" alt="img"></p>
+<p>APP界面</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/15117578788731.jpg" alt="img"></p>
+<p>视频演示</p>
+<p> <a href="https://v.qq.com/x/page/b051058vicv.html" rel="external nofollow noopener noreferrer" target="_blank">https://v.qq.com/x/page/b051058vicv.html</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>ti官方页面  <a href="http://www.ti.com.cn/product/cn/CC2541" rel="external nofollow noopener noreferrer" target="_blank">http://www.ti.com.cn/product/cn/CC2541</a><br>cc2541蓝牙芯片手册  <a href="https://wenku.baidu.com/view/c7f99ac7376baf1ffd4fad31.html" rel="external nofollow noopener noreferrer" target="_blank">https://wenku.baidu.com/view/c7f99ac7376baf1ffd4fad31.html</a> </p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;随着物联网各类技术的逐步进步，越来越多的智能设备出现在我们生活中，智能锁在锁具市场上所占的份额将会越来越大，甚至超过传统锁，成为主流。而在智
+    
+    </summary>
+    
+      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="智能锁" scheme="http://www.future-sec.com/tags/%E6%99%BA%E8%83%BD%E9%94%81/"/>
+    
+      <category term="蓝牙攻击" scheme="http://www.future-sec.com/tags/%E8%93%9D%E7%89%99%E6%94%BB%E5%87%BB/"/>
+    
+  </entry>
   
   <entry>
     <title>Tomcat 远程代码执行漏洞分析（CVE-2017-12615）</title>
@@ -89,7 +261,7 @@
     <link href="http://www.future-sec.com/iot-security-hardware-analysis.html"/>
     <id>http://www.future-sec.com/iot-security-hardware-analysis.html</id>
     <published>2017-11-16T16:00:00.000Z</published>
-    <updated>2017-11-20T07:08:43.333Z</updated>
+    <updated>2017-11-27T03:04:25.544Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>当我们在分析IOT设备，如智能摄像头、智能门锁、智能路由器等等产品时，采用传统的安全检测手段，如对APP的逆向、云端服务器的渗透测试、产品通信的抓包等方式可以获得部分的信息，但如果需要深入分析智能设备底层的工作原理，从中发现更深层次的安全问题，就不可避免的需要直接接触硬件本身，这也是传统安全手段未能触及的部分，据此，下面简单的谈下关于电路分析和芯片固件提取和调试的一点心得。</p>
 <h2 id="电路识别"><a href="#电路识别" class="headerlink" title="电路识别"></a>电路识别</h2><p>在对电路进行分析之前，需要对PCB电路图和电子元器件知识有简单的了解。<br>PCB（ Printed Circuit Board），中文名称为印制电路板，又称印刷线路板，是重要的电子部件，是电子元器件的支撑体，是电子元器件电气连接的载体。由于它是采用电子印刷术制作的，故被称为“印刷”电路板。<br><img src="/images/image11.jpg" alt="img"><br><img src="/images/image12.jpg" alt="img"><br><img src="/images/image13.jpg" alt="img"></p>
@@ -231,7 +403,7 @@
     <link href="http://www.future-sec.com/f-middlewarescan.html"/>
     <id>http://www.future-sec.com/f-middlewarescan.html</id>
     <published>2016-03-16T16:00:00.000Z</published>
-    <updated>2017-07-10T18:59:50.592Z</updated>
+    <updated>2017-11-20T07:46:13.395Z</updated>
     
     <content type="html"><![CDATA[<h2 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h2><p>实现针对中间件的自动化检测，端口探测-&gt;中间件识别-&gt;漏洞检测-&gt;获取webshell<br>参数说明<br>-h 必须输入的参数，支持ip(192.168.1.1)，ip段（192.168.1），ip范围指定（192.168.1.1-192.168.1.254），最多限制一次可扫描65535个IP。<br>-p 指定要扫描端口列表，多个端口使用,隔开 例如：7001,8080,9999。未指定即使用内置默认端口进行扫描(80,4848,7001,7002,8000,8001,8080,8081,8888,9999,9043,9080)<br>-m 指定线程数量 默认100线程<br>-t 指定HTTP请求超时时间，默认为10秒，端口扫描超时为值的1/2。<br>例子：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">python F-MiddlewareScan.py -h <span class="number">10.111</span><span class="number">.1</span></div><div class="line">python F-MiddlewareScan.py -h <span class="number">192.168</span><span class="number">.1</span><span class="number">.1</span><span class="number">-192.168</span><span class="number">.2</span><span class="number">.111</span></div><div class="line">python F-MiddlewareScan.py -h <span class="number">10.111</span><span class="number">.1</span><span class="number">.22</span> -p <span class="number">80</span>,<span class="number">7001</span>,<span class="number">8080</span> -m <span class="number">200</span> -t <span class="number">6</span></div></pre></td></tr></table></figure>

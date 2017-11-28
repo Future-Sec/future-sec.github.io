@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <title>物联网硬件安全分析基础-固件提取 | 伏宸安全实验室-Future-Sec Information Security Lab</title>
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <meta name="description" content="前言上篇初步介绍一些硬件基础知识和分析硬件所需要的基本工具，本篇将讲述利用编程器直接读取芯片固件的方法。 编程器读取通过夹具夹住芯片引脚，然后连接编程器读取芯片内容，通过编程器连接芯片需要注意引脚的顺序，在IC芯片上都会有一个小点，大多数情况下，小点对应的引脚即为芯片的第一脚，而连接编程器的导线也需要插入编程器上相应的引脚。 案例一：读取中控F7门禁固件拆掉门禁外壳，通过电路图和芯片印字分析，在主">
+<meta name="keywords" content="硬件安全,硬件分析">
+<meta property="og:type" content="article">
+<meta property="og:title" content="物联网硬件安全分析基础-固件提取">
+<meta property="og:url" content="http://www.future-sec.com/iot-security-hardware-obtain.html">
+<meta property="og:site_name" content="伏宸安全实验室-Future-Sec Information Security Lab">
+<meta property="og:description" content="前言上篇初步介绍一些硬件基础知识和分析硬件所需要的基本工具，本篇将讲述利用编程器直接读取芯片固件的方法。 编程器读取通过夹具夹住芯片引脚，然后连接编程器读取芯片内容，通过编程器连接芯片需要注意引脚的顺序，在IC芯片上都会有一个小点，大多数情况下，小点对应的引脚即为芯片的第一脚，而连接编程器的导线也需要插入编程器上相应的引脚。 案例一：读取中控F7门禁固件拆掉门禁外壳，通过电路图和芯片印字分析，在主">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image36.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image37.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image38.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image39.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image40.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image41.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image118.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image42.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image43.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image44.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image45.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image46.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image116.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image47.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image48.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image120.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image49.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image50.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image52.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image119.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image51.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image54.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image53.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image55.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image56.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image115.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image57.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image58.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image59.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image60.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image62.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image121.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image61.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image63.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image64.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image117.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image92.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image93.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image94.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image95.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image46.jpg">
+<meta property="og:updated_time" content="2017-11-27T11:00:50.268Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="物联网硬件安全分析基础-固件提取">
+<meta name="twitter:description" content="前言上篇初步介绍一些硬件基础知识和分析硬件所需要的基本工具，本篇将讲述利用编程器直接读取芯片固件的方法。 编程器读取通过夹具夹住芯片引脚，然后连接编程器读取芯片内容，通过编程器连接芯片需要注意引脚的顺序，在IC芯片上都会有一个小点，大多数情况下，小点对应的引脚即为芯片的第一脚，而连接编程器的导线也需要插入编程器上相应的引脚。 案例一：读取中控F7门禁固件拆掉门禁外壳，通过电路图和芯片印字分析，在主">
+<meta name="twitter:image" content="http://ozuqqvmm5.bkt.clouddn.com/image36.jpg">
+  
+    <link rel="alternative" href="/atom.xml" title="伏宸安全实验室-Future-Sec Information Security Lab" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  
+
+  <!-- Global styles START -->   
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END --> 
+   
+  <!-- Page level plugin styles START -->
+  <link rel="stylesheet" href="/metronic/assets/pages/css/animate.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/owl.carousel/assets/owl.carousel.css">
+  <!-- Page level plugin styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/pages/css/components.css">
+  <link rel="stylesheet" href="/metronic/assets/pages/css/slider.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/pages/css/portfolio.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/red.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END -->
+</head>
+</html>
+<body class="corporate">
+  <!-- BEGIN HEADER -->
+<div class="header">
+  <div class="container">
+    <!--<a class="site-logo" href="/" id="logo">伏宸安全实验室-Future-Sec Information Security Lab</a>-->
+
+    <a class="site-logo" href="/">
+      <img src="/metronic/assets/corporate/img/logos/logo-corp-red.png" alt="Metronic FrontEnd">
+    </a>
+
+    <a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+
+    <!-- BEGIN NAVIGATION -->
+    <div class="header-navigation pull-right font-transform-inherit">
+      <ul>
+	
+	<li class="">
+	  <a href="/index.html">Home</a>
+	</li>
+	
+	<li class="">
+	  <a href="/archives/">Blog</a>
+	</li>
+	
+	<li class="">
+	  <a href="/vulnerabilities.html">Vulnerabilities</a>
+	</li>
+	
+	<li class="">
+	  <a href="/about/">About</a>
+	</li>
+	
+	<!-- BEGIN TOP SEARCH -->
+	<li class="menu-search">
+	  <span class="sep"></span>
+	  <i class="fa fa-search search-btn"></i>
+	  <div class="search-box">
+	   
+	    <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank" class="search-form">
+    <div class="input-group">
+		<input placeholder="Search" class="form-control st-default-search-input" name="word" maxlength="20" type="search">
+		  <input name="si" value="future-sec.com" type="hidden">
+  <input name="tn" value="bds" type="hidden">
+  <input name="cl" value="3" type="hidden">
+  <input name="ct" value="2097152" type="hidden">
+  <input name="s" value="on" type="hidden">
+		<span class="input-group-btn">
+		  <button class="btn btn-primary" type="submit">Search</button>
+		</span>
+	      </div>
+</form>
+	  </div> 
+	</li>
+	<!-- END TOP SEARCH -->
+      </ul>
+    </div>
+    <!-- END NAVIGATION -->
+  </div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/archives/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/iot-security-hardware-obtain.html">物联网硬件安全分析基础-固件提取</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-iot-security-hardware-obtain" class="article article-type-post blog-item" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> 独抒</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2017-11-26T16:00:00.000Z" itemprop="datePublished">2017/11/27</time>
+
+	</li>
+	<li class="hidden-xs"><i class="fa fa-comments"></i>
+	  <a href="http://www.future-sec.com/iot-security-hardware-obtain.html#disqus_thread" class="article-comment-link">Comments</a>
+	</li>
+	<li class="hidden-xs"><i class="fa fa-tags"></i> 
+	  
+  
+    <a href="/tags/硬件安全/" title="硬件安全">硬件安全</a>,
+  
+    <a href="/tags/硬件分析/" title="硬件分析">硬件分析</a>
+  
+
+
+	</li>
+      </ul>
+      
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/硬件安全/">硬件安全</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      <!-- Table of Contents -->
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编程器读取"><span class="toc-number">2.</span> <span class="toc-text">编程器读取</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#案例一：读取中控F7门禁固件"><span class="toc-number">2.1.</span> <span class="toc-text">案例一：读取中控F7门禁固件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#案例二：读取某智能摄像头固件"><span class="toc-number">2.2.</span> <span class="toc-text">案例二：读取某智能摄像头固件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#案例三：读取某智能摄像头固件"><span class="toc-number">2.3.</span> <span class="toc-text">案例三：读取某智能摄像头固件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#案例四：读取某路由器固件"><span class="toc-number">2.4.</span> <span class="toc-text">案例四：读取某路由器固件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#案例五：读取某智能电饭锅固件"><span class="toc-number">2.5.</span> <span class="toc-text">案例五：读取某智能电饭锅固件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#案例六：读取某网络监控摄像机固件"><span class="toc-number">2.6.</span> <span class="toc-text">案例六：读取某网络监控摄像机固件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#拆焊芯片读取固件"><span class="toc-number">3.</span> <span class="toc-text">拆焊芯片读取固件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#热风枪和锡焊拆焊芯片读取固件"><span class="toc-number">3.1.</span> <span class="toc-text">热风枪和锡焊拆焊芯片读取固件</span></a></li></ol></li></ol>
+  </div>
+
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上篇初步介绍一些硬件基础知识和分析硬件所需要的基本工具，本篇将讲述利用编程器直接读取芯片固件的方法。</p>
+<h2 id="编程器读取"><a href="#编程器读取" class="headerlink" title="编程器读取"></a>编程器读取</h2><p>通过夹具夹住芯片引脚，然后连接编程器读取芯片内容，通过编程器连接芯片需要注意引脚的顺序，在IC芯片上都会有一个小点，大多数情况下，小点对应的引脚即为芯片的第一脚，而连接编程器的导线也需要插入编程器上相应的引脚。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image36.jpg" alt="img"></p>
+<h3 id="案例一：读取中控F7门禁固件"><a href="#案例一：读取中控F7门禁固件" class="headerlink" title="案例一：读取中控F7门禁固件"></a>案例一：读取中控F7门禁固件</h3><p>拆掉门禁外壳，通过电路图和芯片印字分析，在主板上有一颗FM25F04A存储芯片，通过夹具连接芯片到编程器，在通过专用编程器软件，对该芯片进行读取。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image37.jpg" alt="img"></p>
+<p>连接完成，确定引脚接线正确后，打开编程器对应软件，通过智能识别芯片ID，即可开始读取固件工作。<br>如无法识别，可根据印字说明，尝试类似的型号，一般情况下兼容。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image38.jpg" alt="img"></p>
+<p>点击读取，即可开始固件提取，成功之后会保存为BIN格式文件，打开即可看到16进制的内容，为下一步分析提供基础。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image39.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image40.jpg" alt="img"></p>
+<h3 id="案例二：读取某智能摄像头固件"><a href="#案例二：读取某智能摄像头固件" class="headerlink" title="案例二：读取某智能摄像头固件"></a>案例二：读取某智能摄像头固件</h3><p>拆掉摄像头外壳，通过分析PCB上的各个IC，找到Flash存储芯片。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image41.jpg" alt="img"></p>
+<p>在显微镜下，可以看到是一颗25L64型号的Flash芯片。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image118.jpg" alt="img"></p>
+<p>用夹具连接各引脚，并和编程器连接，进行固件读取。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image42.jpg" alt="img"></p>
+<p>识别到芯片型号为GD25Q64，点击读取，读取完毕后按照提示保存到文件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image43.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image44.jpg" alt="img"></p>
+<p>打开保存的BIN文件或者查看缓冲区，即可看到固件内容。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image45.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image46.jpg" alt="img"></p>
+<p>在Ubuntu中，用binwalk解包固件，做进一步分析。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image116.jpg" alt="img"></p>
+<h3 id="案例三：读取某智能摄像头固件"><a href="#案例三：读取某智能摄像头固件" class="headerlink" title="案例三：读取某智能摄像头固件"></a>案例三：读取某智能摄像头固件</h3><p>打开外壳，在PCB背面发现一颗FLASH存储芯片<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image47.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image48.jpg" alt="img"></p>
+<p>通过显微镜发现芯片型号为25L128。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image120.jpg" alt="img"></p>
+<p>连接编程器读取固件并保存。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image49.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image50.jpg" alt="img"></p>
+<h3 id="案例四：读取某路由器固件"><a href="#案例四：读取某路由器固件" class="headerlink" title="案例四：读取某路由器固件"></a>案例四：读取某路由器固件</h3><p>打开外壳，发现PCB上有一颗Flash存储器，但厂商出于安全考虑，把芯片印字涂抹掉了。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image52.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image119.jpg" alt="img"></p>
+<p>在不知道芯片型号的情况下，我们连接该芯片，让编程器去尝试读取。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image51.jpg" alt="img"></p>
+<p>通过智能识别，发现编程器无法识别出具体型号，而因为Flash存储芯片的种类多样，通过查找又无法获得该路由器的具体参数，这时我们通过UART串口，读取出UBOOT启动信息，串口输出里面发现了该芯片型号为W25Q128BV。（下一篇将会重点介绍关于串口调试的方法）<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image54.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image53.jpg" alt="img"></p>
+<p>在编程器中选择该型号，成功提取出固件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image55.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image56.jpg" alt="img"></p>
+<p>用binwalk解包固件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image115.jpg" alt="img"></p>
+<h3 id="案例五：读取某智能电饭锅固件"><a href="#案例五：读取某智能电饭锅固件" class="headerlink" title="案例五：读取某智能电饭锅固件"></a>案例五：读取某智能电饭锅固件</h3><p>拆掉外壳，背面嵌有一块PCB，反面是WIFI处理芯片，正面为存储器，连接编程器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image57.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image58.jpg" alt="img"></p>
+<p>通过印字分析为25芯片，存储大小为2M字节，尝试该型号芯片，成功读取固件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image59.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image60.jpg" alt="img"></p>
+<h3 id="案例六：读取某网络监控摄像机固件"><a href="#案例六：读取某网络监控摄像机固件" class="headerlink" title="案例六：读取某网络监控摄像机固件"></a>案例六：读取某网络监控摄像机固件</h3><p>在PCB上找到一块25L128型号的Flash存储芯片。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image62.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image121.jpg" alt="img"></p>
+<p>通过夹具连接编程器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image61.jpg" alt="img"></p>
+<p>识别到芯片为MX25L128，选择其中一种，成功提取固件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image63.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image64.jpg" alt="img"></p>
+<p>用binwalk解包固件内容。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image117.jpg" alt="img"></p>
+<h2 id="拆焊芯片读取固件"><a href="#拆焊芯片读取固件" class="headerlink" title="拆焊芯片读取固件"></a>拆焊芯片读取固件</h2><p>对于某些机器，芯片引脚采用点锡丝网焊接在背面，引脚太小或没有暴露出引脚，就需要通过拆焊芯片来读取固件了。<br>通过热风枪和锡焊配合，很容易从PCB上把芯片拆焊出来，但在拆焊过程中，可能存在芯片因为过热被损坏，PCB上其他元器件被损坏，电路无法接通等风险，需要酌情考虑。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image92.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image93.jpg" alt="img"></p>
+<h3 id="热风枪和锡焊拆焊芯片读取固件"><a href="#热风枪和锡焊拆焊芯片读取固件" class="headerlink" title="热风枪和锡焊拆焊芯片读取固件"></a>热风枪和锡焊拆焊芯片读取固件</h3><p>设置热风枪温度为400度，拆焊掉的芯片，通过转接座与编程器连接，同样需要注意芯片的引脚方向。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image94.jpg" alt="img"></p>
+<p>读取芯片固件并导出。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image95.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image46.jpg" alt="img"></p>
+
+      
+    </div>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/yet-another-web-fingerprinter.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          浅谈现代化指纹识别及工具编写
+        
+      </div>
+    </a>
+  
+  
+    <a href="/how-to-crack-a-ble-lock.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">如何破解一个蓝牙锁</div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+
+
+
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- CATEGORIES START -->
+<h2 class="no-top-space">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/硬件安全/">硬件安全 (4)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/BROADCOM-WI-FI/">BROADCOM WI-FI (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/web安全/">web安全 (4)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/系统安全/">系统安全 (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- BEGIN BLOG TAGS -->
+<div class="blog-tags margin-bottom-20">
+  <h2>Tags</h2>
+  
+  <div class="widget-wrap">
+    <div class="widget">
+      
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/"><i class="fa fa-tags"></i>Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网渗透/"><i class="fa fa-tags"></i>内网渗透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/指纹识别/"><i class="fa fa-tags"></i>指纹识别</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/智能锁/"><i class="fa fa-tags"></i>智能锁</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件分析/"><i class="fa fa-tags"></i>硬件分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/蓝牙攻击/"><i class="fa fa-tags"></i>蓝牙攻击</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程代码执行/"><i class="fa fa-tags"></i>远程代码执行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
+    </div>
+  </div>
+
+
+</div>
+<!-- END BLOG TAGS -->
+
+
+<!-- BEGIN FEATURED POSTS -->                            
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->                            
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>伏宸安全实验室<br><br> 伏宸安全实验室是广东安创信息科技开发有限公司旗下的以网络安全研究为核心的专业实验室，主攻前沿安全技术，包括：渗透测试、黑产对抗、威胁情报、智能硬件与无线电安全等。</p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              广州市越秀区寺右新马路108号丰伟大厦15B、C单元<br>
+              BC 15/F Fengwei Buiding NO.108 Siyouxinma Road<br>
+              Guangzhou,China Code:510600<br>
+              Phone: 020-87392713<br>
+              Email: <a href="mailto:admin@future-sec.com" rel="external nofollow noopener noreferrer" target="_blank">admin@future-sec.com</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2017 伏宸安全实验室-Future-Sec Information Security Lab<br>
+ <a href="javascript:;">Future-sec</a> | <a href="javascript:;">广东安创信息科技开发有限公司</a>
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      <li><a href="https://github.com/Future-Sec/" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-github"></i></a></li>
+    
+      <li><a href="https://weibo.com/futuresec" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weibo"></i></a></li>
+    
+      <li><a href="https://mp.weixin.qq.com/s/QuDKBrMist8GL16EEO-u4Q" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weixin"></i></a></li>
+    
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+    
+  </ul>  
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]--> 
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/plugins/owl.carousel/owl.carousel.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/wow.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();    
+        Layout.initOWL();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling(); 
+	new WOW().init();
+    });
+</script>
+ <script>
+        // 给图片添加链接
+        $(document).ready(function() {
+            $("p img").each(function() {
+                var strA = "<a class='fancybox' href='" + this.src + "'></a>";
+                $(this).wrapAll(strA);
+            });
+        });
+    
+        // fancybox
+        $(".fancybox").fancybox({
+                                  openEffect    : 'elastic',
+                                  closeEffect   : 'elastic',
+                              });
+    </script>
+    <script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?9e36ea61528e32ab9a0bc86aa61db5f7";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- END CORE PLUGINS -->
+
+<!-- BEGIN PAGE-SPECIFIC PLUGINS --> 
+
+
+
+
+
+
+
+<!-- END PAGE-SPECIFIC PLUGINS --> 
+
+<!-- BEGIN INTEGRATIONS -->
+
+
+
+
+
+<!-- END INTEGRATIONS -->
+
+</body>
+
