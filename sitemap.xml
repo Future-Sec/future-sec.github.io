@@ -2,9 +2,37 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html</loc>
+    
+    <lastmod>2017-12-21T07:53:50.474Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/using-MITMF-attack-not-80-port-http.html</loc>
+    
+    <lastmod>2017-12-21T07:42:22.081Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://www.future-sec.com/android-ssl-security.html</loc>
     
-    <lastmod>2017-12-15T15:05:55.537Z</lastmod>
+    <lastmod>2017-12-21T07:35:04.370Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/broadcom-wifi-2.html</loc>
+    
+    <lastmod>2017-12-21T07:33:35.154Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/broadcom-wifi-1.html</loc>
+    
+    <lastmod>2017-12-21T07:33:30.953Z</lastmod>
     
   </url>
   
@@ -65,20 +93,6 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/broadcom-wifi-2.html</loc>
-    
-    <lastmod>2017-08-30T09:01:17.389Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://www.future-sec.com/broadcom-wifi-1.html</loc>
-    
-    <lastmod>2017-08-30T09:01:14.453Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://www.future-sec.com/verification_code.html</loc>
     
     <lastmod>2017-07-10T19:39:19.295Z</lastmod>
@@ -107,13 +121,6 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/categories/index.html</loc>
-    
-    <lastmod>2017-06-26T11:36:02.658Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://www.future-sec.com/tags/index.html</loc>
     
     <lastmod>2017-06-26T11:36:02.658Z</lastmod>
@@ -121,16 +128,9 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/404.html</loc>
+    <loc>http://www.future-sec.com/categories/index.html</loc>
     
-    <lastmod>2016-04-26T13:44:54.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://www.future-sec.com/index.html</loc>
-    
-    <lastmod>2016-04-26T13:44:54.000Z</lastmod>
+    <lastmod>2017-06-26T11:36:02.658Z</lastmod>
     
   </url>
   
@@ -149,7 +149,21 @@
   </url>
   
   <url>
+    <loc>http://www.future-sec.com/index.html</loc>
+    
+    <lastmod>2016-04-26T13:44:54.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://www.future-sec.com/projects/index.html</loc>
+    
+    <lastmod>2016-04-26T13:44:54.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/404.html</loc>
     
     <lastmod>2016-04-26T13:44:54.000Z</lastmod>
     

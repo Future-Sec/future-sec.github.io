@@ -7,7 +7,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Archives: 2017/5 | 伏宸安全实验室-Future-Sec Information Security Lab</title>
+  <title>Tag: web安全 | 伏宸安全实验室-Future-Sec Information Security Lab</title>
 
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -15,7 +15,7 @@
   <meta name="description" content="伏宸安全实验室Future-Sec Information Security Lab">
 <meta property="og:type" content="website">
 <meta property="og:title" content="伏宸安全实验室-Future-Sec Information Security Lab">
-<meta property="og:url" content="http://www.future-sec.com/archives/2017/05/index.html">
+<meta property="og:url" content="http://www.future-sec.com/tags/web安全/index.html">
 <meta property="og:site_name" content="伏宸安全实验室-Future-Sec Information Security Lab">
 <meta property="og:description" content="伏宸安全实验室Future-Sec Information Security Lab">
 <meta name="twitter:card" content="summary">
@@ -27,10 +27,6 @@
   
     <link rel="icon" href="/favicon.ico">
   
-    
-  <meta content="{{ title }}" name="description">
-  <meta content="{{ title }}" name="keywords">
-  <meta content="{{ title }}" name="author">
 
   
 
@@ -72,11 +68,15 @@
       <ul>
 	
 	<li class="">
-	  <a href="/home.html">Home</a>
+	  <a href="/index.html">Home</a>
 	</li>
 	
 	<li class="">
 	  <a href="/archives/">Blog</a>
+	</li>
+	
+	<li class="">
+	  <a href="/vulnerabilities.html">Vulnerabilities</a>
 	</li>
 	
 	<li class="">
@@ -88,14 +88,20 @@
 	  <span class="sep"></span>
 	  <i class="fa fa-search search-btn"></i>
 	  <div class="search-box">
-	    <form action="#">
-	      <div class="input-group">
-		<input type="text" placeholder="Search" class="form-control st-default-search-input">
+	   
+	    <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank" class="search-form">
+    <div class="input-group">
+		<input placeholder="Search" class="form-control st-default-search-input" name="word" maxlength="20" type="search">
+		  <input name="si" value="future-sec.com" type="hidden">
+  <input name="tn" value="bds" type="hidden">
+  <input name="cl" value="3" type="hidden">
+  <input name="ct" value="2097152" type="hidden">
+  <input name="s" value="on" type="hidden">
 		<span class="input-group-btn">
 		  <button class="btn btn-primary" type="submit">Search</button>
 		</span>
 	      </div>
-	    </form>
+</form>
 	  </div> 
 	</li>
 	<!-- END TOP SEARCH -->
@@ -109,13 +115,14 @@
   <div class="container">
   <ul class="breadcrumb">
     <li><a href="/">Home</a></li>
-    <li class="active">Blog</li>
+    <li><a href="/blog">Blog</a></li>
+    <li class="active">Tagged: web安全</li>
   </ul>
-<div id="main">
-  <h1>Blog</h1>
+<section id="main">
+  <h1>Tagged: web安全</h1>
   <div class="row">
 
-<div class="col-md-9 col-sm-9 blog-posts">
+<div class="col-xs-12 blog-posts">
 
 
   <section class="archives-wrap">
@@ -124,7 +131,7 @@
 	<div class="row">
   <div class="col-md-4 col-sm-4">
     
-      <img src="/images/mMzyE3v.png" class="img-responsive">
+      <img src="http://ozuqqvmm5.bkt.clouddn.com/Screenshot35.jpg" class="img-responsive">
     
   </div>
   
@@ -132,26 +139,26 @@
   
     
     <h2 itemprop="name">
-      <a class="archive-article-title" href="/badbarcode.html">一维条形码攻击技术(Badbarcode)</a>
+      <a class="archive-article-title" href="/using-MITMF-attack-not-80-port-http.html">使用MITMF中间人攻击非80端口的HTTP</a>
     </h2>
 
 
     <ul class="blog-info">
       <li>
       	<i class="fa fa-calendar"></i> 
-        <time datetime="2017-05-24T16:00:00.000Z" itemprop="datePublished">2017/05/25</time>
+        <time datetime="2017-12-20T16:00:00.000Z" itemprop="datePublished">2017/12/21</time>
 
       </li>
       <li><i class="fa fa-comments"></i>
-        <a href="http://www.future-sec.com/badbarcode.html#disqus_thread" class="article-comment-link">Comments</a>
+        <a href="http://www.future-sec.com/using-MITMF-attack-not-80-port-http.html#disqus_thread" class="article-comment-link">Comments</a>
       </li>
       <li>
 	<i class="fa fa-tags"></i>
 	
   
-    <a href="/tags/硬件安全/" title="硬件安全">硬件安全</a>,
+    <a href="/tags/web安全/" title="web安全">web安全</a>,
   
-    <a href="/tags/条形码/" title="条形码">条形码</a>
+    <a href="/tags/MITMf/" title="MITMf">MITMf</a>
   
 
 
@@ -159,12 +166,12 @@
     </ul>
     <div class="blog-item">
       
-	在日常生活中，条形码随处可见，特别在超市，便利店，物流业，但你们扫的条形码真的安全吗？之前TK教主 在PacSec介绍的条形码攻击和twitter上的demo视频太炫酷，所以就自己买了个扫码器自己研究了一下 ，在研究时候也找遍了国内外所有资料，但是都没有对可以执行的攻击技术完整的文章，故有此文分享。
+	MITMf 是一款可拓展性很高的中间人攻击框架，基于代理工具sergio-proxy修改而来。
       
     </div>
     <br>
     <br>
-    <a href="http://www.future-sec.com/badbarcode.html" class="more">Read more <i class="icon-angle-right"></i></a>
+    <a href="http://www.future-sec.com/using-MITMF-attack-not-80-port-http.html" class="more">Read more <i class="icon-angle-right"></i></a>
   </div>
 </div>
 <hr class="blog-post-sep">
@@ -180,64 +187,11 @@
 
 </div>
 
-<div class="col-md-3 col-sm-3 blog-sidebar">
-  <!-- CATEGORIES START -->
-<h2 class="no-top-space">Categories</h2>
-
-<div class="widget-wrap">
-  <div class="widget">
-    <ul class="nav sidebar-categories margin-bottom-40">
-      
-	<li>
-	  <a href="/categories/硬件安全/">硬件安全 (1)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/web安全/">web安全 (2)</a>
-	</li>
-      
-    </ul>
-  </div>
 </div>
 
-
-<!-- CATEGORIES END -->
-
-<!-- BEGIN BLOG TAGS -->
-<div class="blog-tags margin-bottom-20">
-  <h2>Tags</h2>
-  
-  <div class="widget-wrap">
-    <div class="widget">
-      
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
-    </div>
-  </div>
-
-
-</div>
-<!-- END BLOG TAGS -->
-
-
-<!-- BEGIN FEATURED POSTS -->                            
-<h2>Featured Posts</h2>
-<div class="recent-news margin-bottom-10">
-  
-    
-  
-    
-  
-    
-  
-</div>
-<!-- END FEATURED POSTS -->                            
-
+</section>
 </div>
 
-</div>
-
-</div>
-</div>
 
     <!-- BEGIN PRE-FOOTER -->
     <div class="pre-footer">
@@ -285,13 +239,11 @@
     
       <li><a href="https://github.com/Future-Sec/" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-github"></i></a></li>
     
-      <li><a href="https://weibo.com/futures-sec" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weibo"></i></a></li>
+      <li><a href="https://weibo.com/futuresec" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weibo"></i></a></li>
     
       <li><a href="https://mp.weixin.qq.com/s/QuDKBrMist8GL16EEO-u4Q" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weixin"></i></a></li>
     
       <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
-    
-      <li><a href="https://weibo.com/futures-ec" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-stackoverflow"></i></a></li>
     
   </ul>  
 </div>
@@ -343,6 +295,15 @@
                                   closeEffect   : 'elastic',
                               });
     </script>
+    <script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?9e36ea61528e32ab9a0bc86aa61db5f7";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
 <!-- END CORE PLUGINS -->
 
 <!-- BEGIN PAGE-SPECIFIC PLUGINS --> 

