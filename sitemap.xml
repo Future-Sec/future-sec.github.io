@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://www.future-sec.com/iot-security-hardware-analysis.html</loc>
+    
+    <lastmod>2017-12-26T03:01:45.419Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html</loc>
     
     <lastmod>2017-12-21T07:53:50.474Z</lastmod>
@@ -65,13 +72,6 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/iot-security-hardware-analysis.html</loc>
-    
-    <lastmod>2017-11-27T03:04:25.544Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://www.future-sec.com/network-penetration.html</loc>
     
     <lastmod>2017-11-20T08:29:04.175Z</lastmod>
@@ -121,13 +121,6 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/tags/index.html</loc>
-    
-    <lastmod>2017-06-26T11:36:02.658Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://www.future-sec.com/categories/index.html</loc>
     
     <lastmod>2017-06-26T11:36:02.658Z</lastmod>
@@ -135,7 +128,28 @@
   </url>
   
   <url>
+    <loc>http://www.future-sec.com/tags/index.html</loc>
+    
+    <lastmod>2017-06-26T11:36:02.658Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/index.html</loc>
+    
+    <lastmod>2016-04-26T13:44:54.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://www.future-sec.com/about/index.html</loc>
+    
+    <lastmod>2016-04-26T13:44:54.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/404.html</loc>
     
     <lastmod>2016-04-26T13:44:54.000Z</lastmod>
     
@@ -149,21 +163,7 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/index.html</loc>
-    
-    <lastmod>2016-04-26T13:44:54.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://www.future-sec.com/projects/index.html</loc>
-    
-    <lastmod>2016-04-26T13:44:54.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://www.future-sec.com/404.html</loc>
     
     <lastmod>2016-04-26T13:44:54.000Z</lastmod>
     

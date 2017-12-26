@@ -412,7 +412,7 @@
     <link href="http://www.future-sec.com/iot-security-hardware-analysis.html"/>
     <id>http://www.future-sec.com/iot-security-hardware-analysis.html</id>
     <published>2017-11-16T16:00:00.000Z</published>
-    <updated>2017-11-27T03:04:25.544Z</updated>
+    <updated>2017-12-26T03:01:45.419Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>当我们在分析IOT设备，如智能摄像头、智能门锁、智能路由器等等产品时，采用传统的安全检测手段，如对APP的逆向、云端服务器的渗透测试、产品通信的抓包等方式可以获得部分的信息，但如果需要深入分析智能设备底层的工作原理，从中发现更深层次的安全问题，就不可避免的需要直接接触硬件本身，这也是传统安全手段未能触及的部分，据此，下面简单的谈下关于电路分析和芯片固件提取和调试的一点心得。</p>
 <h2 id="电路识别"><a href="#电路识别" class="headerlink" title="电路识别"></a>电路识别</h2><p>在对电路进行分析之前，需要对PCB电路图和电子元器件知识有简单的了解。<br>PCB（ Printed Circuit Board），中文名称为印制电路板，又称印刷线路板，是重要的电子部件，是电子元器件的支撑体，是电子元器件电气连接的载体。由于它是采用电子印刷术制作的，故被称为“印刷”电路板。<br><img src="/images/image11.jpg" alt="img"><br><img src="/images/image12.jpg" alt="img"><br><img src="/images/image13.jpg" alt="img"></p>
