@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.future-sec.com/"/>
-  <updated>2017-12-21T07:42:22.081Z</updated>
+  <updated>2017-12-21T07:53:50.474Z</updated>
   <id>http://www.future-sec.com/</id>
   
   <author>
@@ -14,6 +14,39 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Janus漏洞(CVE-2017-13156)分析</title>
+    <link href="http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html"/>
+    <id>http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html</id>
+    <published>2017-12-20T16:00:00.000Z</published>
+    <updated>2017-12-21T07:53:50.474Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签名，是没有办法安装到系统中的。Android通过数字签名来标识应用程序的作者和在应用程序之间建立信任关系，不是用来决定最终用户可以安装哪些应用程序。这个数字签名由应用程序的作者完成，并不需要权威的数字证书签名机构认证，它只是用来让应用程序包自我认证的。然而Google在本月4日发布的Android安全公告中编号为CVE-2017-13156，这个漏洞被称为Janus漏洞，利用该漏洞可修改app而不影响原始签名。</p>
+<h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h3 id="Android-app签名校验简单介绍"><a href="#Android-app签名校验简单介绍" class="headerlink" title="Android app签名校验简单介绍"></a>Android app签名校验简单介绍</h3><p>在Android源码中“frameworks/base/core/java/android/content/pm/PackageParser.java”中。PackageParser类的collectCertificates方法会对APK进行签名校验，并且遍历APK中的所有文件，对每个文件进行校验。下面是该方法的源码：<br><img src="http://p1aqjecep.bkt.clouddn.com/image002.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image004.jpg" alt="img"><br>APK是一个ZIP格式的文件，因此使用ZIP相关的类进行读写。在上面代码中调用了loadCertificates，这个方法会返回一个二维数组，当APK中的文件签名校验失败，loadCertificates方法会返回一个空数组（可能是null，可能是数组长度为0），那么依照上面代码的逻辑如果数组为空则会抛出异常。<br>loadCertificates方法的代码见下：<br><img src="http://p1aqjecep.bkt.clouddn.com/image006.jpg" alt="img"><br>其中is是JarFile.JarFileInputStream类的对象。loadCertificates调用了readFullyIgnoringContents，在readFullyIgnoringContents中会调用JarFile.JarFileInputStream.read（JarFile类在“libcore/luni/src/main/java/java/util/jar/JarFile.java”文件中）<br>读取APK中一项数据，在read方法中会校验读取到的数据项的签名，如果签名校验失败，则会抛出SecurityException类型的异常，即签名校验失败。<br>上面代码调用了StrictJarFile.getCertificateChains方法，在/ libcore / luni / src / main / java / java / util / jar / StrictJarFile.java里面。下面是它的代码：<br><img src="http://p1aqjecep.bkt.clouddn.com/image007.jpg" alt="img"><br>上面的isSigned在下面的代码里面获取的：<br><img src="http://p1aqjecep.bkt.clouddn.com/image009.jpg" alt="img"><br>当证书读取成功，而且APK经过了签名，isSigned为true。<br>回到StrictJarFile.getCertificateChains中，当isSigned为true时会调用JarVerifier.getCertificateChains方法，下面是它的代码：<br><img src="http://p1aqjecep.bkt.clouddn.com/image010.jpg" alt="img"><br>verifiedEntries的声明：<br><img src="http://p1aqjecep.bkt.clouddn.com/image012.jpg" alt="img"><br>verifiedEntries是一个键值对，键是APK中经过了签名的文件名，如：classes.dex文件，值是证书数组。如果向已经签过名的APK中新添加一个文件然后安装这个APK，当程序逻辑执行到JarVerifier.getCertificateChains中时，在verifiedEntries里面无法找到新添加的文件名（因为这个新文件是在APK签名之后添加），那么JarVerifier.getCertificateChains方法将返回null。<br>以上就是整个对于app签名的简单分析。</p>
+<h3 id="签名方案"><a href="#签名方案" class="headerlink" title="签名方案"></a>签名方案</h3><p>参考google官方文档获得:<br>APK 签名方案<br>Android 支持两种应用签名方案，一种是基于 JAR 签名的方案（v1 方案），另一种是 Android Nougat (Android 7.0) 中引入的 APK 签名方案 v2（v2 方案）。<br>JAR 签名（v1 方案）<br>v1 签名并非保护整个apk文件，例如 ZIP 元数据就不受保护。再者，APK 验证程序需要处理大量不可信（尚未经过验证）的数据结构，而不受签名保护的数据不在处理的行列中。这会导致相当大的受攻击面。此外，APK 验证程序必须解压所有已压缩的条目，而这需要花费更多时间和内存。为了解决这些问题，Android 7.0 中引入了 APK 签名方案 v2。<br>APK 签名方案 v2（v2 方案）<br>Android 7.0 中引入了 APK 签名方案 v2（v2 方案）。该方案会对 APK 的内容进行hash处理和签名，然后将生成的“APK 签名分块”插入到 APK 中。<br>在验证期间，v2 方案会将 APK 文件视为 Blob，并对整个文件进行签名检查。对 APK 进行的任何修改（包括对 ZIP 元数据进行的修改）都会使 APK 签名作废。这种形式的 APK 验证不仅速度要快得多，而且能够发现更多种未经授权的修改。<br>同时，新的签名格式向后兼容，使用这种新格式签名的 APK（必须也使用v1） 可在更低版本的 Android 设备上进行安装（会直接忽略添加到 APK 的额外数据）。</p>
+<h3 id="apk签名校验方式"><a href="#apk签名校验方式" class="headerlink" title="apk签名校验方式"></a>apk签名校验方式</h3><p>为了提高兼容性，应同时采用 v1 和 v2 这两种方案对应用进行签名。与只使用v1 方案签名的应用相比，经过 v2 方案签名的应用能够更快速地安装到 Android Nougat 以及更高版本的设备上。但是更低版本的 Android 平台会忽略 v2 签名，这就需要应用包含 v1 签名。<br><img src="http://p1aqjecep.bkt.clouddn.com/image014.jpg" alt="img"><br>验证程序会对照存储在“APK 签名分块”中的 v2 签名对 APK 的全文件hash进行验证。该hash涵盖除“APK 签名分块”（其中包含 v2 签名）之外的所有内容。在“APK 签名分块”以外对 APK 进行的任何修改都会使 APK 的 v2 签名作废。v2 签名被删除的 APK 也会被拒绝，因为 v1 签名指明相应 APK 带有 v2 签名，所以 Android Nougat 及更高版本会拒绝使用 v1 签名验证 APK。</p>
+<h2 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h2><p>Janus漏洞主要是向APK里面添加额外的DEX文件。一方面，APK文件是zip文件，可以包含初始时的任意字节，在它的zip条目（实际情况下更多是在zip条目里面）。但是JAR签名方案只考虑了zip入口。当计算或者校验apk的签名的时候，它忽略了其他字节。另一方面，在字符串、类、方法定义等常规部分之后，一个DEX文件可以包含任意的字节。综上所述，一个文件可以同时包含一个APK文件和一个DEX文件。<br><img src="http://p1aqjecep.bkt.clouddn.com/image016.jpg" alt="img"><br>另一个关键点是Dalvik / ART虚拟机方面。android运行加载APK文件，提取它的DEX文件，然后运行它的代码。在实践中，虚拟机可以加载和执行APK文件。当它得到APK文件时，它仍然会查看header的magic字节来判断它是什么类型的文件，如果找到一个DEX类型的，就会将文件载入为DEX文件，否则就会将文件加载为一个APK文件，其中包括一个带有DEX的zip文件。因此，既可以读取DEX文件又可以读取APK文件。<br>所以攻击者可以利用着这种二元性，在不影响其签名的情况下将一个恶意DEX文件预先添加到APK文件里面，然后，android运行时接受APK文件作为一个合法的早期版本的应用程序的有效更新，但是Dalvik虚拟机从注入的DEX文件中加载代码，从而实现攻击。</p>
+<h2 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h2><p><img src="http://p1aqjecep.bkt.clouddn.com/image018.jpg" alt="img"><br>原来的apk主要代码<br><img src="http://p1aqjecep.bkt.clouddn.com/image019.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image021.jpg" alt="img"><br>修改了dex文件，将Log.i(“janus”,”点击事件”);修改为Toast.makeText(getApplicationContext(),”I steal your car.”,Toast.LENGTH_LONG).show();<br><img src="http://p1aqjecep.bkt.clouddn.com/image023.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image024.jpg" alt="img"><br>安装合并好的1.apk<br><img src="http://p1aqjecep.bkt.clouddn.com/image026.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image027.jpg" alt="img"><br>测试<br><img src="http://p1aqjecep.bkt.clouddn.com/image029.jpg" alt="img"><br>攻击完成</p>
+<h2 id="影响范围"><a href="#影响范围" class="headerlink" title="影响范围"></a>影响范围</h2><p>该漏洞仅影响基于 JAR 签名的方案（v1 方案）。不影响自Android 7.0 以来引入的 APK 签名方案 v2（v2 方案）。</p>
+<h2 id="漏洞危害"><a href="#漏洞危害" class="headerlink" title="漏洞危害"></a>漏洞危害</h2><p>可被添加恶意dex文件可以进行一些敏感性的操作，例如窃取用户数据、监控手机等高危操作。</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://source.android.com/security/apksigning/v2#verification" rel="external nofollow noopener noreferrer" target="_blank">https://source.android.com/security/apksigning/v2#verification</a><br><a href="https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures" rel="external nofollow noopener noreferrer" target="_blank">https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签
+    
+    </summary>
+    
+      <category term="移动安全" scheme="http://www.future-sec.com/categories/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="移动安全" scheme="http://www.future-sec.com/tags/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+    
+      <category term="app签名" scheme="http://www.future-sec.com/tags/app%E7%AD%BE%E5%90%8D/"/>
+    
+  </entry>
   
   <entry>
     <title>使用MITMF中间人攻击非80端口的HTTP</title>
@@ -57,35 +90,34 @@
   </entry>
   
   <entry>
-    <title>Janus漏洞(CVE-2017-13156)分析</title>
-    <link href="http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html"/>
-    <id>http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html</id>
-    <published>2017-12-20T16:00:00.000Z</published>
-    <updated>2017-12-21T07:53:50.474Z</updated>
+    <title>物联网硬件安全分析基础-串口调试</title>
+    <link href="http://www.future-sec.com/iot-security-hardware-debuging.html"/>
+    <id>http://www.future-sec.com/iot-security-hardware-debuging.html</id>
+    <published>2017-12-04T16:00:00.000Z</published>
+    <updated>2017-12-15T12:56:52.397Z</updated>
     
-    <content type="html"><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签名，是没有办法安装到系统中的。Android通过数字签名来标识应用程序的作者和在应用程序之间建立信任关系，不是用来决定最终用户可以安装哪些应用程序。这个数字签名由应用程序的作者完成，并不需要权威的数字证书签名机构认证，它只是用来让应用程序包自我认证的。然而Google在本月4日发布的Android安全公告中编号为CVE-2017-13156，这个漏洞被称为Janus漏洞，利用该漏洞可修改app而不影响原始签名。</p>
-<h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h3 id="Android-app签名校验简单介绍"><a href="#Android-app签名校验简单介绍" class="headerlink" title="Android app签名校验简单介绍"></a>Android app签名校验简单介绍</h3><p>在Android源码中“frameworks/base/core/java/android/content/pm/PackageParser.java”中。PackageParser类的collectCertificates方法会对APK进行签名校验，并且遍历APK中的所有文件，对每个文件进行校验。下面是该方法的源码：<br><img src="http://p1aqjecep.bkt.clouddn.com/image002.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image004.jpg" alt="img"><br>APK是一个ZIP格式的文件，因此使用ZIP相关的类进行读写。在上面代码中调用了loadCertificates，这个方法会返回一个二维数组，当APK中的文件签名校验失败，loadCertificates方法会返回一个空数组（可能是null，可能是数组长度为0），那么依照上面代码的逻辑如果数组为空则会抛出异常。<br>loadCertificates方法的代码见下：<br><img src="http://p1aqjecep.bkt.clouddn.com/image006.jpg" alt="img"><br>其中is是JarFile.JarFileInputStream类的对象。loadCertificates调用了readFullyIgnoringContents，在readFullyIgnoringContents中会调用JarFile.JarFileInputStream.read（JarFile类在“libcore/luni/src/main/java/java/util/jar/JarFile.java”文件中）<br>读取APK中一项数据，在read方法中会校验读取到的数据项的签名，如果签名校验失败，则会抛出SecurityException类型的异常，即签名校验失败。<br>上面代码调用了StrictJarFile.getCertificateChains方法，在/ libcore / luni / src / main / java / java / util / jar / StrictJarFile.java里面。下面是它的代码：<br><img src="http://p1aqjecep.bkt.clouddn.com/image007.jpg" alt="img"><br>上面的isSigned在下面的代码里面获取的：<br><img src="http://p1aqjecep.bkt.clouddn.com/image009.jpg" alt="img"><br>当证书读取成功，而且APK经过了签名，isSigned为true。<br>回到StrictJarFile.getCertificateChains中，当isSigned为true时会调用JarVerifier.getCertificateChains方法，下面是它的代码：<br><img src="http://p1aqjecep.bkt.clouddn.com/image010.jpg" alt="img"><br>verifiedEntries的声明：<br><img src="http://p1aqjecep.bkt.clouddn.com/image012.jpg" alt="img"><br>verifiedEntries是一个键值对，键是APK中经过了签名的文件名，如：classes.dex文件，值是证书数组。如果向已经签过名的APK中新添加一个文件然后安装这个APK，当程序逻辑执行到JarVerifier.getCertificateChains中时，在verifiedEntries里面无法找到新添加的文件名（因为这个新文件是在APK签名之后添加），那么JarVerifier.getCertificateChains方法将返回null。<br>以上就是整个对于app签名的简单分析。</p>
-<h3 id="签名方案"><a href="#签名方案" class="headerlink" title="签名方案"></a>签名方案</h3><p>参考google官方文档获得:<br>APK 签名方案<br>Android 支持两种应用签名方案，一种是基于 JAR 签名的方案（v1 方案），另一种是 Android Nougat (Android 7.0) 中引入的 APK 签名方案 v2（v2 方案）。<br>JAR 签名（v1 方案）<br>v1 签名并非保护整个apk文件，例如 ZIP 元数据就不受保护。再者，APK 验证程序需要处理大量不可信（尚未经过验证）的数据结构，而不受签名保护的数据不在处理的行列中。这会导致相当大的受攻击面。此外，APK 验证程序必须解压所有已压缩的条目，而这需要花费更多时间和内存。为了解决这些问题，Android 7.0 中引入了 APK 签名方案 v2。<br>APK 签名方案 v2（v2 方案）<br>Android 7.0 中引入了 APK 签名方案 v2（v2 方案）。该方案会对 APK 的内容进行hash处理和签名，然后将生成的“APK 签名分块”插入到 APK 中。<br>在验证期间，v2 方案会将 APK 文件视为 Blob，并对整个文件进行签名检查。对 APK 进行的任何修改（包括对 ZIP 元数据进行的修改）都会使 APK 签名作废。这种形式的 APK 验证不仅速度要快得多，而且能够发现更多种未经授权的修改。<br>同时，新的签名格式向后兼容，使用这种新格式签名的 APK（必须也使用v1） 可在更低版本的 Android 设备上进行安装（会直接忽略添加到 APK 的额外数据）。</p>
-<h3 id="apk签名校验方式"><a href="#apk签名校验方式" class="headerlink" title="apk签名校验方式"></a>apk签名校验方式</h3><p>为了提高兼容性，应同时采用 v1 和 v2 这两种方案对应用进行签名。与只使用v1 方案签名的应用相比，经过 v2 方案签名的应用能够更快速地安装到 Android Nougat 以及更高版本的设备上。但是更低版本的 Android 平台会忽略 v2 签名，这就需要应用包含 v1 签名。<br><img src="http://p1aqjecep.bkt.clouddn.com/image014.jpg" alt="img"><br>验证程序会对照存储在“APK 签名分块”中的 v2 签名对 APK 的全文件hash进行验证。该hash涵盖除“APK 签名分块”（其中包含 v2 签名）之外的所有内容。在“APK 签名分块”以外对 APK 进行的任何修改都会使 APK 的 v2 签名作废。v2 签名被删除的 APK 也会被拒绝，因为 v1 签名指明相应 APK 带有 v2 签名，所以 Android Nougat 及更高版本会拒绝使用 v1 签名验证 APK。</p>
-<h2 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h2><p>Janus漏洞主要是向APK里面添加额外的DEX文件。一方面，APK文件是zip文件，可以包含初始时的任意字节，在它的zip条目（实际情况下更多是在zip条目里面）。但是JAR签名方案只考虑了zip入口。当计算或者校验apk的签名的时候，它忽略了其他字节。另一方面，在字符串、类、方法定义等常规部分之后，一个DEX文件可以包含任意的字节。综上所述，一个文件可以同时包含一个APK文件和一个DEX文件。<br><img src="http://p1aqjecep.bkt.clouddn.com/image016.jpg" alt="img"><br>另一个关键点是Dalvik / ART虚拟机方面。android运行加载APK文件，提取它的DEX文件，然后运行它的代码。在实践中，虚拟机可以加载和执行APK文件。当它得到APK文件时，它仍然会查看header的magic字节来判断它是什么类型的文件，如果找到一个DEX类型的，就会将文件载入为DEX文件，否则就会将文件加载为一个APK文件，其中包括一个带有DEX的zip文件。因此，既可以读取DEX文件又可以读取APK文件。<br>所以攻击者可以利用着这种二元性，在不影响其签名的情况下将一个恶意DEX文件预先添加到APK文件里面，然后，android运行时接受APK文件作为一个合法的早期版本的应用程序的有效更新，但是Dalvik虚拟机从注入的DEX文件中加载代码，从而实现攻击。</p>
-<h2 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h2><p><img src="http://p1aqjecep.bkt.clouddn.com/image018.jpg" alt="img"><br>原来的apk主要代码<br><img src="http://p1aqjecep.bkt.clouddn.com/image019.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image021.jpg" alt="img"><br>修改了dex文件，将Log.i(“janus”,”点击事件”);修改为Toast.makeText(getApplicationContext(),”I steal your car.”,Toast.LENGTH_LONG).show();<br><img src="http://p1aqjecep.bkt.clouddn.com/image023.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image024.jpg" alt="img"><br>安装合并好的1.apk<br><img src="http://p1aqjecep.bkt.clouddn.com/image026.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image027.jpg" alt="img"><br>测试<br><img src="http://p1aqjecep.bkt.clouddn.com/image029.jpg" alt="img"><br>攻击完成</p>
-<h2 id="影响范围"><a href="#影响范围" class="headerlink" title="影响范围"></a>影响范围</h2><p>该漏洞仅影响基于 JAR 签名的方案（v1 方案）。不影响自Android 7.0 以来引入的 APK 签名方案 v2（v2 方案）。</p>
-<h2 id="漏洞危害"><a href="#漏洞危害" class="headerlink" title="漏洞危害"></a>漏洞危害</h2><p>可被添加恶意dex文件可以进行一些敏感性的操作，例如窃取用户数据、监控手机等高危操作。</p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://source.android.com/security/apksigning/v2#verification" rel="external nofollow noopener noreferrer" target="_blank">https://source.android.com/security/apksigning/v2#verification</a><br><a href="https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures" rel="external nofollow noopener noreferrer" target="_blank">https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures</a></p>
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上篇介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态调试。</p>
+<h2 id="UART串口调试"><a href="#UART串口调试" class="headerlink" title="UART串口调试"></a>UART串口调试</h2><p>UART调试第一步需要先找到对应的四个PIN，在通电情况下，VCC口可以不要接，判断 GND, RX, TX三个引脚是调试的关键，找四个引脚可以先看PCB上的印字。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image65.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image66.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image67.jpg" alt="img"><br>但多数厂商在量产前会去掉用于调试的串口印字，如果找不到对应引脚的印字，就需要先分析PCB的结构，一般PCB上有3、4 、5个并排或相距不远的焊点或通孔，就有可能是UART调试串口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image68.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image69.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image70.jpg" alt="img"><br>但PCB上可能存在多个这样的焊点或通孔，从多个口中找出真正的调试串口，就需要借助到万用表。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image101.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image102.jpg" alt="img"><br>万用表找串口首先需要找到GND口，就是接地口，在疑似串口的焊点处，通过测量电势差，可以判断出GND口，通过连接焊点和输入负极，如果电势为0，就可能是GND口，如果电势为最大值，例如3.6V、5V等，就可能是VCC口。然后通过UART转换器对应的4个口，引出导线，并设置好串口输出环境后，就可以依次尝试。也可以通过短接其中的两口，如果机器重启，就可以判断这两口为VCC和GND。<br>需要注意的是，在TTL电平模式下，UATR转换接口上的RX、TX口与上位设备，也就是PCB上的UART口的RX和TX是需要反接的。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image71.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image72.jpg" alt="img"></p>
+<h3 id="案例一：调试某智能摄像头"><a href="#案例一：调试某智能摄像头" class="headerlink" title="案例一：调试某智能摄像头"></a>案例一：调试某智能摄像头</h3><p>通过万用表测量电势差之后，在靠近CPU的地方有三个通孔，有可能是UART串口，用导线连接之后，设置波特率为115200。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image73.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image35.jpg" alt="img"><br>用SecureCRT连接串口，给机器通上电之后，串口立马输出了启动信息，并可以执行命令，说明串口正确，如果遇到无法输入的情况，首先检查接线是否松动，然后在SecureCRT中的， Session Options -&gt; Connection -&gt; Serial -&gt; Flow Control，将原先选中的 RTS/CTS取消掉，这是因为如果选中了RTS/CTS ，则硬件上要有对应接口，软件上实现对应协议，才能实现此流控制。如果串口输出为乱码，则需要切换波特率，直至输出正常。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image74.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image75.jpg" alt="img"></p>
+<h3 id="案例二：调试某路由器"><a href="#案例二：调试某路由器" class="headerlink" title="案例二：调试某路由器"></a>案例二：调试某路由器</h3><p>在靠近cpu的地方有四个通孔，测量电势差后，利用导线探针，确定了三个PIN，连接转换器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image76.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image77.jpg" alt="img"><br>串口中输出调试信息，因波特率设置问题，初始输出为乱码，改为38400即可正常输出。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image78.jpg" alt="img"></p>
+<h3 id="案例三：调试某路由器"><a href="#案例三：调试某路由器" class="headerlink" title="案例三：调试某路由器"></a>案例三：调试某路由器</h3><p>在PCB上有四个焊点，先测量电势差，分出GND和VCC，在利用焊枪分别焊上导线，连接转换接口，测试出TX和RX口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image79.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image80.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image81.jpg" alt="img"></p>
+<h3 id="案例四：调试某路由器"><a href="#案例四：调试某路由器" class="headerlink" title="案例四：调试某路由器"></a>案例四：调试某路由器</h3><p>在PCB一侧有5个通孔，并标注有UART-0字样，通电后，测试各口电势差，确实GND和VCC后，连接转换接口，并测试出RX和TX口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image82.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image83.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image84.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image85.jpg" alt="img"><br>通过本地架设的tftp服务器，并在串口输入命令，开启相关服务，就可以通过tftp与机器传输文件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image86.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image87.jpg" alt="img"></p>
+<h3 id="案例五：调试某无线数据终端"><a href="#案例五：调试某无线数据终端" class="headerlink" title="案例五：调试某无线数据终端"></a>案例五：调试某无线数据终端</h3><p>拆开正面压板，发现PCB上标注有印字，利用PCB夹具和探针，引出RX和TX口，连接转换器，因该无线终端串口电压不超过1.7V，焊接容易造成信号衰减，因此采用夹具。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image88.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image89.jpg" alt="img"><br>因串口输出信息过多，影响输入和输出结果，因此采用串口调试助手，设置波特率为115200，输入命令并发送，可以成功执行。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image90.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image91.jpg" alt="img"></p>
+<h3 id="案例六：调试某无线数据终端"><a href="#案例六：调试某无线数据终端" class="headerlink" title="案例六：调试某无线数据终端"></a>案例六：调试某无线数据终端</h3><p>拆解机器，该型机器采用多块电路板层级设计，其主要处理芯片位于顶部，拆解时注意走线位置，防止拉坏接线口，在PCB上有UART的PIN口印字，给每一个PIN口焊上导线，连接转换器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image122.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image123.jpg" alt="img"><br>设置波特率为921600，连接串口，用root账号登陆，密码为空，成功进入系统，执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image124.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image125.jpg" alt="img"></p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;上篇介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态
     
     </summary>
     
-      <category term="移动安全" scheme="http://www.future-sec.com/categories/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
     
     
-      <category term="移动安全" scheme="http://www.future-sec.com/tags/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+      <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
     
-      <category term="app签名" scheme="http://www.future-sec.com/tags/app%E7%AD%BE%E5%90%8D/"/>
+      <category term="UART串口调试" scheme="http://www.future-sec.com/tags/UART%E4%B8%B2%E5%8F%A3%E8%B0%83%E8%AF%95/"/>
     
   </entry>
   
@@ -135,34 +167,62 @@
   </entry>
   
   <entry>
-    <title>物联网硬件安全分析基础-串口调试</title>
-    <link href="http://www.future-sec.com/iot-security-hardware-debuging.html"/>
-    <id>http://www.future-sec.com/iot-security-hardware-debuging.html</id>
-    <published>2017-12-04T16:00:00.000Z</published>
-    <updated>2017-12-15T12:56:52.397Z</updated>
+    <title>如何破解一个蓝牙锁</title>
+    <link href="http://www.future-sec.com/how-to-crack-a-ble-lock.html"/>
+    <id>http://www.future-sec.com/how-to-crack-a-ble-lock.html</id>
+    <published>2017-11-26T16:00:00.000Z</published>
+    <updated>2017-11-27T11:01:32.347Z</updated>
     
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上篇介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态调试。</p>
-<h2 id="UART串口调试"><a href="#UART串口调试" class="headerlink" title="UART串口调试"></a>UART串口调试</h2><p>UART调试第一步需要先找到对应的四个PIN，在通电情况下，VCC口可以不要接，判断 GND, RX, TX三个引脚是调试的关键，找四个引脚可以先看PCB上的印字。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image65.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image66.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image67.jpg" alt="img"><br>但多数厂商在量产前会去掉用于调试的串口印字，如果找不到对应引脚的印字，就需要先分析PCB的结构，一般PCB上有3、4 、5个并排或相距不远的焊点或通孔，就有可能是UART调试串口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image68.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image69.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image70.jpg" alt="img"><br>但PCB上可能存在多个这样的焊点或通孔，从多个口中找出真正的调试串口，就需要借助到万用表。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image101.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image102.jpg" alt="img"><br>万用表找串口首先需要找到GND口，就是接地口，在疑似串口的焊点处，通过测量电势差，可以判断出GND口，通过连接焊点和输入负极，如果电势为0，就可能是GND口，如果电势为最大值，例如3.6V、5V等，就可能是VCC口。然后通过UART转换器对应的4个口，引出导线，并设置好串口输出环境后，就可以依次尝试。也可以通过短接其中的两口，如果机器重启，就可以判断这两口为VCC和GND。<br>需要注意的是，在TTL电平模式下，UATR转换接口上的RX、TX口与上位设备，也就是PCB上的UART口的RX和TX是需要反接的。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image71.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image72.jpg" alt="img"></p>
-<h3 id="案例一：调试某智能摄像头"><a href="#案例一：调试某智能摄像头" class="headerlink" title="案例一：调试某智能摄像头"></a>案例一：调试某智能摄像头</h3><p>通过万用表测量电势差之后，在靠近CPU的地方有三个通孔，有可能是UART串口，用导线连接之后，设置波特率为115200。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image73.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image35.jpg" alt="img"><br>用SecureCRT连接串口，给机器通上电之后，串口立马输出了启动信息，并可以执行命令，说明串口正确，如果遇到无法输入的情况，首先检查接线是否松动，然后在SecureCRT中的， Session Options -&gt; Connection -&gt; Serial -&gt; Flow Control，将原先选中的 RTS/CTS取消掉，这是因为如果选中了RTS/CTS ，则硬件上要有对应接口，软件上实现对应协议，才能实现此流控制。如果串口输出为乱码，则需要切换波特率，直至输出正常。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image74.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image75.jpg" alt="img"></p>
-<h3 id="案例二：调试某路由器"><a href="#案例二：调试某路由器" class="headerlink" title="案例二：调试某路由器"></a>案例二：调试某路由器</h3><p>在靠近cpu的地方有四个通孔，测量电势差后，利用导线探针，确定了三个PIN，连接转换器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image76.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image77.jpg" alt="img"><br>串口中输出调试信息，因波特率设置问题，初始输出为乱码，改为38400即可正常输出。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image78.jpg" alt="img"></p>
-<h3 id="案例三：调试某路由器"><a href="#案例三：调试某路由器" class="headerlink" title="案例三：调试某路由器"></a>案例三：调试某路由器</h3><p>在PCB上有四个焊点，先测量电势差，分出GND和VCC，在利用焊枪分别焊上导线，连接转换接口，测试出TX和RX口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image79.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image80.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image81.jpg" alt="img"></p>
-<h3 id="案例四：调试某路由器"><a href="#案例四：调试某路由器" class="headerlink" title="案例四：调试某路由器"></a>案例四：调试某路由器</h3><p>在PCB一侧有5个通孔，并标注有UART-0字样，通电后，测试各口电势差，确实GND和VCC后，连接转换接口，并测试出RX和TX口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image82.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image83.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image84.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image85.jpg" alt="img"><br>通过本地架设的tftp服务器，并在串口输入命令，开启相关服务，就可以通过tftp与机器传输文件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image86.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image87.jpg" alt="img"></p>
-<h3 id="案例五：调试某无线数据终端"><a href="#案例五：调试某无线数据终端" class="headerlink" title="案例五：调试某无线数据终端"></a>案例五：调试某无线数据终端</h3><p>拆开正面压板，发现PCB上标注有印字，利用PCB夹具和探针，引出RX和TX口，连接转换器，因该无线终端串口电压不超过1.7V，焊接容易造成信号衰减，因此采用夹具。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image88.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image89.jpg" alt="img"><br>因串口输出信息过多，影响输入和输出结果，因此采用串口调试助手，设置波特率为115200，输入命令并发送，可以成功执行。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image90.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image91.jpg" alt="img"></p>
-<h3 id="案例六：调试某无线数据终端"><a href="#案例六：调试某无线数据终端" class="headerlink" title="案例六：调试某无线数据终端"></a>案例六：调试某无线数据终端</h3><p>拆解机器，该型机器采用多块电路板层级设计，其主要处理芯片位于顶部，拆解时注意走线位置，防止拉坏接线口，在PCB上有UART的PIN口印字，给每一个PIN口焊上导线，连接转换器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image122.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image123.jpg" alt="img"><br>设置波特率为921600，连接串口，用root账号登陆，密码为空，成功进入系统，执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image124.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image125.jpg" alt="img"></p>
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>随着物联网各类技术的逐步进步，越来越多的智能设备出现在我们生活中，智能锁在锁具市场上所占的份额将会越来越大，甚至超过传统锁，成为主流。而在智能锁中，因为低功耗蓝牙技术的推广，以及受外部环境限制小，通过手机APP交互方便等特点，很多智能锁采用的就是以BLE蓝牙芯片作为控制单元，控制电机或锁簧转动的模式，实现开关锁功能。与其他的安全问题相比，锁具的被破解，可能造成的危害更大，本文通过以破解某型号蓝牙锁，来展示目前蓝牙智能锁可能面临的安全风险。</p>
+<h2 id="蓝牙锁介绍"><a href="#蓝牙锁介绍" class="headerlink" title="蓝牙锁介绍"></a>蓝牙锁介绍</h2><p> 蓝牙锁由于不受外部环境限制，功耗较低，和手机交互方便，目前用的比较多,形状也五花八门，例如目前使用最广泛的一些智能蓝牙锁。</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage9.jpg" alt="img"></p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage10.jpg" alt="img"></p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage11.jpg" alt="img"></p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage12.jpg" alt="img"></p>
+<h2 id="如何去破解一个蓝牙锁"><a href="#如何去破解一个蓝牙锁" class="headerlink" title="如何去破解一个蓝牙锁"></a>如何去破解一个蓝牙锁</h2><p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage13.jpg" alt="img"></p>
+<h3 id="目标介绍"><a href="#目标介绍" class="headerlink" title="目标介绍"></a>目标介绍</h3><p>这个属于低功耗蓝牙锁，使用app 绑定之后可以开启，还能共享密码，修改密码。</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage14.jpg" alt="img"></p>
+<h3 id="内部构架"><a href="#内部构架" class="headerlink" title="内部构架"></a>内部构架</h3><p>显微镜查看电路板<br><img src="http://ozuqqvmm5.bkt.clouddn.com/IMG_2214.jpg" alt="img"></p>
+<p>拆解<br><img src="http://ozuqqvmm5.bkt.clouddn.com/IMG_2216.jpg" alt="img"></p>
+<p>蓝牙锁内部搭载了一块CC2541蓝牙芯片，通过控制电机驱动芯片，带动卡榫运转，从而形成拉锁的开关。CC2541是TI推出的一款专门适用于BLE和专用的2.4GHz应用的SOC芯片解决方案,CC254X在目前物联网蓝牙通信解决方案中，市场占有率很高，应用场景非常广泛。</p>
+<h3 id="探测"><a href="#探测" class="headerlink" title="探测"></a>探测</h3><p>使用app初步连接探测，可以看到</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage16.jpg" alt="img"></p>
+<h3 id="开锁流程"><a href="#开锁流程" class="headerlink" title="开锁流程"></a>开锁流程</h3><p>Logcat 查看app日志</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage17.jpg" alt="img"></p>
+<p>流程为</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171123170725.jpg" alt="img"></p>
+<h3 id="攻击方式"><a href="#攻击方式" class="headerlink" title="攻击方式"></a>攻击方式</h3><p>一般对于蓝牙锁的攻击方式有三种</p>
+<p>1、重放攻击<br>2、暴力破解(6位数字)<br>3、云端漏洞</p>
+<h3 id="重放攻击"><a href="#重放攻击" class="headerlink" title="重放攻击"></a>重放攻击</h3><p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage18.jpg" alt="img"></p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage19.jpg" alt="img"></p>
+<p>通过蓝牙抓包分析，发现通信过程没有加密，可以重放获取认证密码，但如果要模拟真实的智能锁攻击场景，显然不能通过如此显眼的方式，真实环境中往往很难有一个给我们抓包或劫持的场景，所以最好的方式是远程无接触开锁，需要去找云端的漏洞。</p>
+<h3 id="云端漏洞"><a href="#云端漏洞" class="headerlink" title="云端漏洞"></a>云端漏洞</h3><p>云端是Thinkphp5 写的，稍微看了一下,存在有两个漏洞。无认证可以遍历所有id拿到所有锁的信息</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage20.jpg" alt="img"></p>
+<p>没有关闭调试模式会泄露信息,传入一个空的id会吧所有锁的信息报错显示出来，泄露所有锁的密码以及绑定的电话号码mac地址等信息。</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage21.jpg" alt="img"></p>
+<h3 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h3><p>对于真实的破解锁场景，最好用一个手机app来开锁掩人耳目，综合以上分析，编写一个开锁Android app 。<br>工作流程为</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171123170725.jpg" alt="img"></p>
+<p>利用 com.inuker.bluetooth 库快速开发</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage22.jpg" alt="img"></p>
+<p>APP界面</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/15117578788731.jpg" alt="img"></p>
+<p>视频演示</p>
+<p> <a href="https://v.qq.com/x/page/b051058vicv.html" rel="external nofollow noopener noreferrer" target="_blank">https://v.qq.com/x/page/b051058vicv.html</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>ti官方页面  <a href="http://www.ti.com.cn/product/cn/CC2541" rel="external nofollow noopener noreferrer" target="_blank">http://www.ti.com.cn/product/cn/CC2541</a><br>cc2541蓝牙芯片手册  <a href="https://wenku.baidu.com/view/c7f99ac7376baf1ffd4fad31.html" rel="external nofollow noopener noreferrer" target="_blank">https://wenku.baidu.com/view/c7f99ac7376baf1ffd4fad31.html</a> </p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;上篇介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;随着物联网各类技术的逐步进步，越来越多的智能设备出现在我们生活中，智能锁在锁具市场上所占的份额将会越来越大，甚至超过传统锁，成为主流。而在智
     
     </summary>
     
       <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
     
     
-      <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
+      <category term="智能锁" scheme="http://www.future-sec.com/tags/%E6%99%BA%E8%83%BD%E9%94%81/"/>
     
-      <category term="UART串口调试" scheme="http://www.future-sec.com/tags/UART%E4%B8%B2%E5%8F%A3%E8%B0%83%E8%AF%95/"/>
+      <category term="蓝牙攻击" scheme="http://www.future-sec.com/tags/%E8%93%9D%E7%89%99%E6%94%BB%E5%87%BB/"/>
     
   </entry>
   
@@ -275,66 +335,6 @@
       <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
     
       <category term="硬件分析" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%88%86%E6%9E%90/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>如何破解一个蓝牙锁</title>
-    <link href="http://www.future-sec.com/how-to-crack-a-ble-lock.html"/>
-    <id>http://www.future-sec.com/how-to-crack-a-ble-lock.html</id>
-    <published>2017-11-26T16:00:00.000Z</published>
-    <updated>2017-11-27T11:01:32.347Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>随着物联网各类技术的逐步进步，越来越多的智能设备出现在我们生活中，智能锁在锁具市场上所占的份额将会越来越大，甚至超过传统锁，成为主流。而在智能锁中，因为低功耗蓝牙技术的推广，以及受外部环境限制小，通过手机APP交互方便等特点，很多智能锁采用的就是以BLE蓝牙芯片作为控制单元，控制电机或锁簧转动的模式，实现开关锁功能。与其他的安全问题相比，锁具的被破解，可能造成的危害更大，本文通过以破解某型号蓝牙锁，来展示目前蓝牙智能锁可能面临的安全风险。</p>
-<h2 id="蓝牙锁介绍"><a href="#蓝牙锁介绍" class="headerlink" title="蓝牙锁介绍"></a>蓝牙锁介绍</h2><p> 蓝牙锁由于不受外部环境限制，功耗较低，和手机交互方便，目前用的比较多,形状也五花八门，例如目前使用最广泛的一些智能蓝牙锁。</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage9.jpg" alt="img"></p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage10.jpg" alt="img"></p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage11.jpg" alt="img"></p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage12.jpg" alt="img"></p>
-<h2 id="如何去破解一个蓝牙锁"><a href="#如何去破解一个蓝牙锁" class="headerlink" title="如何去破解一个蓝牙锁"></a>如何去破解一个蓝牙锁</h2><p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage13.jpg" alt="img"></p>
-<h3 id="目标介绍"><a href="#目标介绍" class="headerlink" title="目标介绍"></a>目标介绍</h3><p>这个属于低功耗蓝牙锁，使用app 绑定之后可以开启，还能共享密码，修改密码。</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage14.jpg" alt="img"></p>
-<h3 id="内部构架"><a href="#内部构架" class="headerlink" title="内部构架"></a>内部构架</h3><p>显微镜查看电路板<br><img src="http://ozuqqvmm5.bkt.clouddn.com/IMG_2214.jpg" alt="img"></p>
-<p>拆解<br><img src="http://ozuqqvmm5.bkt.clouddn.com/IMG_2216.jpg" alt="img"></p>
-<p>蓝牙锁内部搭载了一块CC2541蓝牙芯片，通过控制电机驱动芯片，带动卡榫运转，从而形成拉锁的开关。CC2541是TI推出的一款专门适用于BLE和专用的2.4GHz应用的SOC芯片解决方案,CC254X在目前物联网蓝牙通信解决方案中，市场占有率很高，应用场景非常广泛。</p>
-<h3 id="探测"><a href="#探测" class="headerlink" title="探测"></a>探测</h3><p>使用app初步连接探测，可以看到</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage16.jpg" alt="img"></p>
-<h3 id="开锁流程"><a href="#开锁流程" class="headerlink" title="开锁流程"></a>开锁流程</h3><p>Logcat 查看app日志</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage17.jpg" alt="img"></p>
-<p>流程为</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171123170725.jpg" alt="img"></p>
-<h3 id="攻击方式"><a href="#攻击方式" class="headerlink" title="攻击方式"></a>攻击方式</h3><p>一般对于蓝牙锁的攻击方式有三种</p>
-<p>1、重放攻击<br>2、暴力破解(6位数字)<br>3、云端漏洞</p>
-<h3 id="重放攻击"><a href="#重放攻击" class="headerlink" title="重放攻击"></a>重放攻击</h3><p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage18.jpg" alt="img"></p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage19.jpg" alt="img"></p>
-<p>通过蓝牙抓包分析，发现通信过程没有加密，可以重放获取认证密码，但如果要模拟真实的智能锁攻击场景，显然不能通过如此显眼的方式，真实环境中往往很难有一个给我们抓包或劫持的场景，所以最好的方式是远程无接触开锁，需要去找云端的漏洞。</p>
-<h3 id="云端漏洞"><a href="#云端漏洞" class="headerlink" title="云端漏洞"></a>云端漏洞</h3><p>云端是Thinkphp5 写的，稍微看了一下,存在有两个漏洞。无认证可以遍历所有id拿到所有锁的信息</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage20.jpg" alt="img"></p>
-<p>没有关闭调试模式会泄露信息,传入一个空的id会吧所有锁的信息报错显示出来，泄露所有锁的密码以及绑定的电话号码mac地址等信息。</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage21.jpg" alt="img"></p>
-<h3 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h3><p>对于真实的破解锁场景，最好用一个手机app来开锁掩人耳目，综合以上分析，编写一个开锁Android app 。<br>工作流程为</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171123170725.jpg" alt="img"></p>
-<p>利用 com.inuker.bluetooth 库快速开发</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage22.jpg" alt="img"></p>
-<p>APP界面</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/15117578788731.jpg" alt="img"></p>
-<p>视频演示</p>
-<p> <a href="https://v.qq.com/x/page/b051058vicv.html" rel="external nofollow noopener noreferrer" target="_blank">https://v.qq.com/x/page/b051058vicv.html</a></p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>ti官方页面  <a href="http://www.ti.com.cn/product/cn/CC2541" rel="external nofollow noopener noreferrer" target="_blank">http://www.ti.com.cn/product/cn/CC2541</a><br>cc2541蓝牙芯片手册  <a href="https://wenku.baidu.com/view/c7f99ac7376baf1ffd4fad31.html" rel="external nofollow noopener noreferrer" target="_blank">https://wenku.baidu.com/view/c7f99ac7376baf1ffd4fad31.html</a> </p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;随着物联网各类技术的逐步进步，越来越多的智能设备出现在我们生活中，智能锁在锁具市场上所占的份额将会越来越大，甚至超过传统锁，成为主流。而在智
-    
-    </summary>
-    
-      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="智能锁" scheme="http://www.future-sec.com/tags/%E6%99%BA%E8%83%BD%E9%94%81/"/>
-    
-      <category term="蓝牙攻击" scheme="http://www.future-sec.com/tags/%E8%93%9D%E7%89%99%E6%94%BB%E5%87%BB/"/>
     
   </entry>
   
