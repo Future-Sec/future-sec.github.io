@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://www.future-sec.com/iot-security-hardware-debuging.html</loc>
+    
+    <lastmod>2017-12-26T03:06:07.555Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/GoAhead-CVE-2017-17562-analysis-and-pwn-a-router.html</loc>
+    
+    <lastmod>2017-12-26T03:03:58.834Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://www.future-sec.com/iot-security-hardware-analysis.html</loc>
     
     <lastmod>2017-12-26T03:01:45.419Z</lastmod>
@@ -40,13 +54,6 @@
     <loc>http://www.future-sec.com/broadcom-wifi-1.html</loc>
     
     <lastmod>2017-12-21T07:33:30.953Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://www.future-sec.com/iot-security-hardware-debuging.html</loc>
-    
-    <lastmod>2017-12-15T12:56:52.397Z</lastmod>
     
   </url>
   

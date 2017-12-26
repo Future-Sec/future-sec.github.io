@@ -53,7 +53,7 @@
 <meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image123.jpg">
 <meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image124.jpg">
 <meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image125.jpg">
-<meta property="og:updated_time" content="2017-12-15T12:56:52.397Z">
+<meta property="og:updated_time" content="2017-12-26T03:06:07.555Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="物联网硬件安全分析基础-串口调试">
 <meta name="twitter:description" content="前言上篇介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态调试。 UART串口调试UART调试第一步需要先找到对应的四个PIN，在通电情况下，VCC口可以不要接，判断 GND, RX, TX三个引脚是调试的关键，找四个引脚可以先看PCB上的印字。但多数厂商在量产前会去掉用于调试的串口印字，如果找不到对应引脚的印字">
@@ -209,7 +209,7 @@
 
   <div id="toc" class="toc-article">
     <strong class="toc-title">文章目录</strong>
-    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UART串口调试"><span class="toc-number">2.</span> <span class="toc-text">UART串口调试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#案例一：调试某智能摄像头"><span class="toc-number">2.1.</span> <span class="toc-text">案例一：调试某智能摄像头</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#案例二：调试某路由器"><span class="toc-number">2.2.</span> <span class="toc-text">案例二：调试某路由器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#案例三：调试某路由器"><span class="toc-number">2.3.</span> <span class="toc-text">案例三：调试某路由器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#案例四：调试某路由器"><span class="toc-number">2.4.</span> <span class="toc-text">案例四：调试某路由器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#案例五：调试某无线数据终端"><span class="toc-number">2.5.</span> <span class="toc-text">案例五：调试某无线数据终端</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#案例六：调试某无线数据终端"><span class="toc-number">2.6.</span> <span class="toc-text">案例六：调试某无线数据终端</span></a></li></ol></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UART串口调试"><span class="toc-number">2.</span> <span class="toc-text">UART串口调试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#案例一：调试某智能摄像头"><span class="toc-number">2.1.</span> <span class="toc-text">案例一：调试某智能摄像头</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#案例二：调试某路由器"><span class="toc-number">2.2.</span> <span class="toc-text">案例二：调试某路由器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#案例三：调试某路由器"><span class="toc-number">2.3.</span> <span class="toc-text">案例三：调试某路由器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#案例四：调试某路由器"><span class="toc-number">2.4.</span> <span class="toc-text">案例四：调试某路由器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#案例五：调试某无线数据终端"><span class="toc-number">2.5.</span> <span class="toc-text">案例五：调试某无线数据终端</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#案例六：调试某语音机器人"><span class="toc-number">2.6.</span> <span class="toc-text">案例六：调试某语音机器人</span></a></li></ol></li></ol>
   </div>
 
         <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上篇介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态调试。</p>
@@ -219,7 +219,7 @@
 <h3 id="案例三：调试某路由器"><a href="#案例三：调试某路由器" class="headerlink" title="案例三：调试某路由器"></a>案例三：调试某路由器</h3><p>在PCB上有四个焊点，先测量电势差，分出GND和VCC，在利用焊枪分别焊上导线，连接转换接口，测试出TX和RX口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image79.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image80.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image81.jpg" alt="img"></p>
 <h3 id="案例四：调试某路由器"><a href="#案例四：调试某路由器" class="headerlink" title="案例四：调试某路由器"></a>案例四：调试某路由器</h3><p>在PCB一侧有5个通孔，并标注有UART-0字样，通电后，测试各口电势差，确实GND和VCC后，连接转换接口，并测试出RX和TX口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image82.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image83.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image84.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image85.jpg" alt="img"><br>通过本地架设的tftp服务器，并在串口输入命令，开启相关服务，就可以通过tftp与机器传输文件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image86.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image87.jpg" alt="img"></p>
 <h3 id="案例五：调试某无线数据终端"><a href="#案例五：调试某无线数据终端" class="headerlink" title="案例五：调试某无线数据终端"></a>案例五：调试某无线数据终端</h3><p>拆开正面压板，发现PCB上标注有印字，利用PCB夹具和探针，引出RX和TX口，连接转换器，因该无线终端串口电压不超过1.7V，焊接容易造成信号衰减，因此采用夹具。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image88.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image89.jpg" alt="img"><br>因串口输出信息过多，影响输入和输出结果，因此采用串口调试助手，设置波特率为115200，输入命令并发送，可以成功执行。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image90.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image91.jpg" alt="img"></p>
-<h3 id="案例六：调试某无线数据终端"><a href="#案例六：调试某无线数据终端" class="headerlink" title="案例六：调试某无线数据终端"></a>案例六：调试某无线数据终端</h3><p>拆解机器，该型机器采用多块电路板层级设计，其主要处理芯片位于顶部，拆解时注意走线位置，防止拉坏接线口，在PCB上有UART的PIN口印字，给每一个PIN口焊上导线，连接转换器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image122.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image123.jpg" alt="img"><br>设置波特率为921600，连接串口，用root账号登陆，密码为空，成功进入系统，执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image124.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image125.jpg" alt="img"></p>
+<h3 id="案例六：调试某语音机器人"><a href="#案例六：调试某语音机器人" class="headerlink" title="案例六：调试某语音机器人"></a>案例六：调试某语音机器人</h3><p>拆解机器，该型机器采用多块电路板层级设计，其主要处理芯片位于顶部，拆解时注意走线位置，防止拉坏接线口，在PCB上有UART的PIN口印字，给每一个PIN口焊上导线，连接转换器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image122.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image123.jpg" alt="img"><br>设置波特率为921600，连接串口，用root账号登陆，密码为空，成功进入系统，执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image124.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image125.jpg" alt="img"></p>
 
       
     </div>
@@ -228,19 +228,19 @@
     
 <nav id="article-nav">
   
-    <a href="/using-MITMF-attack-not-80-port-http.html" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/android-ssl-security.html" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
-          使用MITMF中间人攻击非80端口的HTTP
+          你在互联网上的数据还在裸奔吗？
         
       </div>
     </a>
   
   
-    <a href="/android-ssl-security.html" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/yet-another-web-fingerprinter.html" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">你在互联网上的数据还在裸奔吗？</div>
+      <div class="article-nav-title">浅谈现代化指纹识别及工具编写</div>
     </a>
   
 </nav>
@@ -262,11 +262,11 @@
     <ul class="nav sidebar-categories margin-bottom-40">
       
 	<li>
-	  <a href="/categories/移动安全/">移动安全 (2)</a>
+	  <a href="/categories/硬件安全/">硬件安全 (8)</a>
 	</li>
       
 	<li>
-	  <a href="/categories/硬件安全/">硬件安全 (7)</a>
+	  <a href="/categories/移动安全/">移动安全 (2)</a>
 	</li>
       
 	<li>
@@ -291,7 +291,7 @@
   <div class="widget-wrap">
     <div class="widget">
       
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MITMf/"><i class="fa fa-tags"></i>MITMf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/"><i class="fa fa-tags"></i>Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UART串口调试/"><i class="fa fa-tags"></i>UART串口调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app签名/"><i class="fa fa-tags"></i>app签名</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/"><i class="fa fa-tags"></i>https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/"><i class="fa fa-tags"></i>ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web安全/"><i class="fa fa-tags"></i>web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网渗透/"><i class="fa fa-tags"></i>内网渗透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/指纹识别/"><i class="fa fa-tags"></i>指纹识别</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/智能锁/"><i class="fa fa-tags"></i>智能锁</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件分析/"><i class="fa fa-tags"></i>硬件分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/移动安全/"><i class="fa fa-tags"></i>移动安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/蓝牙攻击/"><i class="fa fa-tags"></i>蓝牙攻击</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程代码执行/"><i class="fa fa-tags"></i>远程代码执行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MITMf/"><i class="fa fa-tags"></i>MITMf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/"><i class="fa fa-tags"></i>Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UART串口调试/"><i class="fa fa-tags"></i>UART串口调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app签名/"><i class="fa fa-tags"></i>app签名</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goahead/"><i class="fa fa-tags"></i>goahead</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/"><i class="fa fa-tags"></i>https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/"><i class="fa fa-tags"></i>ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web安全/"><i class="fa fa-tags"></i>web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网渗透/"><i class="fa fa-tags"></i>内网渗透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/指纹识别/"><i class="fa fa-tags"></i>指纹识别</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/智能锁/"><i class="fa fa-tags"></i>智能锁</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件分析/"><i class="fa fa-tags"></i>硬件分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/移动安全/"><i class="fa fa-tags"></i>移动安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/蓝牙攻击/"><i class="fa fa-tags"></i>蓝牙攻击</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程代码执行/"><i class="fa fa-tags"></i>远程代码执行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
     </div>
   </div>
 
@@ -303,6 +303,8 @@
 <!-- BEGIN FEATURED POSTS -->                            
 <h2>Featured Posts</h2>
 <div class="recent-news margin-bottom-10">
+  
+    
   
     
   
