@@ -7,20 +7,39 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Blog: 2017 | 伏宸安全实验室-Future-Sec Information Security Lab</title>
+  <title>芯片安全系列-Let&#39;s cook! | 伏宸安全实验室-Future-Sec Information Security Lab</title>
 
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <meta name="description" content="伏宸安全实验室Future-Sec Information Security Lab">
-<meta property="og:type" content="website">
-<meta property="og:title" content="伏宸安全实验室-Future-Sec Information Security Lab">
-<meta property="og:url" content="http://www.future-sec.com/archives/2017/page/2/index.html">
+  <meta name="description" content="前言芯片安全是针对芯片本身的安全研究，其在知识产权保护，防抄板山寨、加密破解、优化设计、漏洞挖掘和芯片木马等方面都具有深远意义，传统安全往往着眼于上层应用和驱动层面的安全，然而如果芯片存在本质的设计缺陷或安全漏洞，传统安全手段往往很难触及底层，前段时间英特尔芯片的“崩溃”（Meltdown）和“幽灵”（Spectre）漏洞，轰动整个世界，造成了巨额的损失，此次漏洞爆发就是因为芯片自身的设计缺陷所导">
+<meta name="keywords" content="芯片安全">
+<meta property="og:type" content="article">
+<meta property="og:title" content="芯片安全系列-Let&#39;s cook!">
+<meta property="og:url" content="http://www.future-sec.com/chip-security-let-us-cook.html">
 <meta property="og:site_name" content="伏宸安全实验室-Future-Sec Information Security Lab">
-<meta property="og:description" content="伏宸安全实验室Future-Sec Information Security Lab">
+<meta property="og:description" content="前言芯片安全是针对芯片本身的安全研究，其在知识产权保护，防抄板山寨、加密破解、优化设计、漏洞挖掘和芯片木马等方面都具有深远意义，传统安全往往着眼于上层应用和驱动层面的安全，然而如果芯片存在本质的设计缺陷或安全漏洞，传统安全手段往往很难触及底层，前段时间英特尔芯片的“崩溃”（Meltdown）和“幽灵”（Spectre）漏洞，轰动整个世界，造成了巨额的损失，此次漏洞爆发就是因为芯片自身的设计缺陷所导">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/dfghfghfhg.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/fghgjty555.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/20180116_134552.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/20180116_134549.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/20180116_134618.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/20180116_134719.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/20180116_134735.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/20180116_134815.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/20180116_134845.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/breaking-bad-heisenberg-jesse-hazmat-suit-combo-sixth-scale-threezero-902883-28.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/20180116_134912.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/20180116_135324.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/20180116_135403.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/20180116135409.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/20180116135434.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/78B82770-AB46-4404-B195-2B28835DF2AC.jpg">
+<meta property="og:updated_time" content="2018-01-19T07:32:47.046Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="伏宸安全实验室-Future-Sec Information Security Lab">
-<meta name="twitter:description" content="伏宸安全实验室Future-Sec Information Security Lab">
+<meta name="twitter:title" content="芯片安全系列-Let&#39;s cook!">
+<meta name="twitter:description" content="前言芯片安全是针对芯片本身的安全研究，其在知识产权保护，防抄板山寨、加密破解、优化设计、漏洞挖掘和芯片木马等方面都具有深远意义，传统安全往往着眼于上层应用和驱动层面的安全，然而如果芯片存在本质的设计缺陷或安全漏洞，传统安全手段往往很难触及底层，前段时间英特尔芯片的“崩溃”（Meltdown）和“幽灵”（Spectre）漏洞，轰动整个世界，造成了巨额的损失，此次漏洞爆发就是因为芯片自身的设计缺陷所导">
+<meta name="twitter:image" content="http://p1aqjecep.bkt.clouddn.com/dfghfghfhg.jpg">
   
     <link rel="alternative" href="/atom.xml" title="伏宸安全实验室-Future-Sec Information Security Lab" type="application/atom+xml">
   
@@ -115,175 +134,116 @@
   <div class="container">
   <ul class="breadcrumb">
     <li><a href="/">Home</a></li>
-    <li class="active">Blog</li>
+    <li><a href="/archives/">Blog</a></li>
+    <li class="active">Post</li>
   </ul>
-<div id="main">
-  <h1>Blog</h1>
-  <div class="row">
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/chip-security-let-us-cook.html">芯片安全系列-Let&#39;s cook!</a>
+    </h2>
 
+
+    <div class="row">
 <div class="col-md-9 col-sm-9 blog-posts">
-
-
-  <section class="archives-wrap">
-    <div class="archives">
-      
-	<div class="row">
-  <div class="col-md-4 col-sm-4">
-    
-      <img src="http://future-sec.com//images/image12.jpg" class="img-responsive">
-    
+<article id="post-chip-security-let-us-cook" class="article article-type-post blog-item" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
   </div>
-  
-    <div class="col-md-8 col-sm-8">
-  
+  <div class="article-inner">
     
-    <h2 itemprop="name">
-      <a class="archive-article-title" href="/iot-security-hardware-analysis.html">物联网硬件安全分析基础-硬件分析初探</a>
-    </h2>
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> 独抒</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2018-01-20T16:00:00.000Z" itemprop="datePublished">2018/01/21</time>
 
-
-    <ul class="blog-info">
-      <li>
-      	<i class="fa fa-calendar"></i> 
-        <time datetime="2017-11-16T16:00:00.000Z" itemprop="datePublished">2017/11/17</time>
-
-      </li>
-      <li><i class="fa fa-comments"></i>
-        <a href="http://www.future-sec.com/iot-security-hardware-analysis.html#disqus_thread" class="article-comment-link">Comments</a>
-      </li>
-      <li>
-	<i class="fa fa-tags"></i>
-	
+	</li>
+	<li class="hidden-xs"><i class="fa fa-comments"></i>
+	  <a href="http://www.future-sec.com/chip-security-let-us-cook.html#disqus_thread" class="article-comment-link">Comments</a>
+	</li>
+	<li class="hidden-xs"><i class="fa fa-tags"></i> 
+	  
   
-    <a href="/tags/硬件安全/" title="硬件安全">硬件安全</a>,
-  
-    <a href="/tags/硬件分析/" title="硬件分析">硬件分析</a>
+    <a href="/tags/芯片安全/" title="芯片安全">芯片安全</a>
   
 
 
-      </li>
-    </ul>
-    <div class="blog-item">
+	</li>
+      </ul>
       
-	当我们在分析IOT设备，如智能摄像头、智能门锁、智能路由器等等产品时，采用传统的安全检测手段，如对APP的逆向、云端服务器的渗透测试、产品通信的抓包等方式可以获得部分的信息，但如果需要深入分析智能设备底层的工作原理，从中发现更深层次的安全问题，就不可避免的需要直接接触硬件本身
-      
-    </div>
-    <br>
-    <br>
-    <a href="http://www.future-sec.com/iot-security-hardware-analysis.html" class="more">Read more <i class="icon-angle-right"></i></a>
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/芯片安全/">芯片安全</a>
   </div>
-</div>
-<hr class="blog-post-sep">
+  <br>
 
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
       
-	<div class="row">
-  <div class="col-md-4 col-sm-4">
-    
-      <img src="/images/wifi13.png" class="img-responsive">
-    
+      <!-- Table of Contents -->
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#拆焊"><span class="toc-number">2.</span> <span class="toc-text">拆焊</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#清洁"><span class="toc-number">3.</span> <span class="toc-text">清洁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#芯片读取"><span class="toc-number">4.</span> <span class="toc-text">芯片读取</span></a></li></ol>
   </div>
-  
-    <div class="col-md-8 col-sm-8">
-  
-    
-    <h2 itemprop="name">
-      <a class="archive-article-title" href="/broadcom-wifi-2.html">BROADCOM WI-FI芯片漏洞分析二</a>
-    </h2>
 
-
-    <ul class="blog-info">
-      <li>
-      	<i class="fa fa-calendar"></i> 
-        <time datetime="2017-08-29T16:00:00.000Z" itemprop="datePublished">2017/08/30</time>
-
-      </li>
-      <li><i class="fa fa-comments"></i>
-        <a href="http://www.future-sec.com/broadcom-wifi-2.html#disqus_thread" class="article-comment-link">Comments</a>
-      </li>
-      <li>
-	<i class="fa fa-tags"></i>
-	
-  
-    <a href="/tags/Poc/" title="Poc">Poc</a>,
-  
-    <a href="/tags/BROADCOM-WI-FI/" title="BROADCOM WI-FI">BROADCOM WI-FI</a>
-  
-
-
-      </li>
-    </ul>
-    <div class="blog-item">
-      
-	上一篇文章写过之后又修改了一部分内容，加了很多细节。不过还有一点没有详细说明，具体怎么定位到漏洞函数。这里再进行定位流程详细梳理。首先是定位到帧提取函数，这个定位方式根据Project Zero的提示参考到bcm_parse_tlvs源码，然后在这部分源码中找到明显字符串
-      
-    </div>
-    <br>
-    <br>
-    <a href="http://www.future-sec.com/broadcom-wifi-2.html" class="more">Read more <i class="icon-angle-right"></i></a>
-  </div>
-</div>
-<hr class="blog-post-sep">
-
-      
-	<div class="row">
-  <div class="col-md-4 col-sm-4">
-    
-      <img src="/images/wifi1.png" class="img-responsive">
-    
-  </div>
-  
-    <div class="col-md-8 col-sm-8">
-  
-    
-    <h2 itemprop="name">
-      <a class="archive-article-title" href="/broadcom-wifi-1.html">BROADCOM WI-FI芯片漏洞分析一</a>
-    </h2>
-
-
-    <ul class="blog-info">
-      <li>
-      	<i class="fa fa-calendar"></i> 
-        <time datetime="2017-08-29T16:00:00.000Z" itemprop="datePublished">2017/08/30</time>
-
-      </li>
-      <li><i class="fa fa-comments"></i>
-        <a href="http://www.future-sec.com/broadcom-wifi-1.html#disqus_thread" class="article-comment-link">Comments</a>
-      </li>
-      <li>
-	<i class="fa fa-tags"></i>
-	
-  
-    <a href="/tags/Poc/" title="Poc">Poc</a>,
-  
-    <a href="/tags/BROADCOM-WI-FI/" title="BROADCOM WI-FI">BROADCOM WI-FI</a>
-  
-
-
-      </li>
-    </ul>
-    <div class="blog-item">
-      
-	Android Wi-Fi驱动一直是众多安全研究员关注的重点，Android       Wi-Fi驱动中曾经被发现大量root提权漏洞。但这些漏洞都是存在于WEXT(Wireless-Extensions)接口中的，WEXT是一种即将被淘汰的Wi-Fi配置接口。取而代之的是基于nl80211协议的cfg80211接口。本篇文章主要介绍了基于nl80211协议的cfg80211怎么触发Wi-Fi芯片中的漏洞。以及相关漏洞的定位和分析。
-      
-    </div>
-    <br>
-    <br>
-    <a href="http://www.future-sec.com/broadcom-wifi-1.html" class="more">Read more <i class="icon-angle-right"></i></a>
-  </div>
-</div>
-<hr class="blog-post-sep">
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>芯片安全是针对芯片本身的安全研究，其在知识产权保护，防抄板山寨、加密破解、优化设计、漏洞挖掘和芯片木马等方面都具有深远意义，传统安全往往着眼于上层应用和驱动层面的安全，然而如果芯片存在本质的设计缺陷或安全漏洞，传统安全手段往往很难触及底层，前段时间英特尔芯片的“崩溃”（Meltdown）和“幽灵”（Spectre）漏洞，轰动整个世界，造成了巨额的损失，此次漏洞爆发就是因为芯片自身的设计缺陷所导致的，芯片级的安全研究是一项长期而艰难的工作，其是一门涉及多学科多门类的综合性研究，包括：微电子学、计算机科学、数学、物理学、化学、电磁学、光学等等。芯片分析方式主要包括非侵入式、半侵入式、侵入式、侧信道等。本文通过对某款蓝牙锁芯片的处理和固件提取，作为芯片分析的简单实例。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/dfghfghfhg.jpg" alt="dfghfghfhg"></p>
+<h2 id="拆焊"><a href="#拆焊" class="headerlink" title="拆焊"></a>拆焊</h2><p>在PCB背面有一颗CC2541的蓝牙芯片，此款芯片采用QFN-40封装格式，没有暴露的可以直连外部引脚，厂商在量产时也把调试接口去掉了，为了获取芯片的固件内容，需要进行拆焊。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/fghgjty555.jpg" alt="fghgjty555"></p>
+<p>拆焊所需工具包括：热风枪、焊枪、松香水、吸锡线、洗板水或无水酒精、无纺布、镊子等。热风枪温度调到360度，风速在5档左右，先在距离PCb上方3到5厘米处，给PCB预热几秒，然后缓缓下移到1厘米处，沿着芯片的四周匀速转动，枪口务必不要对准芯片的中心处，防止芯片过热，造成损毁，大概20秒左右即可融化芯片底部焊锡，另一只手用镊子夹住芯片，轻轻往上一提，芯片即可从PCB取下。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116_134552.jpg" alt="20180116_134552"><br><img src="http://p1aqjecep.bkt.clouddn.com/20180116_134549.jpg" alt="20180116_134549"></p>
+<h2 id="清洁"><a href="#清洁" class="headerlink" title="清洁"></a>清洁</h2><p>取下芯片之后，芯片的底部会粘有很多未去除的焊锡和脏物，需要进一步清洁处理，首先滴上松香水，用焊枪使焊锡融化。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116_134618.jpg" alt="20180116_134618"></p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116_134719.jpg" alt="20180116_134719"></p>
+<p>然后用吸锡线配合焊枪把多余的焊锡和脏物吸掉，反复几次。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116_134735.jpg" alt="20180116_134735"></p>
+<p>处理完毕之后，用洗板水和无纺布擦洗芯片，彻底去除脏物残留，引脚应保持光亮，以防接触不良和短路。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116_134815.jpg" alt="20180116_134815"></p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116_134845.jpg" alt="20180116_134845"></p>
+<p>焊锡、松香水和洗板水气味比较刺鼻，高温易伤手，工作环境需要注意通风，有条件可以配置防护服。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/breaking-bad-heisenberg-jesse-hazmat-suit-combo-sixth-scale-threezero-902883-28.jpg" alt="breaking-bad-heisenberg-jesse-hazmat-suit-combo-sixth-scale-threezero-902883-28"></p>
+<h2 id="芯片读取"><a href="#芯片读取" class="headerlink" title="芯片读取"></a>芯片读取</h2><p>CC2541芯片是TI出品的一款蓝牙芯片，TI有专门的工具和软件来读取，包括：CCDebugger调试器和SmartRF Flash Programmer软件，因芯片已经拆下，可以通过转接板或烧录座连接芯片，引出相应的接口，然后连接CCDebugger进行固件的读取。</p>
+<p>把处理好的芯片放入烧录座，需要正确放置芯片，可以通过芯片正面的小圆点确定方向。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116_134912.jpg" alt="20180116_134912"></p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116_135324.jpg" alt="20180116_135324"></p>
+<p>确认无误之后，压紧烧录座盖，连上CCDebugger。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116_135403.jpg" alt="20180116_135403"></p>
+<p>打开SmartRF Flash Programmer，选择Read flash into hex-file选项，在Flash image选项可以选择保存的路径和文件名，然后点Perform actions，即可开始读取。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116135409.jpg" alt="QQ截图20180116135409"></p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116135434.jpg" alt="QQ截图20180116135434"></p>
+<p>读取的文件格式为HEX，然后根据对应的CPU指令编写进行反汇编。   </p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/78B82770-AB46-4404-B195-2B28835DF2AC.jpg" alt="QQ截图20180116135452"></p>
+<p>部分芯片另需进行开片和晶体电路修改等等深度处理，本文是伏宸实验室关于芯片安全的一篇先导性文章，后续将会有一系列关于芯片安全的文章，敬请期待。</p>
 
       
     </div>
+  </div>
+  
     
-      <div id="page-nav" class="pagination">
-	<a class="extend prev" rel="prev" href="/archives/2017/">Prev</a><a class="page-number" href="/archives/2017/">1</a><span class="page-number current">2</span>
-      </div>
-    
-  </section>
+<nav id="article-nav">
+  
+  
+    <a href="/analysis-of-a-4G-wireless-router.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">某4G无线路由终端分析</div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+
+
 
 </div>
-
 <div class="col-md-3 col-sm-3 blog-sidebar">
   <!-- CATEGORIES START -->
 <h2 class="no-top-space">Categories</h2>
@@ -381,10 +341,9 @@
 <!-- END FEATURED POSTS -->                            
 
 </div>
-
 </div>
 
-</div>
+  </section>
 </div>
 
     <!-- BEGIN PRE-FOOTER -->

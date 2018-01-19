@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.future-sec.com/"/>
-  <updated>2017-12-26T03:03:58.834Z</updated>
+  <updated>2018-01-19T07:32:47.046Z</updated>
   <id>http://www.future-sec.com/</id>
   
   <author>
@@ -14,6 +14,178 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>芯片安全系列-Let&#39;s cook!</title>
+    <link href="http://www.future-sec.com/chip-security-let-us-cook.html"/>
+    <id>http://www.future-sec.com/chip-security-let-us-cook.html</id>
+    <published>2018-01-20T16:00:00.000Z</published>
+    <updated>2018-01-19T07:32:47.046Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>芯片安全是针对芯片本身的安全研究，其在知识产权保护，防抄板山寨、加密破解、优化设计、漏洞挖掘和芯片木马等方面都具有深远意义，传统安全往往着眼于上层应用和驱动层面的安全，然而如果芯片存在本质的设计缺陷或安全漏洞，传统安全手段往往很难触及底层，前段时间英特尔芯片的“崩溃”（Meltdown）和“幽灵”（Spectre）漏洞，轰动整个世界，造成了巨额的损失，此次漏洞爆发就是因为芯片自身的设计缺陷所导致的，芯片级的安全研究是一项长期而艰难的工作，其是一门涉及多学科多门类的综合性研究，包括：微电子学、计算机科学、数学、物理学、化学、电磁学、光学等等。芯片分析方式主要包括非侵入式、半侵入式、侵入式、侧信道等。本文通过对某款蓝牙锁芯片的处理和固件提取，作为芯片分析的简单实例。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/dfghfghfhg.jpg" alt="dfghfghfhg"></p>
+<h2 id="拆焊"><a href="#拆焊" class="headerlink" title="拆焊"></a>拆焊</h2><p>在PCB背面有一颗CC2541的蓝牙芯片，此款芯片采用QFN-40封装格式，没有暴露的可以直连外部引脚，厂商在量产时也把调试接口去掉了，为了获取芯片的固件内容，需要进行拆焊。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/fghgjty555.jpg" alt="fghgjty555"></p>
+<p>拆焊所需工具包括：热风枪、焊枪、松香水、吸锡线、洗板水或无水酒精、无纺布、镊子等。热风枪温度调到360度，风速在5档左右，先在距离PCb上方3到5厘米处，给PCB预热几秒，然后缓缓下移到1厘米处，沿着芯片的四周匀速转动，枪口务必不要对准芯片的中心处，防止芯片过热，造成损毁，大概20秒左右即可融化芯片底部焊锡，另一只手用镊子夹住芯片，轻轻往上一提，芯片即可从PCB取下。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116_134552.jpg" alt="20180116_134552"><br><img src="http://p1aqjecep.bkt.clouddn.com/20180116_134549.jpg" alt="20180116_134549"></p>
+<h2 id="清洁"><a href="#清洁" class="headerlink" title="清洁"></a>清洁</h2><p>取下芯片之后，芯片的底部会粘有很多未去除的焊锡和脏物，需要进一步清洁处理，首先滴上松香水，用焊枪使焊锡融化。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116_134618.jpg" alt="20180116_134618"></p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116_134719.jpg" alt="20180116_134719"></p>
+<p>然后用吸锡线配合焊枪把多余的焊锡和脏物吸掉，反复几次。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116_134735.jpg" alt="20180116_134735"></p>
+<p>处理完毕之后，用洗板水和无纺布擦洗芯片，彻底去除脏物残留，引脚应保持光亮，以防接触不良和短路。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116_134815.jpg" alt="20180116_134815"></p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116_134845.jpg" alt="20180116_134845"></p>
+<p>焊锡、松香水和洗板水气味比较刺鼻，高温易伤手，工作环境需要注意通风，有条件可以配置防护服。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/breaking-bad-heisenberg-jesse-hazmat-suit-combo-sixth-scale-threezero-902883-28.jpg" alt="breaking-bad-heisenberg-jesse-hazmat-suit-combo-sixth-scale-threezero-902883-28"></p>
+<h2 id="芯片读取"><a href="#芯片读取" class="headerlink" title="芯片读取"></a>芯片读取</h2><p>CC2541芯片是TI出品的一款蓝牙芯片，TI有专门的工具和软件来读取，包括：CCDebugger调试器和SmartRF Flash Programmer软件，因芯片已经拆下，可以通过转接板或烧录座连接芯片，引出相应的接口，然后连接CCDebugger进行固件的读取。</p>
+<p>把处理好的芯片放入烧录座，需要正确放置芯片，可以通过芯片正面的小圆点确定方向。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116_134912.jpg" alt="20180116_134912"></p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116_135324.jpg" alt="20180116_135324"></p>
+<p>确认无误之后，压紧烧录座盖，连上CCDebugger。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116_135403.jpg" alt="20180116_135403"></p>
+<p>打开SmartRF Flash Programmer，选择Read flash into hex-file选项，在Flash image选项可以选择保存的路径和文件名，然后点Perform actions，即可开始读取。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116135409.jpg" alt="QQ截图20180116135409"></p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/20180116135434.jpg" alt="QQ截图20180116135434"></p>
+<p>读取的文件格式为HEX，然后根据对应的CPU指令编写进行反汇编。   </p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/78B82770-AB46-4404-B195-2B28835DF2AC.jpg" alt="QQ截图20180116135452"></p>
+<p>部分芯片另需进行开片和晶体电路修改等等深度处理，本文是伏宸实验室关于芯片安全的一篇先导性文章，后续将会有一系列关于芯片安全的文章，敬请期待。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;芯片安全是针对芯片本身的安全研究，其在知识产权保护，防抄板山寨、加密破解、优化设计、漏洞挖掘和芯片木马等方面都具有深远意义，传统安全往往着眼
+    
+    </summary>
+    
+      <category term="芯片安全" scheme="http://www.future-sec.com/categories/%E8%8A%AF%E7%89%87%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="芯片安全" scheme="http://www.future-sec.com/tags/%E8%8A%AF%E7%89%87%E5%AE%89%E5%85%A8/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>某4G无线路由终端分析</title>
+    <link href="http://www.future-sec.com/analysis-of-a-4G-wireless-router.html"/>
+    <id>http://www.future-sec.com/analysis-of-a-4G-wireless-router.html</id>
+    <published>2018-01-19T16:00:00.000Z</published>
+    <updated>2018-01-19T07:23:47.442Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="设备介绍"><a href="#设备介绍" class="headerlink" title="设备介绍"></a>设备介绍</h2><p>随着4G网络的大区域覆盖，移动端的网络速度得到大幅提升，此次分析的该款4G无线路由终端，就是通过sim卡连上LTE网络之后，在通过wifi模块将蜂窝网络转为wifi信号共享给其他设备使用，其原理与手机共享热点类似，因其便携省电等功能，目前在市场上的反响颇高，X宝销量达数万件。<br><img src="http://p1aqjecep.bkt.clouddn.com/1224171902.jpg" alt="1224171902"><br><img src="http://p1aqjecep.bkt.clouddn.com/20171219164331.jpg" alt="QQ截图20171219164331"></p>
+<h2 id="硬件分析"><a href="#硬件分析" class="headerlink" title="硬件分析"></a>硬件分析</h2><p>话不多说，进入正题，拆掉背面螺丝，取出电池，揭掉正面盖板，在正面PCB上是一块全彩TFT屏幕，显示效果一般，屏幕下方有多个印字。<br><img src="http://p1aqjecep.bkt.clouddn.com/1224171903.jpg" alt="1224171903"></p>
+<p>左侧有两个焊点，分别是RXD和TXD口，可以通过UART模式调试。<br><img src="http://p1aqjecep.bkt.clouddn.com/1224171903a.jpg" alt="1224171903a"></p>
+<p>下方左侧是8口的JTAG调试口，加一个公用GND口，JTAG调试下篇会重点介绍。<br><img src="http://p1aqjecep.bkt.clouddn.com/1224171903b.jpg" alt="1224171903b"></p>
+<p>正下方靠近USB充电口位置是电源电压测试口，主要用来测量额定输入输出的电源电压。<br><img src="http://p1aqjecep.bkt.clouddn.com/1224171903c.jpg" alt="1224171903c"></p>
+<p>拆掉PCB上的螺丝，翻转板子，背面包括SIM插槽、SD卡插槽以及核心处理芯片，出于保护和散热的目的，还加装了保护盖。<br><img src="http://p1aqjecep.bkt.clouddn.com/1224171904.jpg" alt="1224171904"></p>
+<p>拆掉盖子，先看下主要芯片的型号和用途，这对进一步分析有很大帮助。<br><img src="http://p1aqjecep.bkt.clouddn.com/1224171905-bianhao.jpg" alt="1224171905-bianhao"></p>
+<p>图上标注1的芯片通过查看印字分析,为芯天下出产的PN26Q01AWSIUG 型存储芯片，存储容量为1G。<br><img src="http://p1aqjecep.bkt.clouddn.com/20171218_191431.jpg" alt="20171218_191431"></p>
+<p>标注2的芯片为中兴微电子生产的ZX297520型手机modem芯片，支持TD-LTE/FDD LTE /WCDMA/TD-SCDMA/EDGE全模制式。<br><img src="http://p1aqjecep.bkt.clouddn.com/20171218_191405.jpg" alt="20171218_191405"></p>
+<p>标注3的芯片为Realtek生产的使用非常广泛的RTL8189ES无线wifi芯片，是一款高性能、低功耗、体积小SDIO接口无线模组。<br><img src="http://p1aqjecep.bkt.clouddn.com/20171218_191336.jpg" alt="20171218_191336"></p>
+<p>标注4的芯片为中兴微电子生产的ZX23422电源管理芯片。<br><img src="http://p1aqjecep.bkt.clouddn.com/20171218_191524.jpg" alt="20171218_191524"></p>
+<p>标注5的芯片为锐迪科（RDA）生产的RPM6743射频前端芯片，是蜂窝网络和wifi信号广播收发的重要组成部分。<br><img src="http://p1aqjecep.bkt.clouddn.com/20171218_191505.jpg" alt="20171218_191505"></p>
+<h2 id="串口调试"><a href="#串口调试" class="headerlink" title="串口调试"></a>串口调试</h2><p>在认识设备的基本构成之后，重新组装好，首先通过正面的UART调试串口来进行初步调试，采用夹具连接RXD、TXD两个调试点，在设备通电情况下，只需把转接板上的GND口与板子上的公用GND口相连即可。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/image89.jpg" alt="image89"></p>
+<p>因串口输出信息过多，影响观察输入和输出结果，因此采用串口调试助手，设置波特率为115200，输入命令并发送，可以成功执行。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/image90.jpg" alt="image90"></p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/image91.jpg" alt="image91"></p>
+<h2 id="初步分析"><a href="#初步分析" class="headerlink" title="初步分析"></a>初步分析</h2><p>查看当前进程，通过串口输出信息，发现该终端采用goahead作为web服务器，4719端口存在一个telnet服务。<br><img src="http://p1aqjecep.bkt.clouddn.com/hgjghjtyut.jpg" alt="命令"></p>
+<p>连接wifi进入web管理界面，查看设备ip。<br><img src="http://p1aqjecep.bkt.clouddn.com/15136011800782.jpg" alt="15136011800782"></p>
+<p>通过telnet连接设备，使用弱口令弱口令：admin、admin即可登录。<br><img src="http://p1aqjecep.bkt.clouddn.com/15136011175389.jpg" alt="15136011175389"></p>
+<p>该账号为后门账号。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/15136012728967.jpg" alt="15136012728967">查看开启的端口。</p>
+<p>如果需要继续分析，可以通过tftp 传输文件至本地，例如/bin/goahead。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;设备介绍&quot;&gt;&lt;a href=&quot;#设备介绍&quot; class=&quot;headerlink&quot; title=&quot;设备介绍&quot;&gt;&lt;/a&gt;设备介绍&lt;/h2&gt;&lt;p&gt;随着4G网络的大区域覆盖，移动端的网络速度得到大幅提升，此次分析的该款4G无线路由终端，就是通过sim卡连上LTE网络之后，
+    
+    </summary>
+    
+      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>BROADCOM WI-FI芯片漏洞分析三</title>
+    <link href="http://www.future-sec.com/broadcom-wifi-3.html"/>
+    <id>http://www.future-sec.com/broadcom-wifi-3.html</id>
+    <published>2018-01-18T16:00:00.000Z</published>
+    <updated>2018-01-19T07:22:52.674Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="切入点"><a href="#切入点" class="headerlink" title="切入点"></a>切入点</h2><p>从解析wme信标帧开始<br>参考：<a href="http://www.freebuf.com/vuls/142099.html" rel="external nofollow noopener noreferrer" target="_blank">freebuf博客：完整解析博通WiFi芯片Broadpwn漏洞</a><br>先找到固件中的漏洞位置，如下代码所示，有几个关键的数据帧标志类型。根据管理帧的类型在 VMG-1312 的源代码定位到处理这部分管理帧数据包的代码。</p>
+<figure class="highlight sqf"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">frame_type = *(unsigned <span class="variable">__int16</span> *)(arg + <span class="number">8</span>);  <span class="comment">// arg-&gt;frame_type</span></div><div class="line">  cfg = *(<span class="variable">_DWORD</span> *)(arg + <span class="number">4</span>);                   <span class="comment">// arg-&gt;bsscfg</span></div><div class="line">  v4 = wlc;</div><div class="line">  ie = *(<span class="variable">_DWORD</span> *)(arg + <span class="number">0</span>xC);                  <span class="comment">// arg-&gt;ie</span></div><div class="line">  current_wmm_ie = *(<span class="variable">_BYTE</span> **)(cfg + <span class="number">0</span>x354);    <span class="comment">// cfg-&gt;current_wmm_ie</span></div><div class="line">  <span class="keyword">if</span> ( frame_type == <span class="number">0</span>x20 )                     <span class="comment">// FC_REASSOC_REQ = 0x20 重新关联请求帧</span></div><div class="line">    <span class="built_in">goto</span> LABEL_9;</div><div class="line">  <span class="keyword">if</span> ( frame_type &lt;= <span class="number">0</span>x20 )</div><div class="line">  &#123;</div><div class="line">    <span class="keyword">if</span> ( *(<span class="variable">_WORD</span> *)(arg + <span class="number">8</span>) )</div><div class="line">    &#123;</div><div class="line">      <span class="keyword">if</span> ( frame_type != <span class="number">0</span>x10 )                 <span class="comment">// FC_ASSOC_RESP  = 0x10  //关联帧 </span></div><div class="line">        return <span class="number">0</span>;</div><div class="line">      <span class="built_in">goto</span> LABEL_15;</div><div class="line">    &#125;</div><div class="line">    ...</div><div class="line">    ...</div><div class="line">    ...</div><div class="line">    <span class="keyword">if</span> ( frame_type != <span class="number">0</span>x30 )                     <span class="comment">// FC_REASSOC_RESP = 0x30 重新关联响应帧</span></div><div class="line">  &#123;</div><div class="line">    <span class="keyword">if</span> ( frame_type == <span class="number">0</span>x80 )                   <span class="comment">// FC_BEACON = 0x80 信标帧</span></div><div class="line">    &#123;</div><div class="line">      v16 = **(<span class="variable">_DWORD</span> **)(*(<span class="variable">_DWORD</span> *)arg + <span class="number">0</span>x1C);</div><div class="line">      <span class="keyword">if</span> ( *(<span class="variable">_DWORD</span> *)(*(<span class="variable">_DWORD</span> *)wlc + <span class="number">0</span>x34) )</div><div class="line">      ...</div><div class="line">      ...</div><div class="line">      ...</div></pre></td></tr></table></figure>
+<h2 id="Wlan知识普及"><a href="#Wlan知识普及" class="headerlink" title="Wlan知识普及"></a>Wlan知识普及</h2><p>1）802.11数据包类型</p>
+<figure class="highlight vbscript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="number">1.</span> 数据: 数据数据包的作用是用来携带更高层次的数据(如IP数据包，ISO7层协议)。</div><div class="line">它负责在工作站之间传输数据</div><div class="line"></div><div class="line"><span class="number">2.</span> 管理: 管理数据包控制网络的管理功能</div><div class="line">    <span class="number">1</span>) 信标帧(Beacons): 在无线设备中，定时依次按指定间隔发送的有规律的无线信号(类似心跳包)，主要用于定位和同步使用</div><div class="line">    <span class="number">2</span>) 解除认证(Deauthentication)数据包 </div><div class="line">    <span class="number">3</span>) Probe(<span class="built_in">request</span> <span class="keyword">and</span> <span class="built_in">response</span>)探测包</div><div class="line">    <span class="number">4</span>) Authenticate(<span class="built_in">request</span> <span class="keyword">and</span> <span class="built_in">response</span>)身份认证</div><div class="line">    <span class="number">5</span>) Associate(<span class="built_in">request</span> <span class="keyword">and</span> <span class="built_in">response</span>)关联</div><div class="line">    <span class="number">6</span>) Reassociate(<span class="built_in">request</span> <span class="keyword">and</span> <span class="built_in">response</span>)重新关联</div><div class="line">    <span class="number">7</span>) Dissassociate(notify) 解除关联</div><div class="line">管理帧负责监督，主要用来加入或退出无线网络，以及处理接入点之间连接的转移事宜</div><div class="line"></div><div class="line"><span class="number">3.</span> 控制: 控制数据包得名于术语<span class="string">"媒体接入控制(Media Access Control, MAC)"</span>，是用来控制对共享媒体(即物理媒介，如光缆)的访问</div><div class="line">    <span class="number">1</span>) 请求发送(<span class="built_in">Request</span> <span class="keyword">To</span> Send，RTS)数据包</div><div class="line">    <span class="number">2</span>) 清除发送(Clear <span class="keyword">To</span> Send，CTS)数据包</div><div class="line">    <span class="number">3</span>) ACK确认(RTS/CTS)  </div><div class="line">    <span class="number">4</span>) PS-Poll: 当一部移动工作站从省电模式中苏醒，便会发送一个 PS-Poll 帧给基站，以取得任何暂存帧 </div><div class="line">控制帧通常与数据帧搭配使用，负责区域的清空、信道的取得以及载波监听的维护，并于收到数据时予以正面的应答，借此促进工作站间数据传输的可靠性</div></pre></td></tr></table></figure>
+<h2 id="wifi驱动发送管理帧数据包流程"><a href="#wifi驱动发送管理帧数据包流程" class="headerlink" title="wifi驱动发送管理帧数据包流程"></a>wifi驱动发送管理帧数据包流程</h2><p>总共定位到一处位置：</p>
+<p>是在kernel中发送数据包的过程<br>在\VMG1312-B-master\VMG1312-B-master\kernel\linux\drivers\staging\otus\80211core\cmm.c 中的函数 void zfSendMmFrame(zdev_t<em> dev, u8_t frameType, u16_t</em> dst,<br>                   u32_t p1, u32_t p2, u32_t p3)中实现<br>wlan连接过程：<br>    STA (工作站）启动初始化、开始正式使用、AP 传送数据幀之前，要经过三个阶段才能接入:<br>    (1) 扫描(SCAN)<br>    (2) 认证(Authentication)<br>    (3) 关联(Association) </p>
+<p>1）探测帧</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">case</span> ZM_WLAN_FRAME_TYPE_PROBEREQ :<span class="comment">//构造探测帧</span></div><div class="line">            <span class="keyword">offset</span> = zfSendProbeReq(dev, buf, <span class="keyword">offset</span>, (u8_t) p1);<span class="comment">//探测请求</span></div><div class="line">            <span class="keyword">break</span>;</div></pre></td></tr></table></figure>
+<p>2）探测响应帧</p>
+<p>构造探测响应帧时有WME参数部分<br><figure class="highlight openscad"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">case ZM_WLAN_FRAME_TYPE_PROBERSP : <span class="comment">//探测响应帧</span></div><div class="line">            zm_msg0_mm(ZM_LV_3, <span class="string">"probe rsp"</span>);</div><div class="line">            <span class="comment">/* 24-31 Time Stamp : hardware WON'T fill this field */</span></div><div class="line">            zmw_tx_buf_writeh(dev, buf, <span class="built_in">offset</span>, <span class="number">0</span>);</div><div class="line">            zmw_tx_buf_writeh(dev, buf, <span class="built_in">offset</span>+<span class="number">2</span>, <span class="number">0</span>);</div><div class="line">            zmw_tx_buf_writeh(dev, buf, <span class="built_in">offset</span>+<span class="number">4</span>, <span class="number">0</span>);</div><div class="line">            zmw_tx_buf_writeh(dev, buf, <span class="built_in">offset</span>+<span class="number">6</span>, <span class="number">0</span>);</div><div class="line">            <span class="built_in">offset</span>+=<span class="number">8</span>;</div><div class="line">...</div><div class="line">...</div><div class="line">..</div><div class="line"> <span class="comment">/* WME Parameters */</span></div><div class="line">            <span class="keyword">if</span> (wd-&gt;wlanMode == ZM_MODE_AP)</div><div class="line">            &#123;</div><div class="line">                <span class="keyword">if</span> (wd-&gt;ap.qosMode == <span class="number">1</span>)</div><div class="line">                &#123;</div><div class="line">                    <span class="built_in">offset</span> = zfApAddIeWmePara(dev, buf, <span class="built_in">offset</span>, vap);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">if</span> ( wd-&gt;wlanMode != ZM_MODE_IBSS )</div><div class="line">            &#123;</div><div class="line">            <span class="comment">// jhlee HT 0</span></div><div class="line">            <span class="comment">//CWYang(+)</span></div><div class="line">                <span class="comment">/* TODO : Need to check if it is ok */</span></div><div class="line">            <span class="comment">/* HT Capabilities Info */</span></div><div class="line">            <span class="built_in">offset</span> = zfMmAddHTCapability(dev, buf, <span class="built_in">offset</span>);</div><div class="line">            <span class="comment">//CWYang(+)</span></div><div class="line">            <span class="comment">/* Extended HT Capabilities Info */</span></div><div class="line">            <span class="built_in">offset</span> = zfMmAddExtendedHTCapability(dev, buf, <span class="built_in">offset</span>);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">if</span> ( wd-&gt;sta.ibssAdditionalIESize )</div><div class="line">                <span class="built_in">offset</span> = zfStaAddIbssAdditionalIE(dev, buf, <span class="built_in">offset</span>);</div><div class="line">            break;</div></pre></td></tr></table></figure></p>
+<p>3）身份认证</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">case</span> ZM_WLAN_FRAME_TYPE_AUTH :<span class="comment">//身份认证</span></div><div class="line">            <span class="keyword">if</span> (p1 == <span class="number">0x30001</span>)</div><div class="line">            &#123;</div><div class="line">                hlen += <span class="number">4</span>;</div><div class="line">                <span class="keyword">offset</span> += <span class="number">4</span>;        <span class="comment">// for reserving wep header</span></div><div class="line">                encrypt = <span class="number">1</span>;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="comment">/* Algotrithm Number */</span></div><div class="line">            zmw_tx_buf_writeh(dev, buf, <span class="keyword">offset</span>, (u16_t)(p1&amp;<span class="number">0xffff</span>));</div><div class="line">            <span class="keyword">offset</span>+=<span class="number">2</span>;</div><div class="line"></div><div class="line">            <span class="comment">/* Transaction Number */</span></div><div class="line">            zmw_tx_buf_writeh(dev, buf, <span class="keyword">offset</span>, (u16_t)(p1&gt;&gt;<span class="number">16</span>));</div><div class="line">            <span class="keyword">offset</span>+=<span class="number">2</span>;</div><div class="line">...</div><div class="line">..</div><div class="line">..</div><div class="line"> <span class="keyword">else</span> <span class="keyword">if</span> (p1 == <span class="number">0x30001</span>)</div><div class="line">            &#123;</div><div class="line">                <span class="comment">/* share-3 : STA return challenge Text */</span></div><div class="line">                zfCopyToIntTxBuffer(dev, buf, wd-&gt;sta.challengeText, <span class="keyword">offset</span>, wd-&gt;sta.challengeText[<span class="number">1</span>]+<span class="number">2</span>);</div><div class="line">                <span class="keyword">offset</span> += (wd-&gt;sta.challengeText[<span class="number">1</span>]+<span class="number">2</span>);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">break</span>;</div></pre></td></tr></table></figure>
+<p>4）关联请求/重新关联请求<br><figure class="highlight glsl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">case</span> ZM_WLAN_FRAME_TYPE_ASOCREQ :<span class="comment">//关联请求帧</span></div><div class="line"><span class="keyword">case</span> ZM_WLAN_FRAME_TYPE_REASOCREQ :  <span class="comment">// FC_REASSOC_REQ = 0x20 重新关联请求帧</span></div><div class="line">    <span class="comment">/* Capability */</span></div><div class="line">    zmw_tx_buf_writeb(dev, buf, <span class="keyword">offset</span>++, wd-&gt;sta.capability[<span class="number">0</span>]);</div><div class="line">    zmw_tx_buf_writeb(dev, buf, <span class="keyword">offset</span>++, wd-&gt;sta.capability[<span class="number">1</span>]);</div><div class="line"></div><div class="line">    <span class="comment">/* Listen Interval */</span>  <span class="comment">//监听间隔</span></div><div class="line">    zmw_tx_buf_writeh(dev, buf, <span class="keyword">offset</span>, <span class="number">0x0005</span>);</div><div class="line">    <span class="keyword">offset</span>+=<span class="number">2</span>;</div><div class="line"></div><div class="line">    <span class="comment">/* Reassocaited Request : Current AP address */</span></div><div class="line">    <span class="keyword">if</span> (frameType == ZM_WLAN_FRAME_TYPE_REASOCREQ)<span class="comment">// FC_REASSOC_REQ = 0x20 重新关联请求帧</span></div><div class="line">    &#123;</div><div class="line">    zmw_tx_buf_writeh(dev, buf, <span class="keyword">offset</span>, wd-&gt;sta.bssid[<span class="number">0</span>]);</div><div class="line">        <span class="keyword">offset</span>+=<span class="number">2</span>;</div><div class="line">    zmw_tx_buf_writeh(dev, buf, <span class="keyword">offset</span>, wd-&gt;sta.bssid[<span class="number">1</span>]);</div><div class="line">        <span class="keyword">offset</span>+=<span class="number">2</span>;</div><div class="line">    zmw_tx_buf_writeh(dev, buf, <span class="keyword">offset</span>, wd-&gt;sta.bssid[<span class="number">2</span>]);</div><div class="line">        <span class="keyword">offset</span>+=<span class="number">2</span>;</div><div class="line">    &#125;</div><div class="line">    ...</div><div class="line">    ...</div><div class="line">    </div><div class="line">    <span class="comment">//Store asoc request frame body, for VISTA only</span></div><div class="line">    wd-&gt;sta.asocReqFrameBodySize = ((<span class="keyword">offset</span> - hlen) &gt;</div><div class="line">            ZM_CACHED_FRAMEBODY_SIZE)?</div><div class="line">            ZM_CACHED_FRAMEBODY_SIZE:(<span class="keyword">offset</span> - hlen);</div><div class="line">    <span class="keyword">for</span> (i=<span class="number">0</span>; i&lt;wd-&gt;sta.asocReqFrameBodySize; i++)</div><div class="line">    &#123;</div><div class="line">        wd-&gt;sta.asocReqFrameBody[i] = zmw_tx_buf_readb(dev, buf, i + hlen);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">break</span>;</div></pre></td></tr></table></figure></p>
+<p>5）关联响应/重新关联响应</p>
+<p>这部分也有WME的相关参数构造<br><figure class="highlight glsl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">case</span> ZM_WLAN_FRAME_TYPE_ASOCRSP :<span class="comment">//关联响应帧</span></div><div class="line"><span class="keyword">case</span> ZM_WLAN_FRAME_TYPE_REASOCRSP :<span class="comment">// 重新关联响应帧</span></div><div class="line">    vap = (u16_t) p3;</div><div class="line"></div><div class="line">    <span class="comment">/* Capability */</span></div><div class="line">    zmw_tx_buf_writeh(dev, buf, <span class="keyword">offset</span>, wd-&gt;ap.capab[vap]);</div><div class="line">    <span class="keyword">offset</span>+=<span class="number">2</span>;</div><div class="line"></div><div class="line">    <span class="comment">/* Status Code */</span></div><div class="line">    zmw_tx_buf_writeh(dev, buf, <span class="keyword">offset</span>, (u16_t)p1);</div><div class="line">    <span class="keyword">offset</span>+=<span class="number">2</span>;</div><div class="line"></div><div class="line">    <span class="comment">/* AID */</span></div><div class="line">    zmw_tx_buf_writeh(dev, buf, <span class="keyword">offset</span>, (u16_t)(p2|<span class="number">0xc000</span>));</div><div class="line">    <span class="keyword">offset</span>+=<span class="number">2</span>;</div><div class="line">    ...</div><div class="line">    ...</div><div class="line">    ...</div><div class="line"><span class="comment">/* WME Parameters */</span></div><div class="line">    <span class="keyword">if</span> (wd-&gt;wlanMode == ZM_MODE_AP)</div><div class="line">    &#123;</div><div class="line">        <span class="comment">/* TODO : if WME STA then send WME parameter element */</span></div><div class="line">        <span class="keyword">if</span> (wd-&gt;ap.qosMode == <span class="number">1</span>)</div><div class="line">        &#123;</div><div class="line">            <span class="keyword">offset</span> = zfApAddIeWmePara(dev, buf, <span class="keyword">offset</span>, vap);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// jhlee HT 0</span></div><div class="line">    <span class="comment">//CWYang(+)</span></div><div class="line">    <span class="comment">/* HT Capabilities Info */</span></div><div class="line">    <span class="keyword">offset</span> = zfMmAddHTCapability(dev, buf, <span class="keyword">offset</span>);</div><div class="line">    <span class="comment">//CWYang(+)</span></div><div class="line">    <span class="comment">/* Extended HT Capabilities Info */</span></div><div class="line">    <span class="keyword">offset</span> = zfMmAddExtendedHTCapability(dev, buf, <span class="keyword">offset</span>);</div><div class="line">    <span class="keyword">break</span>;</div></pre></td></tr></table></figure></p>
+<p>6）通知传输指示信息<br><figure class="highlight glsl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">case</span> ZM_WLAN_FRAME_TYPE_ATIM :<span class="comment">//通知传输指示消息</span></div><div class="line">            <span class="comment">/* NULL frame */</span></div><div class="line">            <span class="comment">/* TODO : add two dumb bytes temporarily */</span></div><div class="line">            <span class="keyword">offset</span> += <span class="number">2</span>;</div><div class="line">            <span class="keyword">break</span>;</div></pre></td></tr></table></figure></p>
+<p>7）QoS帧/数据帧</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"> <span class="keyword">case</span> ZM_WLAN_FRAME_TYPE_QOS_NULL :</div><div class="line">            zmw_buf_writeh(dev, buf, <span class="keyword">offset</span>, <span class="number">0x0010</span>);</div><div class="line">            <span class="keyword">offset</span> += <span class="number">2</span>;</div><div class="line">            <span class="keyword">break</span>;</div><div class="line"></div><div class="line"><span class="keyword">case</span> ZM_WLAN_DATA_FRAME :</div><div class="line">    <span class="keyword">break</span>;</div></pre></td></tr></table></figure>
+<p>8）解除关联/解除认证</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">case</span> ZM_WLAN_FRAME_TYPE_DISASOC :<span class="comment">//解除关联</span></div><div class="line"><span class="keyword">case</span> ZM_WLAN_FRAME_TYPE_DEAUTH :<span class="comment">//解除认证</span></div><div class="line">    <span class="keyword">if</span> (wd-&gt;wlanMode == ZM_MODE_AP)</div><div class="line">    &#123;</div><div class="line">      vap = (u16_t) p3;</div><div class="line"></div><div class="line">      <span class="keyword">if</span> ((aid = zfApFindSta(dev, dst)) != <span class="number">0xffff</span>)</div><div class="line">      &#123;</div><div class="line">          zmw_enter_critical_section(dev);</div><div class="line">          <span class="comment">/* Clear STA table */</span></div><div class="line">          wd-&gt;ap.staTable[aid].valid = <span class="number">0</span>;</div><div class="line"></div><div class="line">          zmw_leave_critical_section(dev);</div><div class="line"></div><div class="line">          <span class="keyword">if</span> (wd-&gt;zfcbDisAsocNotify != <span class="keyword">NULL</span>)</div><div class="line">          &#123;</div><div class="line">              wd-&gt;zfcbDisAsocNotify(dev, (u8_t*)dst, vap);</div><div class="line">          &#125;</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">/* Reason Code */</span></div><div class="line">    zmw_tx_buf_writeh(dev, buf, offset, (u16_t)p1);</div><div class="line">    offset+=<span class="number">2</span>;</div><div class="line">    <span class="keyword">break</span>;</div></pre></td></tr></table></figure>
+<p>在wifi连接过程中主要有这些数据包种类</p>
+<p>9）发送数据包<br><figure class="highlight less"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">zfwBufSetSize</span>(dev, buf, offset);<span class="comment">//拷贝构造好的数据包到dev</span></div><div class="line"></div><div class="line"><span class="selector-tag">zm_msg2_mm</span>(ZM_LV_2, <span class="string">"management frame body size="</span>, offset-hlen);</div><div class="line"></div><div class="line"><span class="comment">//Copy wlan header</span></div><div class="line"><span class="selector-tag">zfTxGenMmHeader</span>(dev, frameType, dst, header, offset-hlen, buf, vap, encrypt);<span class="comment">//发送数据包过程</span></div></pre></td></tr></table></figure></p>
+<h2 id="Wifi固件接收到管理帧的处理过程"><a href="#Wifi固件接收到管理帧的处理过程" class="headerlink" title="Wifi固件接收到管理帧的处理过程"></a>Wifi固件接收到管理帧的处理过程</h2><p>我们关注的还是漏洞触发位置的重新关联响应帧</p>
+<p>1）解析重新关联响应帧时造成溢出的过程</p>
+<figure class="highlight xl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">void wlc_bss_parse_wme_ie(wlc_info *wlc, ie_parser_arg *arg) &#123;</div><div class="line">  unsigned int frame_type;  </div><div class="line">  wlc_bsscfg *cfg;  </div><div class="line">  bcm_tlv *ie;  </div><div class="line">  unsigned char *current_wmm_ie;  </div><div class="line">  int flags;</div><div class="line">  <span class="function"><span class="title">frame_type</span> = arg-&gt;</span>frame_type;  </div><div class="line">  <span class="function"><span class="title">cfg</span> = arg-&gt;</span>bsscfg;  </div><div class="line">  <span class="function"><span class="title">ie</span> = arg-&gt;</span>ie;  </div><div class="line">  <span class="function"><span class="title">current_wmm_ie</span> = cfg-&gt;</span>current_wmm_ie;  </div><div class="line">  <span class="keyword">if</span> ( frame_type == FC_REASSOC_REQ ) &#123;    </div><div class="line">    ...    </div><div class="line">    &lt;handle reassociation requests&gt;    </div><div class="line">    ...  &#125;  </div><div class="line">  <span class="keyword">if</span> ( frame_type == FC_ASSOC_RESP ) &#123;    </div><div class="line">    ...    </div><div class="line">    <span class="function"><span class="title">if</span> ( wlc-&gt;</span><span class="function"><span class="title">pub</span>-&gt;</span>_wme ) &#123;      </div><div class="line">      <span class="keyword">if</span> ( !(flags &amp; <span class="number">2</span>) ) &#123;        </div><div class="line">        ...        </div><div class="line">        <span class="keyword">if</span> ( ie ) &#123;          </div><div class="line">          ...          </div><div class="line">          <span class="function"><span class="title">cfg</span>-&gt;</span>flags |= <span class="number">0</span>x100u;          </div><div class="line">          <span class="function"><span class="title">memcpy</span>(current_wmm_ie, ie-&gt;</span><span class="function"><span class="title">data</span>, ie-&gt;</span>len);</div></pre></td></tr></table></figure>
+<p>2)溢出的位置确定</p>
+<p>溢出的位置是current_wmm_ie的下一个结构体wlc-&gt;pm</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">wlc_bsscfg *wlc_bsscfg_malloc(wlc_info *wlc) &#123;  </div><div class="line">  wlc_info *wlc<span class="comment">;  </span></div><div class="line">  wlc_bss_info *current_bss<span class="comment">;  </span></div><div class="line">  wlc_bss_info *target_bss<span class="comment">;  </span></div><div class="line">  wlc_pm_st *pm<span class="comment">;  </span></div><div class="line">  wmm_ie *current_wmm_ie<span class="comment">;</span></div><div class="line">  ...  </div><div class="line">  current_bss = wlc_calloc(<span class="number">0x124</span>)<span class="comment">;  </span></div><div class="line">  wlc-&gt;current_bss = current_bss<span class="comment">;  </span></div><div class="line">  if ( !current_bss ) &#123;    </div><div class="line">    goto fail<span class="comment">;  &#125;  </span></div><div class="line">  target_bss = wlc_calloc(<span class="number">0x124</span>)<span class="comment">;  </span></div><div class="line">  wlc-&gt;target_bss = target_bss<span class="comment">;  </span></div><div class="line">  if ( !target_bss ) &#123;    </div><div class="line">    goto fail<span class="comment">;  &#125;  </span></div><div class="line">  pm = wlc_calloc(<span class="number">0x78</span>)<span class="comment">;  </span></div><div class="line">  wlc-&gt;pm = pm<span class="comment">;  </span></div><div class="line">  if ( !pm ) &#123;    </div><div class="line">    goto fail<span class="comment">;  &#125;  </span></div><div class="line">  current_wmm_ie = wlc_calloc(<span class="number">0x2C</span>)<span class="comment">;  </span></div><div class="line">  wlc-&gt;current_wmm_ie = current_wmm_ie<span class="comment">;  </span></div><div class="line">  if ( !current_wmm_ie ) &#123;    </div><div class="line">    goto fail<span class="comment">;  &#125;</span></div></pre></td></tr></table></figure>
+<p>3）溢出结构体类型</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">typedef struct wlc_pm_st &#123; </div><div class="line">  uint8 PM<span class="comment">; bool PM_override; </span></div><div class="line">  mbool PMenabledModuleId<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>PMenabled<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>PMawakebcn<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>PMpending<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>priorPMstate<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>PSpoll<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>check_for_unaligned_tbtt<span class="comment">; </span></div><div class="line">  uint16 pspoll_prd<span class="comment">; </span></div><div class="line">  struct wl_timer *pspoll_timer<span class="comment">; </span></div><div class="line">  uint16 apsd_trigger_timeout<span class="comment">; </span></div><div class="line">  struct wl_timer *apsd_trigger_timer<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>apsd_sta_usp<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>WME_PM_blocked<span class="comment">; </span></div><div class="line">  uint16 pm2_rcv_percent<span class="comment">; </span></div><div class="line">  pm2rd_state_t pm2_rcv_state<span class="comment">; </span></div><div class="line">  uint16 pm2_rcv_time<span class="comment">; </span></div><div class="line">  uint pm2_sleep_ret_time<span class="comment">; </span></div><div class="line">  uint pm2_sleep_ret_time_left<span class="comment">;  </span></div><div class="line">  uint pm2_last_wake_time<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>pm2_refresh_badiv<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>adv_ps_poll<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>send_pspoll_after_tx<span class="comment">;    </span></div><div class="line">  wlc_hwtimer_to_t *pm2_rcv_timer<span class="comment">;  </span></div><div class="line">  wlc_hwtimer_to_t *pm2_ret_timer<span class="comment">; </span></div><div class="line">&#125; wlc_pm_st_t<span class="comment">;</span></div></pre></td></tr></table></figure>
+<p>4）漏洞利用方式</p>
+<p>struct wlc_pm_st结构体中 wl_timer 类型的pspoll_timer、  apsd_trigger_timer，和wlc_hwtimer_to_t 类型的pm2_rcv_timer、  pm2_ret_timer。<br>wl_timer的 pspoll_timer 成员。这个结构体能在相关过程中定期触发的回调函数进行处理：<br><figure class="highlight xl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">int timer_func(struct wl_timer *t) &#123;  </div><div class="line">  prev_cpsr = j_disable_irqs();  </div><div class="line">  <span class="function"><span class="title">v3</span> = t-&gt;</span>field_20;    </div><div class="line">  ...</div><div class="line">  <span class="keyword">if</span> ( v3 ) &#123;    </div><div class="line">    <span class="function"><span class="title">v7</span> = t-&gt;</span>field_18;    </div><div class="line">    <span class="function"><span class="title">v8</span> = &amp;t-&gt;</span>field_8;    </div><div class="line">    <span class="function"><span class="title">if</span> ( &amp;t-&gt;</span>field_8 == v7 ) &#123;</div><div class="line">      ... </div><div class="line">    &#125; <span class="keyword">else</span> &#123;      </div><div class="line">      <span class="function"><span class="title">v9</span> = t-&gt;</span>field_1c;      </div><div class="line">      <span class="function"><span class="title">v7</span>-&gt;</span>field_14 = v9;      </div><div class="line">      *(v9 + <span class="number">16</span>) = v7;      </div><div class="line">      <span class="keyword">if</span> ( *v3 == v8 ) &#123;        </div><div class="line">        <span class="function"><span class="title">v7</span>-&gt;</span>field_18 = v3; </div><div class="line">      &#125;    </div><div class="line">    &#125;    </div><div class="line">    <span class="function"><span class="title">t</span>-&gt;</span>field_20 = <span class="number">0</span>;  </div><div class="line">  &#125;  </div><div class="line">  j_restore_cpsr(prev_cpsr);  </div><div class="line">  return <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这部分代码是在linux内核里，初步分析是wifi驱动管理帧数据包发送过程，结合研究固件的源码中解析数据包的过程一起看，差不多整个wifi连接过程数据包的处理流程就出来了。接下来的工作，一个是固件地址爆破，还有一个是写exp利用漏洞。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p> 802.11协议帧格式 ：<a href="http://blog.csdn.net/u012570105/article/details/51785452" rel="external nofollow noopener noreferrer" target="_blank">http://blog.csdn.net/u012570105/article/details/51785452</a></p>
+<p> <a href="http://note.youdao.com/noteshare?id=1966431935077db30135e04ba4bb80a6&amp;sub=C682C939E8AD4869B8C877E0CA546A24" rel="external nofollow noopener noreferrer" target="_blank">相关代码参考</a> ：</p>
+<blockquote>
+<p>cmm.c :主要是wifi驱动发送管理帧数据包流程</p>
+<p>wl_linux.h : wl_timer结构体参考</p>
+<p>wlan.h:</p>
+</blockquote>
+<pre><code>/* Frame Subtype */
+#define ZM_WLAN_FRAME_TYPE_ASOCREQ          0x00
+#define ZM_WLAN_FRAME_TYPE_ASOCRSP          0x10
+#define ZM_WLAN_FRAME_TYPE_REASOCREQ        0x20
+#define ZM_WLAN_FRAME_TYPE_REASOCRSP        0x30
+#define ZM_WLAN_FRAME_TYPE_PROBEREQ         0x40
+#define ZM_WLAN_FRAME_TYPE_PROBERSP         0x50
+</code></pre><blockquote>
+<p>wlc_alloc.c :wlc_bsscfg_malloc结构体</p>
+<p>wlc_bsscfg.h : wlc_pm_st 结构体参考</p>
+<p>wlc.c:部分解析管理帧可以根据关键字FC_ASSOC_RESP来定位看</p>
+</blockquote>
+<p>​        </p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;切入点&quot;&gt;&lt;a href=&quot;#切入点&quot; class=&quot;headerlink&quot; title=&quot;切入点&quot;&gt;&lt;/a&gt;切入点&lt;/h2&gt;&lt;p&gt;从解析wme信标帧开始&lt;br&gt;参考：&lt;a href=&quot;http://www.freebuf.com/vuls/142099.html
+    
+    </summary>
+    
+      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="Poc" scheme="http://www.future-sec.com/tags/Poc/"/>
+    
+      <category term="BROADCOM WI-FI" scheme="http://www.future-sec.com/tags/BROADCOM-WI-FI/"/>
+    
+  </entry>
   
   <entry>
     <title>GoAhead远程代码执行漏洞(CVE-2017-17562)分析及实战</title>
@@ -75,6 +247,39 @@
   </entry>
   
   <entry>
+    <title>Janus漏洞(CVE-2017-13156)分析</title>
+    <link href="http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html"/>
+    <id>http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html</id>
+    <published>2017-12-20T16:00:00.000Z</published>
+    <updated>2017-12-21T07:53:50.474Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签名，是没有办法安装到系统中的。Android通过数字签名来标识应用程序的作者和在应用程序之间建立信任关系，不是用来决定最终用户可以安装哪些应用程序。这个数字签名由应用程序的作者完成，并不需要权威的数字证书签名机构认证，它只是用来让应用程序包自我认证的。然而Google在本月4日发布的Android安全公告中编号为CVE-2017-13156，这个漏洞被称为Janus漏洞，利用该漏洞可修改app而不影响原始签名。</p>
+<h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h3 id="Android-app签名校验简单介绍"><a href="#Android-app签名校验简单介绍" class="headerlink" title="Android app签名校验简单介绍"></a>Android app签名校验简单介绍</h3><p>在Android源码中“frameworks/base/core/java/android/content/pm/PackageParser.java”中。PackageParser类的collectCertificates方法会对APK进行签名校验，并且遍历APK中的所有文件，对每个文件进行校验。下面是该方法的源码：<br><img src="http://p1aqjecep.bkt.clouddn.com/image002.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image004.jpg" alt="img"><br>APK是一个ZIP格式的文件，因此使用ZIP相关的类进行读写。在上面代码中调用了loadCertificates，这个方法会返回一个二维数组，当APK中的文件签名校验失败，loadCertificates方法会返回一个空数组（可能是null，可能是数组长度为0），那么依照上面代码的逻辑如果数组为空则会抛出异常。<br>loadCertificates方法的代码见下：<br><img src="http://p1aqjecep.bkt.clouddn.com/image006.jpg" alt="img"><br>其中is是JarFile.JarFileInputStream类的对象。loadCertificates调用了readFullyIgnoringContents，在readFullyIgnoringContents中会调用JarFile.JarFileInputStream.read（JarFile类在“libcore/luni/src/main/java/java/util/jar/JarFile.java”文件中）<br>读取APK中一项数据，在read方法中会校验读取到的数据项的签名，如果签名校验失败，则会抛出SecurityException类型的异常，即签名校验失败。<br>上面代码调用了StrictJarFile.getCertificateChains方法，在/ libcore / luni / src / main / java / java / util / jar / StrictJarFile.java里面。下面是它的代码：<br><img src="http://p1aqjecep.bkt.clouddn.com/image007.jpg" alt="img"><br>上面的isSigned在下面的代码里面获取的：<br><img src="http://p1aqjecep.bkt.clouddn.com/image009.jpg" alt="img"><br>当证书读取成功，而且APK经过了签名，isSigned为true。<br>回到StrictJarFile.getCertificateChains中，当isSigned为true时会调用JarVerifier.getCertificateChains方法，下面是它的代码：<br><img src="http://p1aqjecep.bkt.clouddn.com/image010.jpg" alt="img"><br>verifiedEntries的声明：<br><img src="http://p1aqjecep.bkt.clouddn.com/image012.jpg" alt="img"><br>verifiedEntries是一个键值对，键是APK中经过了签名的文件名，如：classes.dex文件，值是证书数组。如果向已经签过名的APK中新添加一个文件然后安装这个APK，当程序逻辑执行到JarVerifier.getCertificateChains中时，在verifiedEntries里面无法找到新添加的文件名（因为这个新文件是在APK签名之后添加），那么JarVerifier.getCertificateChains方法将返回null。<br>以上就是整个对于app签名的简单分析。</p>
+<h3 id="签名方案"><a href="#签名方案" class="headerlink" title="签名方案"></a>签名方案</h3><p>参考google官方文档获得:<br>APK 签名方案<br>Android 支持两种应用签名方案，一种是基于 JAR 签名的方案（v1 方案），另一种是 Android Nougat (Android 7.0) 中引入的 APK 签名方案 v2（v2 方案）。<br>JAR 签名（v1 方案）<br>v1 签名并非保护整个apk文件，例如 ZIP 元数据就不受保护。再者，APK 验证程序需要处理大量不可信（尚未经过验证）的数据结构，而不受签名保护的数据不在处理的行列中。这会导致相当大的受攻击面。此外，APK 验证程序必须解压所有已压缩的条目，而这需要花费更多时间和内存。为了解决这些问题，Android 7.0 中引入了 APK 签名方案 v2。<br>APK 签名方案 v2（v2 方案）<br>Android 7.0 中引入了 APK 签名方案 v2（v2 方案）。该方案会对 APK 的内容进行hash处理和签名，然后将生成的“APK 签名分块”插入到 APK 中。<br>在验证期间，v2 方案会将 APK 文件视为 Blob，并对整个文件进行签名检查。对 APK 进行的任何修改（包括对 ZIP 元数据进行的修改）都会使 APK 签名作废。这种形式的 APK 验证不仅速度要快得多，而且能够发现更多种未经授权的修改。<br>同时，新的签名格式向后兼容，使用这种新格式签名的 APK（必须也使用v1） 可在更低版本的 Android 设备上进行安装（会直接忽略添加到 APK 的额外数据）。</p>
+<h3 id="apk签名校验方式"><a href="#apk签名校验方式" class="headerlink" title="apk签名校验方式"></a>apk签名校验方式</h3><p>为了提高兼容性，应同时采用 v1 和 v2 这两种方案对应用进行签名。与只使用v1 方案签名的应用相比，经过 v2 方案签名的应用能够更快速地安装到 Android Nougat 以及更高版本的设备上。但是更低版本的 Android 平台会忽略 v2 签名，这就需要应用包含 v1 签名。<br><img src="http://p1aqjecep.bkt.clouddn.com/image014.jpg" alt="img"><br>验证程序会对照存储在“APK 签名分块”中的 v2 签名对 APK 的全文件hash进行验证。该hash涵盖除“APK 签名分块”（其中包含 v2 签名）之外的所有内容。在“APK 签名分块”以外对 APK 进行的任何修改都会使 APK 的 v2 签名作废。v2 签名被删除的 APK 也会被拒绝，因为 v1 签名指明相应 APK 带有 v2 签名，所以 Android Nougat 及更高版本会拒绝使用 v1 签名验证 APK。</p>
+<h2 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h2><p>Janus漏洞主要是向APK里面添加额外的DEX文件。一方面，APK文件是zip文件，可以包含初始时的任意字节，在它的zip条目（实际情况下更多是在zip条目里面）。但是JAR签名方案只考虑了zip入口。当计算或者校验apk的签名的时候，它忽略了其他字节。另一方面，在字符串、类、方法定义等常规部分之后，一个DEX文件可以包含任意的字节。综上所述，一个文件可以同时包含一个APK文件和一个DEX文件。<br><img src="http://p1aqjecep.bkt.clouddn.com/image016.jpg" alt="img"><br>另一个关键点是Dalvik / ART虚拟机方面。android运行加载APK文件，提取它的DEX文件，然后运行它的代码。在实践中，虚拟机可以加载和执行APK文件。当它得到APK文件时，它仍然会查看header的magic字节来判断它是什么类型的文件，如果找到一个DEX类型的，就会将文件载入为DEX文件，否则就会将文件加载为一个APK文件，其中包括一个带有DEX的zip文件。因此，既可以读取DEX文件又可以读取APK文件。<br>所以攻击者可以利用着这种二元性，在不影响其签名的情况下将一个恶意DEX文件预先添加到APK文件里面，然后，android运行时接受APK文件作为一个合法的早期版本的应用程序的有效更新，但是Dalvik虚拟机从注入的DEX文件中加载代码，从而实现攻击。</p>
+<h2 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h2><p><img src="http://p1aqjecep.bkt.clouddn.com/image018.jpg" alt="img"><br>原来的apk主要代码<br><img src="http://p1aqjecep.bkt.clouddn.com/image019.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image021.jpg" alt="img"><br>修改了dex文件，将Log.i(“janus”,”点击事件”);修改为Toast.makeText(getApplicationContext(),”I steal your car.”,Toast.LENGTH_LONG).show();<br><img src="http://p1aqjecep.bkt.clouddn.com/image023.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image024.jpg" alt="img"><br>安装合并好的1.apk<br><img src="http://p1aqjecep.bkt.clouddn.com/image026.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image027.jpg" alt="img"><br>测试<br><img src="http://p1aqjecep.bkt.clouddn.com/image029.jpg" alt="img"><br>攻击完成</p>
+<h2 id="影响范围"><a href="#影响范围" class="headerlink" title="影响范围"></a>影响范围</h2><p>该漏洞仅影响基于 JAR 签名的方案（v1 方案）。不影响自Android 7.0 以来引入的 APK 签名方案 v2（v2 方案）。</p>
+<h2 id="漏洞危害"><a href="#漏洞危害" class="headerlink" title="漏洞危害"></a>漏洞危害</h2><p>可被添加恶意dex文件可以进行一些敏感性的操作，例如窃取用户数据、监控手机等高危操作。</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://source.android.com/security/apksigning/v2#verification" rel="external nofollow noopener noreferrer" target="_blank">https://source.android.com/security/apksigning/v2#verification</a><br><a href="https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures" rel="external nofollow noopener noreferrer" target="_blank">https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签
+    
+    </summary>
+    
+      <category term="移动安全" scheme="http://www.future-sec.com/categories/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="移动安全" scheme="http://www.future-sec.com/tags/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+    
+      <category term="app签名" scheme="http://www.future-sec.com/tags/app%E7%AD%BE%E5%90%8D/"/>
+    
+  </entry>
+  
+  <entry>
     <title>使用MITMF中间人攻击非80端口的HTTP</title>
     <link href="http://www.future-sec.com/using-MITMF-attack-not-80-port-http.html"/>
     <id>http://www.future-sec.com/using-MITMF-attack-not-80-port-http.html</id>
@@ -116,35 +321,34 @@
   </entry>
   
   <entry>
-    <title>Janus漏洞(CVE-2017-13156)分析</title>
-    <link href="http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html"/>
-    <id>http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html</id>
-    <published>2017-12-20T16:00:00.000Z</published>
-    <updated>2017-12-21T07:53:50.474Z</updated>
+    <title>物联网硬件安全分析基础-串口调试</title>
+    <link href="http://www.future-sec.com/iot-security-hardware-debuging.html"/>
+    <id>http://www.future-sec.com/iot-security-hardware-debuging.html</id>
+    <published>2017-12-04T16:00:00.000Z</published>
+    <updated>2017-12-26T03:06:07.555Z</updated>
     
-    <content type="html"><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签名，是没有办法安装到系统中的。Android通过数字签名来标识应用程序的作者和在应用程序之间建立信任关系，不是用来决定最终用户可以安装哪些应用程序。这个数字签名由应用程序的作者完成，并不需要权威的数字证书签名机构认证，它只是用来让应用程序包自我认证的。然而Google在本月4日发布的Android安全公告中编号为CVE-2017-13156，这个漏洞被称为Janus漏洞，利用该漏洞可修改app而不影响原始签名。</p>
-<h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h3 id="Android-app签名校验简单介绍"><a href="#Android-app签名校验简单介绍" class="headerlink" title="Android app签名校验简单介绍"></a>Android app签名校验简单介绍</h3><p>在Android源码中“frameworks/base/core/java/android/content/pm/PackageParser.java”中。PackageParser类的collectCertificates方法会对APK进行签名校验，并且遍历APK中的所有文件，对每个文件进行校验。下面是该方法的源码：<br><img src="http://p1aqjecep.bkt.clouddn.com/image002.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image004.jpg" alt="img"><br>APK是一个ZIP格式的文件，因此使用ZIP相关的类进行读写。在上面代码中调用了loadCertificates，这个方法会返回一个二维数组，当APK中的文件签名校验失败，loadCertificates方法会返回一个空数组（可能是null，可能是数组长度为0），那么依照上面代码的逻辑如果数组为空则会抛出异常。<br>loadCertificates方法的代码见下：<br><img src="http://p1aqjecep.bkt.clouddn.com/image006.jpg" alt="img"><br>其中is是JarFile.JarFileInputStream类的对象。loadCertificates调用了readFullyIgnoringContents，在readFullyIgnoringContents中会调用JarFile.JarFileInputStream.read（JarFile类在“libcore/luni/src/main/java/java/util/jar/JarFile.java”文件中）<br>读取APK中一项数据，在read方法中会校验读取到的数据项的签名，如果签名校验失败，则会抛出SecurityException类型的异常，即签名校验失败。<br>上面代码调用了StrictJarFile.getCertificateChains方法，在/ libcore / luni / src / main / java / java / util / jar / StrictJarFile.java里面。下面是它的代码：<br><img src="http://p1aqjecep.bkt.clouddn.com/image007.jpg" alt="img"><br>上面的isSigned在下面的代码里面获取的：<br><img src="http://p1aqjecep.bkt.clouddn.com/image009.jpg" alt="img"><br>当证书读取成功，而且APK经过了签名，isSigned为true。<br>回到StrictJarFile.getCertificateChains中，当isSigned为true时会调用JarVerifier.getCertificateChains方法，下面是它的代码：<br><img src="http://p1aqjecep.bkt.clouddn.com/image010.jpg" alt="img"><br>verifiedEntries的声明：<br><img src="http://p1aqjecep.bkt.clouddn.com/image012.jpg" alt="img"><br>verifiedEntries是一个键值对，键是APK中经过了签名的文件名，如：classes.dex文件，值是证书数组。如果向已经签过名的APK中新添加一个文件然后安装这个APK，当程序逻辑执行到JarVerifier.getCertificateChains中时，在verifiedEntries里面无法找到新添加的文件名（因为这个新文件是在APK签名之后添加），那么JarVerifier.getCertificateChains方法将返回null。<br>以上就是整个对于app签名的简单分析。</p>
-<h3 id="签名方案"><a href="#签名方案" class="headerlink" title="签名方案"></a>签名方案</h3><p>参考google官方文档获得:<br>APK 签名方案<br>Android 支持两种应用签名方案，一种是基于 JAR 签名的方案（v1 方案），另一种是 Android Nougat (Android 7.0) 中引入的 APK 签名方案 v2（v2 方案）。<br>JAR 签名（v1 方案）<br>v1 签名并非保护整个apk文件，例如 ZIP 元数据就不受保护。再者，APK 验证程序需要处理大量不可信（尚未经过验证）的数据结构，而不受签名保护的数据不在处理的行列中。这会导致相当大的受攻击面。此外，APK 验证程序必须解压所有已压缩的条目，而这需要花费更多时间和内存。为了解决这些问题，Android 7.0 中引入了 APK 签名方案 v2。<br>APK 签名方案 v2（v2 方案）<br>Android 7.0 中引入了 APK 签名方案 v2（v2 方案）。该方案会对 APK 的内容进行hash处理和签名，然后将生成的“APK 签名分块”插入到 APK 中。<br>在验证期间，v2 方案会将 APK 文件视为 Blob，并对整个文件进行签名检查。对 APK 进行的任何修改（包括对 ZIP 元数据进行的修改）都会使 APK 签名作废。这种形式的 APK 验证不仅速度要快得多，而且能够发现更多种未经授权的修改。<br>同时，新的签名格式向后兼容，使用这种新格式签名的 APK（必须也使用v1） 可在更低版本的 Android 设备上进行安装（会直接忽略添加到 APK 的额外数据）。</p>
-<h3 id="apk签名校验方式"><a href="#apk签名校验方式" class="headerlink" title="apk签名校验方式"></a>apk签名校验方式</h3><p>为了提高兼容性，应同时采用 v1 和 v2 这两种方案对应用进行签名。与只使用v1 方案签名的应用相比，经过 v2 方案签名的应用能够更快速地安装到 Android Nougat 以及更高版本的设备上。但是更低版本的 Android 平台会忽略 v2 签名，这就需要应用包含 v1 签名。<br><img src="http://p1aqjecep.bkt.clouddn.com/image014.jpg" alt="img"><br>验证程序会对照存储在“APK 签名分块”中的 v2 签名对 APK 的全文件hash进行验证。该hash涵盖除“APK 签名分块”（其中包含 v2 签名）之外的所有内容。在“APK 签名分块”以外对 APK 进行的任何修改都会使 APK 的 v2 签名作废。v2 签名被删除的 APK 也会被拒绝，因为 v1 签名指明相应 APK 带有 v2 签名，所以 Android Nougat 及更高版本会拒绝使用 v1 签名验证 APK。</p>
-<h2 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h2><p>Janus漏洞主要是向APK里面添加额外的DEX文件。一方面，APK文件是zip文件，可以包含初始时的任意字节，在它的zip条目（实际情况下更多是在zip条目里面）。但是JAR签名方案只考虑了zip入口。当计算或者校验apk的签名的时候，它忽略了其他字节。另一方面，在字符串、类、方法定义等常规部分之后，一个DEX文件可以包含任意的字节。综上所述，一个文件可以同时包含一个APK文件和一个DEX文件。<br><img src="http://p1aqjecep.bkt.clouddn.com/image016.jpg" alt="img"><br>另一个关键点是Dalvik / ART虚拟机方面。android运行加载APK文件，提取它的DEX文件，然后运行它的代码。在实践中，虚拟机可以加载和执行APK文件。当它得到APK文件时，它仍然会查看header的magic字节来判断它是什么类型的文件，如果找到一个DEX类型的，就会将文件载入为DEX文件，否则就会将文件加载为一个APK文件，其中包括一个带有DEX的zip文件。因此，既可以读取DEX文件又可以读取APK文件。<br>所以攻击者可以利用着这种二元性，在不影响其签名的情况下将一个恶意DEX文件预先添加到APK文件里面，然后，android运行时接受APK文件作为一个合法的早期版本的应用程序的有效更新，但是Dalvik虚拟机从注入的DEX文件中加载代码，从而实现攻击。</p>
-<h2 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h2><p><img src="http://p1aqjecep.bkt.clouddn.com/image018.jpg" alt="img"><br>原来的apk主要代码<br><img src="http://p1aqjecep.bkt.clouddn.com/image019.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image021.jpg" alt="img"><br>修改了dex文件，将Log.i(“janus”,”点击事件”);修改为Toast.makeText(getApplicationContext(),”I steal your car.”,Toast.LENGTH_LONG).show();<br><img src="http://p1aqjecep.bkt.clouddn.com/image023.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image024.jpg" alt="img"><br>安装合并好的1.apk<br><img src="http://p1aqjecep.bkt.clouddn.com/image026.jpg" alt="img"><br><img src="http://p1aqjecep.bkt.clouddn.com/image027.jpg" alt="img"><br>测试<br><img src="http://p1aqjecep.bkt.clouddn.com/image029.jpg" alt="img"><br>攻击完成</p>
-<h2 id="影响范围"><a href="#影响范围" class="headerlink" title="影响范围"></a>影响范围</h2><p>该漏洞仅影响基于 JAR 签名的方案（v1 方案）。不影响自Android 7.0 以来引入的 APK 签名方案 v2（v2 方案）。</p>
-<h2 id="漏洞危害"><a href="#漏洞危害" class="headerlink" title="漏洞危害"></a>漏洞危害</h2><p>可被添加恶意dex文件可以进行一些敏感性的操作，例如窃取用户数据、监控手机等高危操作。</p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://source.android.com/security/apksigning/v2#verification" rel="external nofollow noopener noreferrer" target="_blank">https://source.android.com/security/apksigning/v2#verification</a><br><a href="https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures" rel="external nofollow noopener noreferrer" target="_blank">https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures</a></p>
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上篇介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态调试。</p>
+<h2 id="UART串口调试"><a href="#UART串口调试" class="headerlink" title="UART串口调试"></a>UART串口调试</h2><p>UART调试第一步需要先找到对应的四个PIN，在通电情况下，VCC口可以不要接，判断 GND, RX, TX三个引脚是调试的关键，找四个引脚可以先看PCB上的印字。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image65.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image66.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image67.jpg" alt="img"><br>但多数厂商在量产前会去掉用于调试的串口印字，如果找不到对应引脚的印字，就需要先分析PCB的结构，一般PCB上有3、4 、5个并排或相距不远的焊点或通孔，就有可能是UART调试串口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image68.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image69.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image70.jpg" alt="img"><br>但PCB上可能存在多个这样的焊点或通孔，从多个口中找出真正的调试串口，就需要借助到万用表。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image101.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image102.jpg" alt="img"><br>万用表找串口首先需要找到GND口，就是接地口，在疑似串口的焊点处，通过测量电势差，可以判断出GND口，通过连接焊点和输入负极，如果电势为0，就可能是GND口，如果电势为最大值，例如3.6V、5V等，就可能是VCC口。然后通过UART转换器对应的4个口，引出导线，并设置好串口输出环境后，就可以依次尝试。也可以通过短接其中的两口，如果机器重启，就可以判断这两口为VCC和GND。<br>需要注意的是，在TTL电平模式下，UATR转换接口上的RX、TX口与上位设备，也就是PCB上的UART口的RX和TX是需要反接的。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image71.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image72.jpg" alt="img"></p>
+<h3 id="案例一：调试某智能摄像头"><a href="#案例一：调试某智能摄像头" class="headerlink" title="案例一：调试某智能摄像头"></a>案例一：调试某智能摄像头</h3><p>通过万用表测量电势差之后，在靠近CPU的地方有三个通孔，有可能是UART串口，用导线连接之后，设置波特率为115200。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image73.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image35.jpg" alt="img"><br>用SecureCRT连接串口，给机器通上电之后，串口立马输出了启动信息，并可以执行命令，说明串口正确，如果遇到无法输入的情况，首先检查接线是否松动，然后在SecureCRT中的， Session Options -&gt; Connection -&gt; Serial -&gt; Flow Control，将原先选中的 RTS/CTS取消掉，这是因为如果选中了RTS/CTS ，则硬件上要有对应接口，软件上实现对应协议，才能实现此流控制。如果串口输出为乱码，则需要切换波特率，直至输出正常。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image74.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image75.jpg" alt="img"></p>
+<h3 id="案例二：调试某路由器"><a href="#案例二：调试某路由器" class="headerlink" title="案例二：调试某路由器"></a>案例二：调试某路由器</h3><p>在靠近cpu的地方有四个通孔，测量电势差后，利用导线探针，确定了三个PIN，连接转换器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image76.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image77.jpg" alt="img"><br>串口中输出调试信息，因波特率设置问题，初始输出为乱码，改为38400即可正常输出。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image78.jpg" alt="img"></p>
+<h3 id="案例三：调试某路由器"><a href="#案例三：调试某路由器" class="headerlink" title="案例三：调试某路由器"></a>案例三：调试某路由器</h3><p>在PCB上有四个焊点，先测量电势差，分出GND和VCC，在利用焊枪分别焊上导线，连接转换接口，测试出TX和RX口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image79.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image80.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image81.jpg" alt="img"></p>
+<h3 id="案例四：调试某路由器"><a href="#案例四：调试某路由器" class="headerlink" title="案例四：调试某路由器"></a>案例四：调试某路由器</h3><p>在PCB一侧有5个通孔，并标注有UART-0字样，通电后，测试各口电势差，确实GND和VCC后，连接转换接口，并测试出RX和TX口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image82.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image83.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image84.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image85.jpg" alt="img"><br>通过本地架设的tftp服务器，并在串口输入命令，开启相关服务，就可以通过tftp与机器传输文件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image86.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image87.jpg" alt="img"></p>
+<h3 id="案例五：调试某无线数据终端"><a href="#案例五：调试某无线数据终端" class="headerlink" title="案例五：调试某无线数据终端"></a>案例五：调试某无线数据终端</h3><p>拆开正面压板，发现PCB上标注有印字，利用PCB夹具和探针，引出RX和TX口，连接转换器，因该无线终端串口电压不超过1.7V，焊接容易造成信号衰减，因此采用夹具。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image88.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image89.jpg" alt="img"><br>因串口输出信息过多，影响输入和输出结果，因此采用串口调试助手，设置波特率为115200，输入命令并发送，可以成功执行。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image90.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image91.jpg" alt="img"></p>
+<h3 id="案例六：调试某语音机器人"><a href="#案例六：调试某语音机器人" class="headerlink" title="案例六：调试某语音机器人"></a>案例六：调试某语音机器人</h3><p>拆解机器，该型机器采用多块电路板层级设计，其主要处理芯片位于顶部，拆解时注意走线位置，防止拉坏接线口，在PCB上有UART的PIN口印字，给每一个PIN口焊上导线，连接转换器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image122.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image123.jpg" alt="img"><br>设置波特率为921600，连接串口，用root账号登陆，密码为空，成功进入系统，执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image124.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image125.jpg" alt="img"></p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;上篇介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态
     
     </summary>
     
-      <category term="移动安全" scheme="http://www.future-sec.com/categories/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
     
     
-      <category term="移动安全" scheme="http://www.future-sec.com/tags/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+      <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
     
-      <category term="app签名" scheme="http://www.future-sec.com/tags/app%E7%AD%BE%E5%90%8D/"/>
+      <category term="UART串口调试" scheme="http://www.future-sec.com/tags/UART%E4%B8%B2%E5%8F%A3%E8%B0%83%E8%AF%95/"/>
     
   </entry>
   
@@ -194,34 +398,62 @@
   </entry>
   
   <entry>
-    <title>物联网硬件安全分析基础-串口调试</title>
-    <link href="http://www.future-sec.com/iot-security-hardware-debuging.html"/>
-    <id>http://www.future-sec.com/iot-security-hardware-debuging.html</id>
-    <published>2017-12-04T16:00:00.000Z</published>
-    <updated>2017-12-26T03:06:07.555Z</updated>
+    <title>如何破解一个蓝牙锁</title>
+    <link href="http://www.future-sec.com/how-to-crack-a-ble-lock.html"/>
+    <id>http://www.future-sec.com/how-to-crack-a-ble-lock.html</id>
+    <published>2017-11-26T16:00:00.000Z</published>
+    <updated>2017-11-27T11:01:32.347Z</updated>
     
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上篇介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态调试。</p>
-<h2 id="UART串口调试"><a href="#UART串口调试" class="headerlink" title="UART串口调试"></a>UART串口调试</h2><p>UART调试第一步需要先找到对应的四个PIN，在通电情况下，VCC口可以不要接，判断 GND, RX, TX三个引脚是调试的关键，找四个引脚可以先看PCB上的印字。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image65.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image66.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image67.jpg" alt="img"><br>但多数厂商在量产前会去掉用于调试的串口印字，如果找不到对应引脚的印字，就需要先分析PCB的结构，一般PCB上有3、4 、5个并排或相距不远的焊点或通孔，就有可能是UART调试串口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image68.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image69.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image70.jpg" alt="img"><br>但PCB上可能存在多个这样的焊点或通孔，从多个口中找出真正的调试串口，就需要借助到万用表。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image101.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image102.jpg" alt="img"><br>万用表找串口首先需要找到GND口，就是接地口，在疑似串口的焊点处，通过测量电势差，可以判断出GND口，通过连接焊点和输入负极，如果电势为0，就可能是GND口，如果电势为最大值，例如3.6V、5V等，就可能是VCC口。然后通过UART转换器对应的4个口，引出导线，并设置好串口输出环境后，就可以依次尝试。也可以通过短接其中的两口，如果机器重启，就可以判断这两口为VCC和GND。<br>需要注意的是，在TTL电平模式下，UATR转换接口上的RX、TX口与上位设备，也就是PCB上的UART口的RX和TX是需要反接的。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image71.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image72.jpg" alt="img"></p>
-<h3 id="案例一：调试某智能摄像头"><a href="#案例一：调试某智能摄像头" class="headerlink" title="案例一：调试某智能摄像头"></a>案例一：调试某智能摄像头</h3><p>通过万用表测量电势差之后，在靠近CPU的地方有三个通孔，有可能是UART串口，用导线连接之后，设置波特率为115200。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image73.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image35.jpg" alt="img"><br>用SecureCRT连接串口，给机器通上电之后，串口立马输出了启动信息，并可以执行命令，说明串口正确，如果遇到无法输入的情况，首先检查接线是否松动，然后在SecureCRT中的， Session Options -&gt; Connection -&gt; Serial -&gt; Flow Control，将原先选中的 RTS/CTS取消掉，这是因为如果选中了RTS/CTS ，则硬件上要有对应接口，软件上实现对应协议，才能实现此流控制。如果串口输出为乱码，则需要切换波特率，直至输出正常。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image74.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image75.jpg" alt="img"></p>
-<h3 id="案例二：调试某路由器"><a href="#案例二：调试某路由器" class="headerlink" title="案例二：调试某路由器"></a>案例二：调试某路由器</h3><p>在靠近cpu的地方有四个通孔，测量电势差后，利用导线探针，确定了三个PIN，连接转换器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image76.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image77.jpg" alt="img"><br>串口中输出调试信息，因波特率设置问题，初始输出为乱码，改为38400即可正常输出。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image78.jpg" alt="img"></p>
-<h3 id="案例三：调试某路由器"><a href="#案例三：调试某路由器" class="headerlink" title="案例三：调试某路由器"></a>案例三：调试某路由器</h3><p>在PCB上有四个焊点，先测量电势差，分出GND和VCC，在利用焊枪分别焊上导线，连接转换接口，测试出TX和RX口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image79.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image80.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image81.jpg" alt="img"></p>
-<h3 id="案例四：调试某路由器"><a href="#案例四：调试某路由器" class="headerlink" title="案例四：调试某路由器"></a>案例四：调试某路由器</h3><p>在PCB一侧有5个通孔，并标注有UART-0字样，通电后，测试各口电势差，确实GND和VCC后，连接转换接口，并测试出RX和TX口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image82.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image83.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image84.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image85.jpg" alt="img"><br>通过本地架设的tftp服务器，并在串口输入命令，开启相关服务，就可以通过tftp与机器传输文件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image86.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image87.jpg" alt="img"></p>
-<h3 id="案例五：调试某无线数据终端"><a href="#案例五：调试某无线数据终端" class="headerlink" title="案例五：调试某无线数据终端"></a>案例五：调试某无线数据终端</h3><p>拆开正面压板，发现PCB上标注有印字，利用PCB夹具和探针，引出RX和TX口，连接转换器，因该无线终端串口电压不超过1.7V，焊接容易造成信号衰减，因此采用夹具。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image88.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image89.jpg" alt="img"><br>因串口输出信息过多，影响输入和输出结果，因此采用串口调试助手，设置波特率为115200，输入命令并发送，可以成功执行。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image90.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image91.jpg" alt="img"></p>
-<h3 id="案例六：调试某语音机器人"><a href="#案例六：调试某语音机器人" class="headerlink" title="案例六：调试某语音机器人"></a>案例六：调试某语音机器人</h3><p>拆解机器，该型机器采用多块电路板层级设计，其主要处理芯片位于顶部，拆解时注意走线位置，防止拉坏接线口，在PCB上有UART的PIN口印字，给每一个PIN口焊上导线，连接转换器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image122.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image123.jpg" alt="img"><br>设置波特率为921600，连接串口，用root账号登陆，密码为空，成功进入系统，执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image124.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image125.jpg" alt="img"></p>
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>随着物联网各类技术的逐步进步，越来越多的智能设备出现在我们生活中，智能锁在锁具市场上所占的份额将会越来越大，甚至超过传统锁，成为主流。而在智能锁中，因为低功耗蓝牙技术的推广，以及受外部环境限制小，通过手机APP交互方便等特点，很多智能锁采用的就是以BLE蓝牙芯片作为控制单元，控制电机或锁簧转动的模式，实现开关锁功能。与其他的安全问题相比，锁具的被破解，可能造成的危害更大，本文通过以破解某型号蓝牙锁，来展示目前蓝牙智能锁可能面临的安全风险。</p>
+<h2 id="蓝牙锁介绍"><a href="#蓝牙锁介绍" class="headerlink" title="蓝牙锁介绍"></a>蓝牙锁介绍</h2><p> 蓝牙锁由于不受外部环境限制，功耗较低，和手机交互方便，目前用的比较多,形状也五花八门，例如目前使用最广泛的一些智能蓝牙锁。</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage9.jpg" alt="img"></p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage10.jpg" alt="img"></p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage11.jpg" alt="img"></p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage12.jpg" alt="img"></p>
+<h2 id="如何去破解一个蓝牙锁"><a href="#如何去破解一个蓝牙锁" class="headerlink" title="如何去破解一个蓝牙锁"></a>如何去破解一个蓝牙锁</h2><p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage13.jpg" alt="img"></p>
+<h3 id="目标介绍"><a href="#目标介绍" class="headerlink" title="目标介绍"></a>目标介绍</h3><p>这个属于低功耗蓝牙锁，使用app 绑定之后可以开启，还能共享密码，修改密码。</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage14.jpg" alt="img"></p>
+<h3 id="内部构架"><a href="#内部构架" class="headerlink" title="内部构架"></a>内部构架</h3><p>显微镜查看电路板<br><img src="http://ozuqqvmm5.bkt.clouddn.com/IMG_2214.jpg" alt="img"></p>
+<p>拆解<br><img src="http://ozuqqvmm5.bkt.clouddn.com/IMG_2216.jpg" alt="img"></p>
+<p>蓝牙锁内部搭载了一块CC2541蓝牙芯片，通过控制电机驱动芯片，带动卡榫运转，从而形成拉锁的开关。CC2541是TI推出的一款专门适用于BLE和专用的2.4GHz应用的SOC芯片解决方案,CC254X在目前物联网蓝牙通信解决方案中，市场占有率很高，应用场景非常广泛。</p>
+<h3 id="探测"><a href="#探测" class="headerlink" title="探测"></a>探测</h3><p>使用app初步连接探测，可以看到</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage16.jpg" alt="img"></p>
+<h3 id="开锁流程"><a href="#开锁流程" class="headerlink" title="开锁流程"></a>开锁流程</h3><p>Logcat 查看app日志</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage17.jpg" alt="img"></p>
+<p>流程为</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171123170725.jpg" alt="img"></p>
+<h3 id="攻击方式"><a href="#攻击方式" class="headerlink" title="攻击方式"></a>攻击方式</h3><p>一般对于蓝牙锁的攻击方式有三种</p>
+<p>1、重放攻击<br>2、暴力破解(6位数字)<br>3、云端漏洞</p>
+<h3 id="重放攻击"><a href="#重放攻击" class="headerlink" title="重放攻击"></a>重放攻击</h3><p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage18.jpg" alt="img"></p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage19.jpg" alt="img"></p>
+<p>通过蓝牙抓包分析，发现通信过程没有加密，可以重放获取认证密码，但如果要模拟真实的智能锁攻击场景，显然不能通过如此显眼的方式，真实环境中往往很难有一个给我们抓包或劫持的场景，所以最好的方式是远程无接触开锁，需要去找云端的漏洞。</p>
+<h3 id="云端漏洞"><a href="#云端漏洞" class="headerlink" title="云端漏洞"></a>云端漏洞</h3><p>云端是Thinkphp5 写的，稍微看了一下,存在有两个漏洞。无认证可以遍历所有id拿到所有锁的信息</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage20.jpg" alt="img"></p>
+<p>没有关闭调试模式会泄露信息,传入一个空的id会吧所有锁的信息报错显示出来，泄露所有锁的密码以及绑定的电话号码mac地址等信息。</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage21.jpg" alt="img"></p>
+<h3 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h3><p>对于真实的破解锁场景，最好用一个手机app来开锁掩人耳目，综合以上分析，编写一个开锁Android app 。<br>工作流程为</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171123170725.jpg" alt="img"></p>
+<p>利用 com.inuker.bluetooth 库快速开发</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage22.jpg" alt="img"></p>
+<p>APP界面</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/15117578788731.jpg" alt="img"></p>
+<p>视频演示</p>
+<p> <a href="https://v.qq.com/x/page/b051058vicv.html" rel="external nofollow noopener noreferrer" target="_blank">https://v.qq.com/x/page/b051058vicv.html</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>ti官方页面  <a href="http://www.ti.com.cn/product/cn/CC2541" rel="external nofollow noopener noreferrer" target="_blank">http://www.ti.com.cn/product/cn/CC2541</a><br>cc2541蓝牙芯片手册  <a href="https://wenku.baidu.com/view/c7f99ac7376baf1ffd4fad31.html" rel="external nofollow noopener noreferrer" target="_blank">https://wenku.baidu.com/view/c7f99ac7376baf1ffd4fad31.html</a> </p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;上篇介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;随着物联网各类技术的逐步进步，越来越多的智能设备出现在我们生活中，智能锁在锁具市场上所占的份额将会越来越大，甚至超过传统锁，成为主流。而在智
     
     </summary>
     
       <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
     
     
-      <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
+      <category term="智能锁" scheme="http://www.future-sec.com/tags/%E6%99%BA%E8%83%BD%E9%94%81/"/>
     
-      <category term="UART串口调试" scheme="http://www.future-sec.com/tags/UART%E4%B8%B2%E5%8F%A3%E8%B0%83%E8%AF%95/"/>
+      <category term="蓝牙攻击" scheme="http://www.future-sec.com/tags/%E8%93%9D%E7%89%99%E6%94%BB%E5%87%BB/"/>
     
   </entry>
   
@@ -334,66 +566,6 @@
       <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
     
       <category term="硬件分析" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%88%86%E6%9E%90/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>如何破解一个蓝牙锁</title>
-    <link href="http://www.future-sec.com/how-to-crack-a-ble-lock.html"/>
-    <id>http://www.future-sec.com/how-to-crack-a-ble-lock.html</id>
-    <published>2017-11-26T16:00:00.000Z</published>
-    <updated>2017-11-27T11:01:32.347Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>随着物联网各类技术的逐步进步，越来越多的智能设备出现在我们生活中，智能锁在锁具市场上所占的份额将会越来越大，甚至超过传统锁，成为主流。而在智能锁中，因为低功耗蓝牙技术的推广，以及受外部环境限制小，通过手机APP交互方便等特点，很多智能锁采用的就是以BLE蓝牙芯片作为控制单元，控制电机或锁簧转动的模式，实现开关锁功能。与其他的安全问题相比，锁具的被破解，可能造成的危害更大，本文通过以破解某型号蓝牙锁，来展示目前蓝牙智能锁可能面临的安全风险。</p>
-<h2 id="蓝牙锁介绍"><a href="#蓝牙锁介绍" class="headerlink" title="蓝牙锁介绍"></a>蓝牙锁介绍</h2><p> 蓝牙锁由于不受外部环境限制，功耗较低，和手机交互方便，目前用的比较多,形状也五花八门，例如目前使用最广泛的一些智能蓝牙锁。</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage9.jpg" alt="img"></p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage10.jpg" alt="img"></p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage11.jpg" alt="img"></p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage12.jpg" alt="img"></p>
-<h2 id="如何去破解一个蓝牙锁"><a href="#如何去破解一个蓝牙锁" class="headerlink" title="如何去破解一个蓝牙锁"></a>如何去破解一个蓝牙锁</h2><p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage13.jpg" alt="img"></p>
-<h3 id="目标介绍"><a href="#目标介绍" class="headerlink" title="目标介绍"></a>目标介绍</h3><p>这个属于低功耗蓝牙锁，使用app 绑定之后可以开启，还能共享密码，修改密码。</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage14.jpg" alt="img"></p>
-<h3 id="内部构架"><a href="#内部构架" class="headerlink" title="内部构架"></a>内部构架</h3><p>显微镜查看电路板<br><img src="http://ozuqqvmm5.bkt.clouddn.com/IMG_2214.jpg" alt="img"></p>
-<p>拆解<br><img src="http://ozuqqvmm5.bkt.clouddn.com/IMG_2216.jpg" alt="img"></p>
-<p>蓝牙锁内部搭载了一块CC2541蓝牙芯片，通过控制电机驱动芯片，带动卡榫运转，从而形成拉锁的开关。CC2541是TI推出的一款专门适用于BLE和专用的2.4GHz应用的SOC芯片解决方案,CC254X在目前物联网蓝牙通信解决方案中，市场占有率很高，应用场景非常广泛。</p>
-<h3 id="探测"><a href="#探测" class="headerlink" title="探测"></a>探测</h3><p>使用app初步连接探测，可以看到</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage16.jpg" alt="img"></p>
-<h3 id="开锁流程"><a href="#开锁流程" class="headerlink" title="开锁流程"></a>开锁流程</h3><p>Logcat 查看app日志</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage17.jpg" alt="img"></p>
-<p>流程为</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171123170725.jpg" alt="img"></p>
-<h3 id="攻击方式"><a href="#攻击方式" class="headerlink" title="攻击方式"></a>攻击方式</h3><p>一般对于蓝牙锁的攻击方式有三种</p>
-<p>1、重放攻击<br>2、暴力破解(6位数字)<br>3、云端漏洞</p>
-<h3 id="重放攻击"><a href="#重放攻击" class="headerlink" title="重放攻击"></a>重放攻击</h3><p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage18.jpg" alt="img"></p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage19.jpg" alt="img"></p>
-<p>通过蓝牙抓包分析，发现通信过程没有加密，可以重放获取认证密码，但如果要模拟真实的智能锁攻击场景，显然不能通过如此显眼的方式，真实环境中往往很难有一个给我们抓包或劫持的场景，所以最好的方式是远程无接触开锁，需要去找云端的漏洞。</p>
-<h3 id="云端漏洞"><a href="#云端漏洞" class="headerlink" title="云端漏洞"></a>云端漏洞</h3><p>云端是Thinkphp5 写的，稍微看了一下,存在有两个漏洞。无认证可以遍历所有id拿到所有锁的信息</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage20.jpg" alt="img"></p>
-<p>没有关闭调试模式会泄露信息,传入一个空的id会吧所有锁的信息报错显示出来，泄露所有锁的密码以及绑定的电话号码mac地址等信息。</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage21.jpg" alt="img"></p>
-<h3 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h3><p>对于真实的破解锁场景，最好用一个手机app来开锁掩人耳目，综合以上分析，编写一个开锁Android app 。<br>工作流程为</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171123170725.jpg" alt="img"></p>
-<p>利用 com.inuker.bluetooth 库快速开发</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/bimage22.jpg" alt="img"></p>
-<p>APP界面</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/15117578788731.jpg" alt="img"></p>
-<p>视频演示</p>
-<p> <a href="https://v.qq.com/x/page/b051058vicv.html" rel="external nofollow noopener noreferrer" target="_blank">https://v.qq.com/x/page/b051058vicv.html</a></p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>ti官方页面  <a href="http://www.ti.com.cn/product/cn/CC2541" rel="external nofollow noopener noreferrer" target="_blank">http://www.ti.com.cn/product/cn/CC2541</a><br>cc2541蓝牙芯片手册  <a href="https://wenku.baidu.com/view/c7f99ac7376baf1ffd4fad31.html" rel="external nofollow noopener noreferrer" target="_blank">https://wenku.baidu.com/view/c7f99ac7376baf1ffd4fad31.html</a> </p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;随着物联网各类技术的逐步进步，越来越多的智能设备出现在我们生活中，智能锁在锁具市场上所占的份额将会越来越大，甚至超过传统锁，成为主流。而在智
-    
-    </summary>
-    
-      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="智能锁" scheme="http://www.future-sec.com/tags/%E6%99%BA%E8%83%BD%E9%94%81/"/>
-    
-      <category term="蓝牙攻击" scheme="http://www.future-sec.com/tags/%E8%93%9D%E7%89%99%E6%94%BB%E5%87%BB/"/>
     
   </entry>
   

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <title>BROADCOM WI-FI芯片漏洞分析三 | 伏宸安全实验室-Future-Sec Information Security Lab</title>
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <meta name="description" content="切入点从解析wme信标帧开始参考：freebuf博客：完整解析博通WiFi芯片Broadpwn漏洞先找到固件中的漏洞位置，如下代码所示，有几个关键的数据帧标志类型。根据管理帧的类型在 VMG-1312 的源代码定位到处理这部分管理帧数据包的代码。 123456789101112131415161718192021222324252627frame_type = *(unsigned __int16">
+<meta name="keywords" content="Poc,BROADCOM WI-FI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BROADCOM WI-FI芯片漏洞分析三">
+<meta property="og:url" content="http://www.future-sec.com/broadcom-wifi-3.html">
+<meta property="og:site_name" content="伏宸安全实验室-Future-Sec Information Security Lab">
+<meta property="og:description" content="切入点从解析wme信标帧开始参考：freebuf博客：完整解析博通WiFi芯片Broadpwn漏洞先找到固件中的漏洞位置，如下代码所示，有几个关键的数据帧标志类型。根据管理帧的类型在 VMG-1312 的源代码定位到处理这部分管理帧数据包的代码。 123456789101112131415161718192021222324252627frame_type = *(unsigned __int16">
+<meta property="og:updated_time" content="2018-01-19T07:22:52.674Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="BROADCOM WI-FI芯片漏洞分析三">
+<meta name="twitter:description" content="切入点从解析wme信标帧开始参考：freebuf博客：完整解析博通WiFi芯片Broadpwn漏洞先找到固件中的漏洞位置，如下代码所示，有几个关键的数据帧标志类型。根据管理帧的类型在 VMG-1312 的源代码定位到处理这部分管理帧数据包的代码。 123456789101112131415161718192021222324252627frame_type = *(unsigned __int16">
+  
+    <link rel="alternative" href="/atom.xml" title="伏宸安全实验室-Future-Sec Information Security Lab" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  
+
+  <!-- Global styles START -->   
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END --> 
+   
+  <!-- Page level plugin styles START -->
+  <link rel="stylesheet" href="/metronic/assets/pages/css/animate.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/owl.carousel/assets/owl.carousel.css">
+  <!-- Page level plugin styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/pages/css/components.css">
+  <link rel="stylesheet" href="/metronic/assets/pages/css/slider.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/pages/css/portfolio.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/red.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END -->
+</head>
+</html>
+<body class="corporate">
+  <!-- BEGIN HEADER -->
+<div class="header">
+  <div class="container">
+    <!--<a class="site-logo" href="/" id="logo">伏宸安全实验室-Future-Sec Information Security Lab</a>-->
+
+    <a class="site-logo" href="/">
+      <img src="/metronic/assets/corporate/img/logos/logo-corp-red.png" alt="Metronic FrontEnd">
+    </a>
+
+    <a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+
+    <!-- BEGIN NAVIGATION -->
+    <div class="header-navigation pull-right font-transform-inherit">
+      <ul>
+	
+	<li class="">
+	  <a href="/index.html">Home</a>
+	</li>
+	
+	<li class="">
+	  <a href="/archives/">Blog</a>
+	</li>
+	
+	<li class="">
+	  <a href="/vulnerabilities.html">Vulnerabilities</a>
+	</li>
+	
+	<li class="">
+	  <a href="/about/">About</a>
+	</li>
+	
+	<!-- BEGIN TOP SEARCH -->
+	<li class="menu-search">
+	  <span class="sep"></span>
+	  <i class="fa fa-search search-btn"></i>
+	  <div class="search-box">
+	   
+	    <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank" class="search-form">
+    <div class="input-group">
+		<input placeholder="Search" class="form-control st-default-search-input" name="word" maxlength="20" type="search">
+		  <input name="si" value="future-sec.com" type="hidden">
+  <input name="tn" value="bds" type="hidden">
+  <input name="cl" value="3" type="hidden">
+  <input name="ct" value="2097152" type="hidden">
+  <input name="s" value="on" type="hidden">
+		<span class="input-group-btn">
+		  <button class="btn btn-primary" type="submit">Search</button>
+		</span>
+	      </div>
+</form>
+	  </div> 
+	</li>
+	<!-- END TOP SEARCH -->
+      </ul>
+    </div>
+    <!-- END NAVIGATION -->
+  </div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/archives/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/broadcom-wifi-3.html">BROADCOM WI-FI芯片漏洞分析三</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-broadcom-wifi-3" class="article article-type-post blog-item" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> Crystal</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2018-01-18T16:00:00.000Z" itemprop="datePublished">2018/01/19</time>
+
+	</li>
+	<li class="hidden-xs"><i class="fa fa-comments"></i>
+	  <a href="http://www.future-sec.com/broadcom-wifi-3.html#disqus_thread" class="article-comment-link">Comments</a>
+	</li>
+	<li class="hidden-xs"><i class="fa fa-tags"></i> 
+	  
+  
+    <a href="/tags/Poc/" title="Poc">Poc</a>,
+  
+    <a href="/tags/BROADCOM-WI-FI/" title="BROADCOM WI-FI">BROADCOM WI-FI</a>
+  
+
+
+	</li>
+      </ul>
+      
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/硬件安全/">硬件安全</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      <!-- Table of Contents -->
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#切入点"><span class="toc-number">1.</span> <span class="toc-text">切入点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Wlan知识普及"><span class="toc-number">2.</span> <span class="toc-text">Wlan知识普及</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#wifi驱动发送管理帧数据包流程"><span class="toc-number">3.</span> <span class="toc-text">wifi驱动发送管理帧数据包流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Wifi固件接收到管理帧的处理过程"><span class="toc-number">4.</span> <span class="toc-text">Wifi固件接收到管理帧的处理过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">5.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-number">6.</span> <span class="toc-text">参考</span></a></li></ol>
+  </div>
+
+        <h2 id="切入点"><a href="#切入点" class="headerlink" title="切入点"></a>切入点</h2><p>从解析wme信标帧开始<br>参考：<a href="http://www.freebuf.com/vuls/142099.html" rel="external nofollow noopener noreferrer" target="_blank">freebuf博客：完整解析博通WiFi芯片Broadpwn漏洞</a><br>先找到固件中的漏洞位置，如下代码所示，有几个关键的数据帧标志类型。根据管理帧的类型在 VMG-1312 的源代码定位到处理这部分管理帧数据包的代码。</p>
+<figure class="highlight sqf"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">frame_type = *(unsigned <span class="variable">__int16</span> *)(arg + <span class="number">8</span>);  <span class="comment">// arg-&gt;frame_type</span></div><div class="line">  cfg = *(<span class="variable">_DWORD</span> *)(arg + <span class="number">4</span>);                   <span class="comment">// arg-&gt;bsscfg</span></div><div class="line">  v4 = wlc;</div><div class="line">  ie = *(<span class="variable">_DWORD</span> *)(arg + <span class="number">0</span>xC);                  <span class="comment">// arg-&gt;ie</span></div><div class="line">  current_wmm_ie = *(<span class="variable">_BYTE</span> **)(cfg + <span class="number">0</span>x354);    <span class="comment">// cfg-&gt;current_wmm_ie</span></div><div class="line">  <span class="keyword">if</span> ( frame_type == <span class="number">0</span>x20 )                     <span class="comment">// FC_REASSOC_REQ = 0x20 重新关联请求帧</span></div><div class="line">    <span class="built_in">goto</span> LABEL_9;</div><div class="line">  <span class="keyword">if</span> ( frame_type &lt;= <span class="number">0</span>x20 )</div><div class="line">  &#123;</div><div class="line">    <span class="keyword">if</span> ( *(<span class="variable">_WORD</span> *)(arg + <span class="number">8</span>) )</div><div class="line">    &#123;</div><div class="line">      <span class="keyword">if</span> ( frame_type != <span class="number">0</span>x10 )                 <span class="comment">// FC_ASSOC_RESP  = 0x10  //关联帧 </span></div><div class="line">        return <span class="number">0</span>;</div><div class="line">      <span class="built_in">goto</span> LABEL_15;</div><div class="line">    &#125;</div><div class="line">    ...</div><div class="line">    ...</div><div class="line">    ...</div><div class="line">    <span class="keyword">if</span> ( frame_type != <span class="number">0</span>x30 )                     <span class="comment">// FC_REASSOC_RESP = 0x30 重新关联响应帧</span></div><div class="line">  &#123;</div><div class="line">    <span class="keyword">if</span> ( frame_type == <span class="number">0</span>x80 )                   <span class="comment">// FC_BEACON = 0x80 信标帧</span></div><div class="line">    &#123;</div><div class="line">      v16 = **(<span class="variable">_DWORD</span> **)(*(<span class="variable">_DWORD</span> *)arg + <span class="number">0</span>x1C);</div><div class="line">      <span class="keyword">if</span> ( *(<span class="variable">_DWORD</span> *)(*(<span class="variable">_DWORD</span> *)wlc + <span class="number">0</span>x34) )</div><div class="line">      ...</div><div class="line">      ...</div><div class="line">      ...</div></pre></td></tr></table></figure>
+<h2 id="Wlan知识普及"><a href="#Wlan知识普及" class="headerlink" title="Wlan知识普及"></a>Wlan知识普及</h2><p>1）802.11数据包类型</p>
+<figure class="highlight vbscript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="number">1.</span> 数据: 数据数据包的作用是用来携带更高层次的数据(如IP数据包，ISO7层协议)。</div><div class="line">它负责在工作站之间传输数据</div><div class="line"></div><div class="line"><span class="number">2.</span> 管理: 管理数据包控制网络的管理功能</div><div class="line">    <span class="number">1</span>) 信标帧(Beacons): 在无线设备中，定时依次按指定间隔发送的有规律的无线信号(类似心跳包)，主要用于定位和同步使用</div><div class="line">    <span class="number">2</span>) 解除认证(Deauthentication)数据包 </div><div class="line">    <span class="number">3</span>) Probe(<span class="built_in">request</span> <span class="keyword">and</span> <span class="built_in">response</span>)探测包</div><div class="line">    <span class="number">4</span>) Authenticate(<span class="built_in">request</span> <span class="keyword">and</span> <span class="built_in">response</span>)身份认证</div><div class="line">    <span class="number">5</span>) Associate(<span class="built_in">request</span> <span class="keyword">and</span> <span class="built_in">response</span>)关联</div><div class="line">    <span class="number">6</span>) Reassociate(<span class="built_in">request</span> <span class="keyword">and</span> <span class="built_in">response</span>)重新关联</div><div class="line">    <span class="number">7</span>) Dissassociate(notify) 解除关联</div><div class="line">管理帧负责监督，主要用来加入或退出无线网络，以及处理接入点之间连接的转移事宜</div><div class="line"></div><div class="line"><span class="number">3.</span> 控制: 控制数据包得名于术语<span class="string">"媒体接入控制(Media Access Control, MAC)"</span>，是用来控制对共享媒体(即物理媒介，如光缆)的访问</div><div class="line">    <span class="number">1</span>) 请求发送(<span class="built_in">Request</span> <span class="keyword">To</span> Send，RTS)数据包</div><div class="line">    <span class="number">2</span>) 清除发送(Clear <span class="keyword">To</span> Send，CTS)数据包</div><div class="line">    <span class="number">3</span>) ACK确认(RTS/CTS)  </div><div class="line">    <span class="number">4</span>) PS-Poll: 当一部移动工作站从省电模式中苏醒，便会发送一个 PS-Poll 帧给基站，以取得任何暂存帧 </div><div class="line">控制帧通常与数据帧搭配使用，负责区域的清空、信道的取得以及载波监听的维护，并于收到数据时予以正面的应答，借此促进工作站间数据传输的可靠性</div></pre></td></tr></table></figure>
+<h2 id="wifi驱动发送管理帧数据包流程"><a href="#wifi驱动发送管理帧数据包流程" class="headerlink" title="wifi驱动发送管理帧数据包流程"></a>wifi驱动发送管理帧数据包流程</h2><p>总共定位到一处位置：</p>
+<p>是在kernel中发送数据包的过程<br>在\VMG1312-B-master\VMG1312-B-master\kernel\linux\drivers\staging\otus\80211core\cmm.c 中的函数 void zfSendMmFrame(zdev_t<em> dev, u8_t frameType, u16_t</em> dst,<br>                   u32_t p1, u32_t p2, u32_t p3)中实现<br>wlan连接过程：<br>    STA (工作站）启动初始化、开始正式使用、AP 传送数据幀之前，要经过三个阶段才能接入:<br>    (1) 扫描(SCAN)<br>    (2) 认证(Authentication)<br>    (3) 关联(Association) </p>
+<p>1）探测帧</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">case</span> ZM_WLAN_FRAME_TYPE_PROBEREQ :<span class="comment">//构造探测帧</span></div><div class="line">            <span class="keyword">offset</span> = zfSendProbeReq(dev, buf, <span class="keyword">offset</span>, (u8_t) p1);<span class="comment">//探测请求</span></div><div class="line">            <span class="keyword">break</span>;</div></pre></td></tr></table></figure>
+<p>2）探测响应帧</p>
+<p>构造探测响应帧时有WME参数部分<br><figure class="highlight openscad"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">case ZM_WLAN_FRAME_TYPE_PROBERSP : <span class="comment">//探测响应帧</span></div><div class="line">            zm_msg0_mm(ZM_LV_3, <span class="string">"probe rsp"</span>);</div><div class="line">            <span class="comment">/* 24-31 Time Stamp : hardware WON'T fill this field */</span></div><div class="line">            zmw_tx_buf_writeh(dev, buf, <span class="built_in">offset</span>, <span class="number">0</span>);</div><div class="line">            zmw_tx_buf_writeh(dev, buf, <span class="built_in">offset</span>+<span class="number">2</span>, <span class="number">0</span>);</div><div class="line">            zmw_tx_buf_writeh(dev, buf, <span class="built_in">offset</span>+<span class="number">4</span>, <span class="number">0</span>);</div><div class="line">            zmw_tx_buf_writeh(dev, buf, <span class="built_in">offset</span>+<span class="number">6</span>, <span class="number">0</span>);</div><div class="line">            <span class="built_in">offset</span>+=<span class="number">8</span>;</div><div class="line">...</div><div class="line">...</div><div class="line">..</div><div class="line"> <span class="comment">/* WME Parameters */</span></div><div class="line">            <span class="keyword">if</span> (wd-&gt;wlanMode == ZM_MODE_AP)</div><div class="line">            &#123;</div><div class="line">                <span class="keyword">if</span> (wd-&gt;ap.qosMode == <span class="number">1</span>)</div><div class="line">                &#123;</div><div class="line">                    <span class="built_in">offset</span> = zfApAddIeWmePara(dev, buf, <span class="built_in">offset</span>, vap);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">if</span> ( wd-&gt;wlanMode != ZM_MODE_IBSS )</div><div class="line">            &#123;</div><div class="line">            <span class="comment">// jhlee HT 0</span></div><div class="line">            <span class="comment">//CWYang(+)</span></div><div class="line">                <span class="comment">/* TODO : Need to check if it is ok */</span></div><div class="line">            <span class="comment">/* HT Capabilities Info */</span></div><div class="line">            <span class="built_in">offset</span> = zfMmAddHTCapability(dev, buf, <span class="built_in">offset</span>);</div><div class="line">            <span class="comment">//CWYang(+)</span></div><div class="line">            <span class="comment">/* Extended HT Capabilities Info */</span></div><div class="line">            <span class="built_in">offset</span> = zfMmAddExtendedHTCapability(dev, buf, <span class="built_in">offset</span>);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">if</span> ( wd-&gt;sta.ibssAdditionalIESize )</div><div class="line">                <span class="built_in">offset</span> = zfStaAddIbssAdditionalIE(dev, buf, <span class="built_in">offset</span>);</div><div class="line">            break;</div></pre></td></tr></table></figure></p>
+<p>3）身份认证</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">case</span> ZM_WLAN_FRAME_TYPE_AUTH :<span class="comment">//身份认证</span></div><div class="line">            <span class="keyword">if</span> (p1 == <span class="number">0x30001</span>)</div><div class="line">            &#123;</div><div class="line">                hlen += <span class="number">4</span>;</div><div class="line">                <span class="keyword">offset</span> += <span class="number">4</span>;        <span class="comment">// for reserving wep header</span></div><div class="line">                encrypt = <span class="number">1</span>;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="comment">/* Algotrithm Number */</span></div><div class="line">            zmw_tx_buf_writeh(dev, buf, <span class="keyword">offset</span>, (u16_t)(p1&amp;<span class="number">0xffff</span>));</div><div class="line">            <span class="keyword">offset</span>+=<span class="number">2</span>;</div><div class="line"></div><div class="line">            <span class="comment">/* Transaction Number */</span></div><div class="line">            zmw_tx_buf_writeh(dev, buf, <span class="keyword">offset</span>, (u16_t)(p1&gt;&gt;<span class="number">16</span>));</div><div class="line">            <span class="keyword">offset</span>+=<span class="number">2</span>;</div><div class="line">...</div><div class="line">..</div><div class="line">..</div><div class="line"> <span class="keyword">else</span> <span class="keyword">if</span> (p1 == <span class="number">0x30001</span>)</div><div class="line">            &#123;</div><div class="line">                <span class="comment">/* share-3 : STA return challenge Text */</span></div><div class="line">                zfCopyToIntTxBuffer(dev, buf, wd-&gt;sta.challengeText, <span class="keyword">offset</span>, wd-&gt;sta.challengeText[<span class="number">1</span>]+<span class="number">2</span>);</div><div class="line">                <span class="keyword">offset</span> += (wd-&gt;sta.challengeText[<span class="number">1</span>]+<span class="number">2</span>);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">break</span>;</div></pre></td></tr></table></figure>
+<p>4）关联请求/重新关联请求<br><figure class="highlight glsl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">case</span> ZM_WLAN_FRAME_TYPE_ASOCREQ :<span class="comment">//关联请求帧</span></div><div class="line"><span class="keyword">case</span> ZM_WLAN_FRAME_TYPE_REASOCREQ :  <span class="comment">// FC_REASSOC_REQ = 0x20 重新关联请求帧</span></div><div class="line">    <span class="comment">/* Capability */</span></div><div class="line">    zmw_tx_buf_writeb(dev, buf, <span class="keyword">offset</span>++, wd-&gt;sta.capability[<span class="number">0</span>]);</div><div class="line">    zmw_tx_buf_writeb(dev, buf, <span class="keyword">offset</span>++, wd-&gt;sta.capability[<span class="number">1</span>]);</div><div class="line"></div><div class="line">    <span class="comment">/* Listen Interval */</span>  <span class="comment">//监听间隔</span></div><div class="line">    zmw_tx_buf_writeh(dev, buf, <span class="keyword">offset</span>, <span class="number">0x0005</span>);</div><div class="line">    <span class="keyword">offset</span>+=<span class="number">2</span>;</div><div class="line"></div><div class="line">    <span class="comment">/* Reassocaited Request : Current AP address */</span></div><div class="line">    <span class="keyword">if</span> (frameType == ZM_WLAN_FRAME_TYPE_REASOCREQ)<span class="comment">// FC_REASSOC_REQ = 0x20 重新关联请求帧</span></div><div class="line">    &#123;</div><div class="line">    zmw_tx_buf_writeh(dev, buf, <span class="keyword">offset</span>, wd-&gt;sta.bssid[<span class="number">0</span>]);</div><div class="line">        <span class="keyword">offset</span>+=<span class="number">2</span>;</div><div class="line">    zmw_tx_buf_writeh(dev, buf, <span class="keyword">offset</span>, wd-&gt;sta.bssid[<span class="number">1</span>]);</div><div class="line">        <span class="keyword">offset</span>+=<span class="number">2</span>;</div><div class="line">    zmw_tx_buf_writeh(dev, buf, <span class="keyword">offset</span>, wd-&gt;sta.bssid[<span class="number">2</span>]);</div><div class="line">        <span class="keyword">offset</span>+=<span class="number">2</span>;</div><div class="line">    &#125;</div><div class="line">    ...</div><div class="line">    ...</div><div class="line">    </div><div class="line">    <span class="comment">//Store asoc request frame body, for VISTA only</span></div><div class="line">    wd-&gt;sta.asocReqFrameBodySize = ((<span class="keyword">offset</span> - hlen) &gt;</div><div class="line">            ZM_CACHED_FRAMEBODY_SIZE)?</div><div class="line">            ZM_CACHED_FRAMEBODY_SIZE:(<span class="keyword">offset</span> - hlen);</div><div class="line">    <span class="keyword">for</span> (i=<span class="number">0</span>; i&lt;wd-&gt;sta.asocReqFrameBodySize; i++)</div><div class="line">    &#123;</div><div class="line">        wd-&gt;sta.asocReqFrameBody[i] = zmw_tx_buf_readb(dev, buf, i + hlen);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">break</span>;</div></pre></td></tr></table></figure></p>
+<p>5）关联响应/重新关联响应</p>
+<p>这部分也有WME的相关参数构造<br><figure class="highlight glsl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">case</span> ZM_WLAN_FRAME_TYPE_ASOCRSP :<span class="comment">//关联响应帧</span></div><div class="line"><span class="keyword">case</span> ZM_WLAN_FRAME_TYPE_REASOCRSP :<span class="comment">// 重新关联响应帧</span></div><div class="line">    vap = (u16_t) p3;</div><div class="line"></div><div class="line">    <span class="comment">/* Capability */</span></div><div class="line">    zmw_tx_buf_writeh(dev, buf, <span class="keyword">offset</span>, wd-&gt;ap.capab[vap]);</div><div class="line">    <span class="keyword">offset</span>+=<span class="number">2</span>;</div><div class="line"></div><div class="line">    <span class="comment">/* Status Code */</span></div><div class="line">    zmw_tx_buf_writeh(dev, buf, <span class="keyword">offset</span>, (u16_t)p1);</div><div class="line">    <span class="keyword">offset</span>+=<span class="number">2</span>;</div><div class="line"></div><div class="line">    <span class="comment">/* AID */</span></div><div class="line">    zmw_tx_buf_writeh(dev, buf, <span class="keyword">offset</span>, (u16_t)(p2|<span class="number">0xc000</span>));</div><div class="line">    <span class="keyword">offset</span>+=<span class="number">2</span>;</div><div class="line">    ...</div><div class="line">    ...</div><div class="line">    ...</div><div class="line"><span class="comment">/* WME Parameters */</span></div><div class="line">    <span class="keyword">if</span> (wd-&gt;wlanMode == ZM_MODE_AP)</div><div class="line">    &#123;</div><div class="line">        <span class="comment">/* TODO : if WME STA then send WME parameter element */</span></div><div class="line">        <span class="keyword">if</span> (wd-&gt;ap.qosMode == <span class="number">1</span>)</div><div class="line">        &#123;</div><div class="line">            <span class="keyword">offset</span> = zfApAddIeWmePara(dev, buf, <span class="keyword">offset</span>, vap);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// jhlee HT 0</span></div><div class="line">    <span class="comment">//CWYang(+)</span></div><div class="line">    <span class="comment">/* HT Capabilities Info */</span></div><div class="line">    <span class="keyword">offset</span> = zfMmAddHTCapability(dev, buf, <span class="keyword">offset</span>);</div><div class="line">    <span class="comment">//CWYang(+)</span></div><div class="line">    <span class="comment">/* Extended HT Capabilities Info */</span></div><div class="line">    <span class="keyword">offset</span> = zfMmAddExtendedHTCapability(dev, buf, <span class="keyword">offset</span>);</div><div class="line">    <span class="keyword">break</span>;</div></pre></td></tr></table></figure></p>
+<p>6）通知传输指示信息<br><figure class="highlight glsl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">case</span> ZM_WLAN_FRAME_TYPE_ATIM :<span class="comment">//通知传输指示消息</span></div><div class="line">            <span class="comment">/* NULL frame */</span></div><div class="line">            <span class="comment">/* TODO : add two dumb bytes temporarily */</span></div><div class="line">            <span class="keyword">offset</span> += <span class="number">2</span>;</div><div class="line">            <span class="keyword">break</span>;</div></pre></td></tr></table></figure></p>
+<p>7）QoS帧/数据帧</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"> <span class="keyword">case</span> ZM_WLAN_FRAME_TYPE_QOS_NULL :</div><div class="line">            zmw_buf_writeh(dev, buf, <span class="keyword">offset</span>, <span class="number">0x0010</span>);</div><div class="line">            <span class="keyword">offset</span> += <span class="number">2</span>;</div><div class="line">            <span class="keyword">break</span>;</div><div class="line"></div><div class="line"><span class="keyword">case</span> ZM_WLAN_DATA_FRAME :</div><div class="line">    <span class="keyword">break</span>;</div></pre></td></tr></table></figure>
+<p>8）解除关联/解除认证</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">case</span> ZM_WLAN_FRAME_TYPE_DISASOC :<span class="comment">//解除关联</span></div><div class="line"><span class="keyword">case</span> ZM_WLAN_FRAME_TYPE_DEAUTH :<span class="comment">//解除认证</span></div><div class="line">    <span class="keyword">if</span> (wd-&gt;wlanMode == ZM_MODE_AP)</div><div class="line">    &#123;</div><div class="line">      vap = (u16_t) p3;</div><div class="line"></div><div class="line">      <span class="keyword">if</span> ((aid = zfApFindSta(dev, dst)) != <span class="number">0xffff</span>)</div><div class="line">      &#123;</div><div class="line">          zmw_enter_critical_section(dev);</div><div class="line">          <span class="comment">/* Clear STA table */</span></div><div class="line">          wd-&gt;ap.staTable[aid].valid = <span class="number">0</span>;</div><div class="line"></div><div class="line">          zmw_leave_critical_section(dev);</div><div class="line"></div><div class="line">          <span class="keyword">if</span> (wd-&gt;zfcbDisAsocNotify != <span class="keyword">NULL</span>)</div><div class="line">          &#123;</div><div class="line">              wd-&gt;zfcbDisAsocNotify(dev, (u8_t*)dst, vap);</div><div class="line">          &#125;</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">/* Reason Code */</span></div><div class="line">    zmw_tx_buf_writeh(dev, buf, offset, (u16_t)p1);</div><div class="line">    offset+=<span class="number">2</span>;</div><div class="line">    <span class="keyword">break</span>;</div></pre></td></tr></table></figure>
+<p>在wifi连接过程中主要有这些数据包种类</p>
+<p>9）发送数据包<br><figure class="highlight less"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">zfwBufSetSize</span>(dev, buf, offset);<span class="comment">//拷贝构造好的数据包到dev</span></div><div class="line"></div><div class="line"><span class="selector-tag">zm_msg2_mm</span>(ZM_LV_2, <span class="string">"management frame body size="</span>, offset-hlen);</div><div class="line"></div><div class="line"><span class="comment">//Copy wlan header</span></div><div class="line"><span class="selector-tag">zfTxGenMmHeader</span>(dev, frameType, dst, header, offset-hlen, buf, vap, encrypt);<span class="comment">//发送数据包过程</span></div></pre></td></tr></table></figure></p>
+<h2 id="Wifi固件接收到管理帧的处理过程"><a href="#Wifi固件接收到管理帧的处理过程" class="headerlink" title="Wifi固件接收到管理帧的处理过程"></a>Wifi固件接收到管理帧的处理过程</h2><p>我们关注的还是漏洞触发位置的重新关联响应帧</p>
+<p>1）解析重新关联响应帧时造成溢出的过程</p>
+<figure class="highlight xl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">void wlc_bss_parse_wme_ie(wlc_info *wlc, ie_parser_arg *arg) &#123;</div><div class="line">  unsigned int frame_type;  </div><div class="line">  wlc_bsscfg *cfg;  </div><div class="line">  bcm_tlv *ie;  </div><div class="line">  unsigned char *current_wmm_ie;  </div><div class="line">  int flags;</div><div class="line">  <span class="function"><span class="title">frame_type</span> = arg-&gt;</span>frame_type;  </div><div class="line">  <span class="function"><span class="title">cfg</span> = arg-&gt;</span>bsscfg;  </div><div class="line">  <span class="function"><span class="title">ie</span> = arg-&gt;</span>ie;  </div><div class="line">  <span class="function"><span class="title">current_wmm_ie</span> = cfg-&gt;</span>current_wmm_ie;  </div><div class="line">  <span class="keyword">if</span> ( frame_type == FC_REASSOC_REQ ) &#123;    </div><div class="line">    ...    </div><div class="line">    &lt;handle reassociation requests&gt;    </div><div class="line">    ...  &#125;  </div><div class="line">  <span class="keyword">if</span> ( frame_type == FC_ASSOC_RESP ) &#123;    </div><div class="line">    ...    </div><div class="line">    <span class="function"><span class="title">if</span> ( wlc-&gt;</span><span class="function"><span class="title">pub</span>-&gt;</span>_wme ) &#123;      </div><div class="line">      <span class="keyword">if</span> ( !(flags &amp; <span class="number">2</span>) ) &#123;        </div><div class="line">        ...        </div><div class="line">        <span class="keyword">if</span> ( ie ) &#123;          </div><div class="line">          ...          </div><div class="line">          <span class="function"><span class="title">cfg</span>-&gt;</span>flags |= <span class="number">0</span>x100u;          </div><div class="line">          <span class="function"><span class="title">memcpy</span>(current_wmm_ie, ie-&gt;</span><span class="function"><span class="title">data</span>, ie-&gt;</span>len);</div></pre></td></tr></table></figure>
+<p>2)溢出的位置确定</p>
+<p>溢出的位置是current_wmm_ie的下一个结构体wlc-&gt;pm</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">wlc_bsscfg *wlc_bsscfg_malloc(wlc_info *wlc) &#123;  </div><div class="line">  wlc_info *wlc<span class="comment">;  </span></div><div class="line">  wlc_bss_info *current_bss<span class="comment">;  </span></div><div class="line">  wlc_bss_info *target_bss<span class="comment">;  </span></div><div class="line">  wlc_pm_st *pm<span class="comment">;  </span></div><div class="line">  wmm_ie *current_wmm_ie<span class="comment">;</span></div><div class="line">  ...  </div><div class="line">  current_bss = wlc_calloc(<span class="number">0x124</span>)<span class="comment">;  </span></div><div class="line">  wlc-&gt;current_bss = current_bss<span class="comment">;  </span></div><div class="line">  if ( !current_bss ) &#123;    </div><div class="line">    goto fail<span class="comment">;  &#125;  </span></div><div class="line">  target_bss = wlc_calloc(<span class="number">0x124</span>)<span class="comment">;  </span></div><div class="line">  wlc-&gt;target_bss = target_bss<span class="comment">;  </span></div><div class="line">  if ( !target_bss ) &#123;    </div><div class="line">    goto fail<span class="comment">;  &#125;  </span></div><div class="line">  pm = wlc_calloc(<span class="number">0x78</span>)<span class="comment">;  </span></div><div class="line">  wlc-&gt;pm = pm<span class="comment">;  </span></div><div class="line">  if ( !pm ) &#123;    </div><div class="line">    goto fail<span class="comment">;  &#125;  </span></div><div class="line">  current_wmm_ie = wlc_calloc(<span class="number">0x2C</span>)<span class="comment">;  </span></div><div class="line">  wlc-&gt;current_wmm_ie = current_wmm_ie<span class="comment">;  </span></div><div class="line">  if ( !current_wmm_ie ) &#123;    </div><div class="line">    goto fail<span class="comment">;  &#125;</span></div></pre></td></tr></table></figure>
+<p>3）溢出结构体类型</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">typedef struct wlc_pm_st &#123; </div><div class="line">  uint8 PM<span class="comment">; bool PM_override; </span></div><div class="line">  mbool PMenabledModuleId<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>PMenabled<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>PMawakebcn<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>PMpending<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>priorPMstate<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>PSpoll<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>check_for_unaligned_tbtt<span class="comment">; </span></div><div class="line">  uint16 pspoll_prd<span class="comment">; </span></div><div class="line">  struct wl_timer *pspoll_timer<span class="comment">; </span></div><div class="line">  uint16 apsd_trigger_timeout<span class="comment">; </span></div><div class="line">  struct wl_timer *apsd_trigger_timer<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>apsd_sta_usp<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>WME_PM_blocked<span class="comment">; </span></div><div class="line">  uint16 pm2_rcv_percent<span class="comment">; </span></div><div class="line">  pm2rd_state_t pm2_rcv_state<span class="comment">; </span></div><div class="line">  uint16 pm2_rcv_time<span class="comment">; </span></div><div class="line">  uint pm2_sleep_ret_time<span class="comment">; </span></div><div class="line">  uint pm2_sleep_ret_time_left<span class="comment">;  </span></div><div class="line">  uint pm2_last_wake_time<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>pm2_refresh_badiv<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>adv_ps_poll<span class="comment">; </span></div><div class="line">  <span class="keyword">bool </span>send_pspoll_after_tx<span class="comment">;    </span></div><div class="line">  wlc_hwtimer_to_t *pm2_rcv_timer<span class="comment">;  </span></div><div class="line">  wlc_hwtimer_to_t *pm2_ret_timer<span class="comment">; </span></div><div class="line">&#125; wlc_pm_st_t<span class="comment">;</span></div></pre></td></tr></table></figure>
+<p>4）漏洞利用方式</p>
+<p>struct wlc_pm_st结构体中 wl_timer 类型的pspoll_timer、  apsd_trigger_timer，和wlc_hwtimer_to_t 类型的pm2_rcv_timer、  pm2_ret_timer。<br>wl_timer的 pspoll_timer 成员。这个结构体能在相关过程中定期触发的回调函数进行处理：<br><figure class="highlight xl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">int timer_func(struct wl_timer *t) &#123;  </div><div class="line">  prev_cpsr = j_disable_irqs();  </div><div class="line">  <span class="function"><span class="title">v3</span> = t-&gt;</span>field_20;    </div><div class="line">  ...</div><div class="line">  <span class="keyword">if</span> ( v3 ) &#123;    </div><div class="line">    <span class="function"><span class="title">v7</span> = t-&gt;</span>field_18;    </div><div class="line">    <span class="function"><span class="title">v8</span> = &amp;t-&gt;</span>field_8;    </div><div class="line">    <span class="function"><span class="title">if</span> ( &amp;t-&gt;</span>field_8 == v7 ) &#123;</div><div class="line">      ... </div><div class="line">    &#125; <span class="keyword">else</span> &#123;      </div><div class="line">      <span class="function"><span class="title">v9</span> = t-&gt;</span>field_1c;      </div><div class="line">      <span class="function"><span class="title">v7</span>-&gt;</span>field_14 = v9;      </div><div class="line">      *(v9 + <span class="number">16</span>) = v7;      </div><div class="line">      <span class="keyword">if</span> ( *v3 == v8 ) &#123;        </div><div class="line">        <span class="function"><span class="title">v7</span>-&gt;</span>field_18 = v3; </div><div class="line">      &#125;    </div><div class="line">    &#125;    </div><div class="line">    <span class="function"><span class="title">t</span>-&gt;</span>field_20 = <span class="number">0</span>;  </div><div class="line">  &#125;  </div><div class="line">  j_restore_cpsr(prev_cpsr);  </div><div class="line">  return <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这部分代码是在linux内核里，初步分析是wifi驱动管理帧数据包发送过程，结合研究固件的源码中解析数据包的过程一起看，差不多整个wifi连接过程数据包的处理流程就出来了。接下来的工作，一个是固件地址爆破，还有一个是写exp利用漏洞。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p> 802.11协议帧格式 ：<a href="http://blog.csdn.net/u012570105/article/details/51785452" rel="external nofollow noopener noreferrer" target="_blank">http://blog.csdn.net/u012570105/article/details/51785452</a></p>
+<p> <a href="http://note.youdao.com/noteshare?id=1966431935077db30135e04ba4bb80a6&amp;sub=C682C939E8AD4869B8C877E0CA546A24" rel="external nofollow noopener noreferrer" target="_blank">相关代码参考</a> ：</p>
+<blockquote>
+<p>cmm.c :主要是wifi驱动发送管理帧数据包流程</p>
+<p>wl_linux.h : wl_timer结构体参考</p>
+<p>wlan.h:</p>
+</blockquote>
+<pre><code>/* Frame Subtype */
+#define ZM_WLAN_FRAME_TYPE_ASOCREQ          0x00
+#define ZM_WLAN_FRAME_TYPE_ASOCRSP          0x10
+#define ZM_WLAN_FRAME_TYPE_REASOCREQ        0x20
+#define ZM_WLAN_FRAME_TYPE_REASOCRSP        0x30
+#define ZM_WLAN_FRAME_TYPE_PROBEREQ         0x40
+#define ZM_WLAN_FRAME_TYPE_PROBERSP         0x50
+</code></pre><blockquote>
+<p>wlc_alloc.c :wlc_bsscfg_malloc结构体</p>
+<p>wlc_bsscfg.h : wlc_pm_st 结构体参考</p>
+<p>wlc.c:部分解析管理帧可以根据关键字FC_ASSOC_RESP来定位看</p>
+</blockquote>
+<p>​        </p>
+
+      
+    </div>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/analysis-of-a-4G-wireless-router.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          某4G无线路由终端分析
+        
+      </div>
+    </a>
+  
+  
+    <a href="/GoAhead-CVE-2017-17562-analysis-and-pwn-a-router.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">GoAhead远程代码执行漏洞(CVE-2017-17562)分析及实战</div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+
+
+
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- CATEGORIES START -->
+<h2 class="no-top-space">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/硬件安全/">硬件安全 (10)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/移动安全/">移动安全 (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/web安全/">web安全 (5)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/系统安全/">系统安全 (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/芯片安全/">芯片安全 (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- BEGIN BLOG TAGS -->
+<div class="blog-tags margin-bottom-20">
+  <h2>Tags</h2>
+  
+  <div class="widget-wrap">
+    <div class="widget">
+      
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MITMf/"><i class="fa fa-tags"></i>MITMf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/"><i class="fa fa-tags"></i>Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UART串口调试/"><i class="fa fa-tags"></i>UART串口调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app签名/"><i class="fa fa-tags"></i>app签名</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goahead/"><i class="fa fa-tags"></i>goahead</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/"><i class="fa fa-tags"></i>https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/"><i class="fa fa-tags"></i>ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web安全/"><i class="fa fa-tags"></i>web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网渗透/"><i class="fa fa-tags"></i>内网渗透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/指纹识别/"><i class="fa fa-tags"></i>指纹识别</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/智能锁/"><i class="fa fa-tags"></i>智能锁</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件分析/"><i class="fa fa-tags"></i>硬件分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/移动安全/"><i class="fa fa-tags"></i>移动安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/芯片安全/"><i class="fa fa-tags"></i>芯片安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/蓝牙攻击/"><i class="fa fa-tags"></i>蓝牙攻击</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程代码执行/"><i class="fa fa-tags"></i>远程代码执行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
+    </div>
+  </div>
+
+
+</div>
+<!-- END BLOG TAGS -->
+
+
+<!-- BEGIN FEATURED POSTS -->                            
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->                            
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>伏宸安全实验室<br><br> 伏宸安全实验室是广东安创信息科技开发有限公司旗下的以网络安全研究为核心的专业实验室，主攻前沿安全技术，包括：渗透测试、黑产对抗、威胁情报、智能硬件与无线电安全等。</p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              广州市越秀区寺右新马路108号丰伟大厦15B、C单元<br>
+              BC 15/F Fengwei Buiding NO.108 Siyouxinma Road<br>
+              Guangzhou,China Code:510600<br>
+              Phone: 020-87392713<br>
+              Email: <a href="mailto:admin@future-sec.com" rel="external nofollow noopener noreferrer" target="_blank">admin@future-sec.com</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2018 伏宸安全实验室-Future-Sec Information Security Lab<br>
+ <a href="javascript:;">Future-sec</a> | <a href="javascript:;">广东安创信息科技开发有限公司</a>
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      <li><a href="https://github.com/Future-Sec/" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-github"></i></a></li>
+    
+      <li><a href="https://weibo.com/futuresec" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weibo"></i></a></li>
+    
+      <li><a href="https://mp.weixin.qq.com/s/QuDKBrMist8GL16EEO-u4Q" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weixin"></i></a></li>
+    
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+    
+      <li><a href="http://yaseng.org/" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-yahoo"></i></a></li>
+    
+  </ul>  
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]--> 
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/plugins/owl.carousel/owl.carousel.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/wow.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();    
+        Layout.initOWL();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling(); 
+	new WOW().init();
+    });
+</script>
+ <script>
+        // 给图片添加链接
+        $(document).ready(function() {
+            $("p img").each(function() {
+                var strA = "<a class='fancybox' href='" + this.src + "'></a>";
+                $(this).wrapAll(strA);
+            });
+        });
+    
+        // fancybox
+        $(".fancybox").fancybox({
+                                  openEffect    : 'elastic',
+                                  closeEffect   : 'elastic',
+                              });
+    </script>
+    <script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?9e36ea61528e32ab9a0bc86aa61db5f7";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- END CORE PLUGINS -->
+
+<!-- BEGIN PAGE-SPECIFIC PLUGINS --> 
+
+
+
+
+
+
+
+<!-- END PAGE-SPECIFIC PLUGINS --> 
+
+<!-- BEGIN INTEGRATIONS -->
+
+
+
+
+
+<!-- END INTEGRATIONS -->
+
+</body>
+

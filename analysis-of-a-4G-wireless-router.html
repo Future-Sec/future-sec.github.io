@@ -7,20 +7,43 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Blog: 2017 | 伏宸安全实验室-Future-Sec Information Security Lab</title>
+  <title>某4G无线路由终端分析 | 伏宸安全实验室-Future-Sec Information Security Lab</title>
 
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <meta name="description" content="伏宸安全实验室Future-Sec Information Security Lab">
-<meta property="og:type" content="website">
-<meta property="og:title" content="伏宸安全实验室-Future-Sec Information Security Lab">
-<meta property="og:url" content="http://www.future-sec.com/archives/2017/page/2/index.html">
+  <meta name="description" content="设备介绍随着4G网络的大区域覆盖，移动端的网络速度得到大幅提升，此次分析的该款4G无线路由终端，就是通过sim卡连上LTE网络之后，在通过wifi模块将蜂窝网络转为wifi信号共享给其他设备使用，其原理与手机共享热点类似，因其便携省电等功能，目前在市场上的反响颇高，X宝销量达数万件。 硬件分析话不多说，进入正题，拆掉背面螺丝，取出电池，揭掉正面盖板，在正面PCB上是一块全彩TFT屏幕，显示效果一般">
+<meta name="keywords" content="硬件安全">
+<meta property="og:type" content="article">
+<meta property="og:title" content="某4G无线路由终端分析">
+<meta property="og:url" content="http://www.future-sec.com/analysis-of-a-4G-wireless-router.html">
 <meta property="og:site_name" content="伏宸安全实验室-Future-Sec Information Security Lab">
-<meta property="og:description" content="伏宸安全实验室Future-Sec Information Security Lab">
+<meta property="og:description" content="设备介绍随着4G网络的大区域覆盖，移动端的网络速度得到大幅提升，此次分析的该款4G无线路由终端，就是通过sim卡连上LTE网络之后，在通过wifi模块将蜂窝网络转为wifi信号共享给其他设备使用，其原理与手机共享热点类似，因其便携省电等功能，目前在市场上的反响颇高，X宝销量达数万件。 硬件分析话不多说，进入正题，拆掉背面螺丝，取出电池，揭掉正面盖板，在正面PCB上是一块全彩TFT屏幕，显示效果一般">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/1224171902.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/20171219164331.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/1224171903.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/1224171903a.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/1224171903b.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/1224171903c.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/1224171904.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/1224171905-bianhao.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/20171218_191431.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/20171218_191405.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/20171218_191336.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/20171218_191524.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/20171218_191505.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/image89.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/image90.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/image91.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/hgjghjtyut.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/15136011800782.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/15136011175389.jpg">
+<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/15136012728967.jpg">
+<meta property="og:updated_time" content="2018-01-19T07:23:47.442Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="伏宸安全实验室-Future-Sec Information Security Lab">
-<meta name="twitter:description" content="伏宸安全实验室Future-Sec Information Security Lab">
+<meta name="twitter:title" content="某4G无线路由终端分析">
+<meta name="twitter:description" content="设备介绍随着4G网络的大区域覆盖，移动端的网络速度得到大幅提升，此次分析的该款4G无线路由终端，就是通过sim卡连上LTE网络之后，在通过wifi模块将蜂窝网络转为wifi信号共享给其他设备使用，其原理与手机共享热点类似，因其便携省电等功能，目前在市场上的反响颇高，X宝销量达数万件。 硬件分析话不多说，进入正题，拆掉背面螺丝，取出电池，揭掉正面盖板，在正面PCB上是一块全彩TFT屏幕，显示效果一般">
+<meta name="twitter:image" content="http://p1aqjecep.bkt.clouddn.com/1224171902.jpg">
   
     <link rel="alternative" href="/atom.xml" title="伏宸安全实验室-Future-Sec Information Security Lab" type="application/atom+xml">
   
@@ -115,175 +138,120 @@
   <div class="container">
   <ul class="breadcrumb">
     <li><a href="/">Home</a></li>
-    <li class="active">Blog</li>
+    <li><a href="/archives/">Blog</a></li>
+    <li class="active">Post</li>
   </ul>
-<div id="main">
-  <h1>Blog</h1>
-  <div class="row">
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/analysis-of-a-4G-wireless-router.html">某4G无线路由终端分析</a>
+    </h2>
 
+
+    <div class="row">
 <div class="col-md-9 col-sm-9 blog-posts">
-
-
-  <section class="archives-wrap">
-    <div class="archives">
-      
-	<div class="row">
-  <div class="col-md-4 col-sm-4">
-    
-      <img src="http://future-sec.com//images/image12.jpg" class="img-responsive">
-    
+<article id="post-analysis-of-a-4G-wireless-router" class="article article-type-post blog-item" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
   </div>
-  
-    <div class="col-md-8 col-sm-8">
-  
+  <div class="article-inner">
     
-    <h2 itemprop="name">
-      <a class="archive-article-title" href="/iot-security-hardware-analysis.html">物联网硬件安全分析基础-硬件分析初探</a>
-    </h2>
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> 独抒</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2018-01-19T16:00:00.000Z" itemprop="datePublished">2018/01/20</time>
 
-
-    <ul class="blog-info">
-      <li>
-      	<i class="fa fa-calendar"></i> 
-        <time datetime="2017-11-16T16:00:00.000Z" itemprop="datePublished">2017/11/17</time>
-
-      </li>
-      <li><i class="fa fa-comments"></i>
-        <a href="http://www.future-sec.com/iot-security-hardware-analysis.html#disqus_thread" class="article-comment-link">Comments</a>
-      </li>
-      <li>
-	<i class="fa fa-tags"></i>
-	
+	</li>
+	<li class="hidden-xs"><i class="fa fa-comments"></i>
+	  <a href="http://www.future-sec.com/analysis-of-a-4G-wireless-router.html#disqus_thread" class="article-comment-link">Comments</a>
+	</li>
+	<li class="hidden-xs"><i class="fa fa-tags"></i> 
+	  
   
-    <a href="/tags/硬件安全/" title="硬件安全">硬件安全</a>,
-  
-    <a href="/tags/硬件分析/" title="硬件分析">硬件分析</a>
+    <a href="/tags/硬件安全/" title="硬件安全">硬件安全</a>
   
 
 
-      </li>
-    </ul>
-    <div class="blog-item">
+	</li>
+      </ul>
       
-	当我们在分析IOT设备，如智能摄像头、智能门锁、智能路由器等等产品时，采用传统的安全检测手段，如对APP的逆向、云端服务器的渗透测试、产品通信的抓包等方式可以获得部分的信息，但如果需要深入分析智能设备底层的工作原理，从中发现更深层次的安全问题，就不可避免的需要直接接触硬件本身
-      
-    </div>
-    <br>
-    <br>
-    <a href="http://www.future-sec.com/iot-security-hardware-analysis.html" class="more">Read more <i class="icon-angle-right"></i></a>
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/硬件安全/">硬件安全</a>
   </div>
-</div>
-<hr class="blog-post-sep">
+  <br>
 
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
       
-	<div class="row">
-  <div class="col-md-4 col-sm-4">
-    
-      <img src="/images/wifi13.png" class="img-responsive">
-    
+      <!-- Table of Contents -->
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#设备介绍"><span class="toc-number">1.</span> <span class="toc-text">设备介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#硬件分析"><span class="toc-number">2.</span> <span class="toc-text">硬件分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#串口调试"><span class="toc-number">3.</span> <span class="toc-text">串口调试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#初步分析"><span class="toc-number">4.</span> <span class="toc-text">初步分析</span></a></li></ol>
   </div>
-  
-    <div class="col-md-8 col-sm-8">
-  
-    
-    <h2 itemprop="name">
-      <a class="archive-article-title" href="/broadcom-wifi-2.html">BROADCOM WI-FI芯片漏洞分析二</a>
-    </h2>
 
-
-    <ul class="blog-info">
-      <li>
-      	<i class="fa fa-calendar"></i> 
-        <time datetime="2017-08-29T16:00:00.000Z" itemprop="datePublished">2017/08/30</time>
-
-      </li>
-      <li><i class="fa fa-comments"></i>
-        <a href="http://www.future-sec.com/broadcom-wifi-2.html#disqus_thread" class="article-comment-link">Comments</a>
-      </li>
-      <li>
-	<i class="fa fa-tags"></i>
-	
-  
-    <a href="/tags/Poc/" title="Poc">Poc</a>,
-  
-    <a href="/tags/BROADCOM-WI-FI/" title="BROADCOM WI-FI">BROADCOM WI-FI</a>
-  
-
-
-      </li>
-    </ul>
-    <div class="blog-item">
-      
-	上一篇文章写过之后又修改了一部分内容，加了很多细节。不过还有一点没有详细说明，具体怎么定位到漏洞函数。这里再进行定位流程详细梳理。首先是定位到帧提取函数，这个定位方式根据Project Zero的提示参考到bcm_parse_tlvs源码，然后在这部分源码中找到明显字符串
-      
-    </div>
-    <br>
-    <br>
-    <a href="http://www.future-sec.com/broadcom-wifi-2.html" class="more">Read more <i class="icon-angle-right"></i></a>
-  </div>
-</div>
-<hr class="blog-post-sep">
-
-      
-	<div class="row">
-  <div class="col-md-4 col-sm-4">
-    
-      <img src="/images/wifi1.png" class="img-responsive">
-    
-  </div>
-  
-    <div class="col-md-8 col-sm-8">
-  
-    
-    <h2 itemprop="name">
-      <a class="archive-article-title" href="/broadcom-wifi-1.html">BROADCOM WI-FI芯片漏洞分析一</a>
-    </h2>
-
-
-    <ul class="blog-info">
-      <li>
-      	<i class="fa fa-calendar"></i> 
-        <time datetime="2017-08-29T16:00:00.000Z" itemprop="datePublished">2017/08/30</time>
-
-      </li>
-      <li><i class="fa fa-comments"></i>
-        <a href="http://www.future-sec.com/broadcom-wifi-1.html#disqus_thread" class="article-comment-link">Comments</a>
-      </li>
-      <li>
-	<i class="fa fa-tags"></i>
-	
-  
-    <a href="/tags/Poc/" title="Poc">Poc</a>,
-  
-    <a href="/tags/BROADCOM-WI-FI/" title="BROADCOM WI-FI">BROADCOM WI-FI</a>
-  
-
-
-      </li>
-    </ul>
-    <div class="blog-item">
-      
-	Android Wi-Fi驱动一直是众多安全研究员关注的重点，Android       Wi-Fi驱动中曾经被发现大量root提权漏洞。但这些漏洞都是存在于WEXT(Wireless-Extensions)接口中的，WEXT是一种即将被淘汰的Wi-Fi配置接口。取而代之的是基于nl80211协议的cfg80211接口。本篇文章主要介绍了基于nl80211协议的cfg80211怎么触发Wi-Fi芯片中的漏洞。以及相关漏洞的定位和分析。
-      
-    </div>
-    <br>
-    <br>
-    <a href="http://www.future-sec.com/broadcom-wifi-1.html" class="more">Read more <i class="icon-angle-right"></i></a>
-  </div>
-</div>
-<hr class="blog-post-sep">
+        <h2 id="设备介绍"><a href="#设备介绍" class="headerlink" title="设备介绍"></a>设备介绍</h2><p>随着4G网络的大区域覆盖，移动端的网络速度得到大幅提升，此次分析的该款4G无线路由终端，就是通过sim卡连上LTE网络之后，在通过wifi模块将蜂窝网络转为wifi信号共享给其他设备使用，其原理与手机共享热点类似，因其便携省电等功能，目前在市场上的反响颇高，X宝销量达数万件。<br><img src="http://p1aqjecep.bkt.clouddn.com/1224171902.jpg" alt="1224171902"><br><img src="http://p1aqjecep.bkt.clouddn.com/20171219164331.jpg" alt="QQ截图20171219164331"></p>
+<h2 id="硬件分析"><a href="#硬件分析" class="headerlink" title="硬件分析"></a>硬件分析</h2><p>话不多说，进入正题，拆掉背面螺丝，取出电池，揭掉正面盖板，在正面PCB上是一块全彩TFT屏幕，显示效果一般，屏幕下方有多个印字。<br><img src="http://p1aqjecep.bkt.clouddn.com/1224171903.jpg" alt="1224171903"></p>
+<p>左侧有两个焊点，分别是RXD和TXD口，可以通过UART模式调试。<br><img src="http://p1aqjecep.bkt.clouddn.com/1224171903a.jpg" alt="1224171903a"></p>
+<p>下方左侧是8口的JTAG调试口，加一个公用GND口，JTAG调试下篇会重点介绍。<br><img src="http://p1aqjecep.bkt.clouddn.com/1224171903b.jpg" alt="1224171903b"></p>
+<p>正下方靠近USB充电口位置是电源电压测试口，主要用来测量额定输入输出的电源电压。<br><img src="http://p1aqjecep.bkt.clouddn.com/1224171903c.jpg" alt="1224171903c"></p>
+<p>拆掉PCB上的螺丝，翻转板子，背面包括SIM插槽、SD卡插槽以及核心处理芯片，出于保护和散热的目的，还加装了保护盖。<br><img src="http://p1aqjecep.bkt.clouddn.com/1224171904.jpg" alt="1224171904"></p>
+<p>拆掉盖子，先看下主要芯片的型号和用途，这对进一步分析有很大帮助。<br><img src="http://p1aqjecep.bkt.clouddn.com/1224171905-bianhao.jpg" alt="1224171905-bianhao"></p>
+<p>图上标注1的芯片通过查看印字分析,为芯天下出产的PN26Q01AWSIUG 型存储芯片，存储容量为1G。<br><img src="http://p1aqjecep.bkt.clouddn.com/20171218_191431.jpg" alt="20171218_191431"></p>
+<p>标注2的芯片为中兴微电子生产的ZX297520型手机modem芯片，支持TD-LTE/FDD LTE /WCDMA/TD-SCDMA/EDGE全模制式。<br><img src="http://p1aqjecep.bkt.clouddn.com/20171218_191405.jpg" alt="20171218_191405"></p>
+<p>标注3的芯片为Realtek生产的使用非常广泛的RTL8189ES无线wifi芯片，是一款高性能、低功耗、体积小SDIO接口无线模组。<br><img src="http://p1aqjecep.bkt.clouddn.com/20171218_191336.jpg" alt="20171218_191336"></p>
+<p>标注4的芯片为中兴微电子生产的ZX23422电源管理芯片。<br><img src="http://p1aqjecep.bkt.clouddn.com/20171218_191524.jpg" alt="20171218_191524"></p>
+<p>标注5的芯片为锐迪科（RDA）生产的RPM6743射频前端芯片，是蜂窝网络和wifi信号广播收发的重要组成部分。<br><img src="http://p1aqjecep.bkt.clouddn.com/20171218_191505.jpg" alt="20171218_191505"></p>
+<h2 id="串口调试"><a href="#串口调试" class="headerlink" title="串口调试"></a>串口调试</h2><p>在认识设备的基本构成之后，重新组装好，首先通过正面的UART调试串口来进行初步调试，采用夹具连接RXD、TXD两个调试点，在设备通电情况下，只需把转接板上的GND口与板子上的公用GND口相连即可。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/image89.jpg" alt="image89"></p>
+<p>因串口输出信息过多，影响观察输入和输出结果，因此采用串口调试助手，设置波特率为115200，输入命令并发送，可以成功执行。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/image90.jpg" alt="image90"></p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/image91.jpg" alt="image91"></p>
+<h2 id="初步分析"><a href="#初步分析" class="headerlink" title="初步分析"></a>初步分析</h2><p>查看当前进程，通过串口输出信息，发现该终端采用goahead作为web服务器，4719端口存在一个telnet服务。<br><img src="http://p1aqjecep.bkt.clouddn.com/hgjghjtyut.jpg" alt="命令"></p>
+<p>连接wifi进入web管理界面，查看设备ip。<br><img src="http://p1aqjecep.bkt.clouddn.com/15136011800782.jpg" alt="15136011800782"></p>
+<p>通过telnet连接设备，使用弱口令弱口令：admin、admin即可登录。<br><img src="http://p1aqjecep.bkt.clouddn.com/15136011175389.jpg" alt="15136011175389"></p>
+<p>该账号为后门账号。</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/15136012728967.jpg" alt="15136012728967">查看开启的端口。</p>
+<p>如果需要继续分析，可以通过tftp 传输文件至本地，例如/bin/goahead。</p>
 
       
     </div>
+  </div>
+  
     
-      <div id="page-nav" class="pagination">
-	<a class="extend prev" rel="prev" href="/archives/2017/">Prev</a><a class="page-number" href="/archives/2017/">1</a><span class="page-number current">2</span>
+<nav id="article-nav">
+  
+    <a href="/chip-security-let-us-cook.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          芯片安全系列-Let&#39;s cook!
+        
       </div>
-    
-  </section>
+    </a>
+  
+  
+    <a href="/broadcom-wifi-3.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">BROADCOM WI-FI芯片漏洞分析三</div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+
+
 
 </div>
-
 <div class="col-md-3 col-sm-3 blog-sidebar">
   <!-- CATEGORIES START -->
 <h2 class="no-top-space">Categories</h2>
@@ -381,10 +349,9 @@
 <!-- END FEATURED POSTS -->                            
 
 </div>
-
 </div>
 
-</div>
+  </section>
 </div>
 
     <!-- BEGIN PRE-FOOTER -->
