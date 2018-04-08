@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <title>QARK工具的介绍和原理分析 | 伏宸安全实验室-Future-Sec Information Security Lab</title>
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <meta name="description" content="简介QARK的核心是一个静态代码分析工具，旨在识别基于Java的Android应用程序的潜在安全漏洞和关注点。QARK还试图提供动态生成的ADB（Android调试桥）命令，以帮助验证其检测到的潜在漏洞。它甚至可以动态地创建一个定制的测试应用程序，以即用APK的形式，专门设计来展示它发现的潜在问题。QARK的设计是基于社区的，可供所有人免费使用。QARK被设计出来的主要目的和大多数的自动化检测工具">
+<meta name="keywords" content="QARK">
+<meta property="og:type" content="article">
+<meta property="og:title" content="QARK工具的介绍和原理分析">
+<meta property="og:url" content="http://www.future-sec.com/introducing-qark.html">
+<meta property="og:site_name" content="伏宸安全实验室-Future-Sec Information Security Lab">
+<meta property="og:description" content="简介QARK的核心是一个静态代码分析工具，旨在识别基于Java的Android应用程序的潜在安全漏洞和关注点。QARK还试图提供动态生成的ADB（Android调试桥）命令，以帮助验证其检测到的潜在漏洞。它甚至可以动态地创建一个定制的测试应用程序，以即用APK的形式，专门设计来展示它发现的潜在问题。QARK的设计是基于社区的，可供所有人免费使用。QARK被设计出来的主要目的和大多数的自动化检测工具">
+<meta property="og:image" content="http://p6usvwwl2.bkt.clouddn.com/image001.png">
+<meta property="og:image" content="http://p6usvwwl2.bkt.clouddn.com/image002.png">
+<meta property="og:image" content="http://p6usvwwl2.bkt.clouddn.com/image003.png">
+<meta property="og:image" content="http://p6usvwwl2.bkt.clouddn.com/image004.png">
+<meta property="og:image" content="http://p6usvwwl2.bkt.clouddn.com/image005.png">
+<meta property="og:image" content="http://p6usvwwl2.bkt.clouddn.com/image006.png">
+<meta property="og:image" content="http://p6usvwwl2.bkt.clouddn.com/image007.png">
+<meta property="og:image" content="http://p6usvwwl2.bkt.clouddn.com/image008.png">
+<meta property="og:image" content="http://p6usvwwl2.bkt.clouddn.com/image009.png">
+<meta property="og:image" content="http://p6usvwwl2.bkt.clouddn.com/image010.png">
+<meta property="og:image" content="http://p6usvwwl2.bkt.clouddn.com/image011.png">
+<meta property="og:image" content="http://p6usvwwl2.bkt.clouddn.com/image012.png">
+<meta property="og:image" content="http://p6usvwwl2.bkt.clouddn.com/image013.png">
+<meta property="og:image" content="http://p6usvwwl2.bkt.clouddn.com/image014.png">
+<meta property="og:updated_time" content="2018-04-08T06:32:05.415Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="QARK工具的介绍和原理分析">
+<meta name="twitter:description" content="简介QARK的核心是一个静态代码分析工具，旨在识别基于Java的Android应用程序的潜在安全漏洞和关注点。QARK还试图提供动态生成的ADB（Android调试桥）命令，以帮助验证其检测到的潜在漏洞。它甚至可以动态地创建一个定制的测试应用程序，以即用APK的形式，专门设计来展示它发现的潜在问题。QARK的设计是基于社区的，可供所有人免费使用。QARK被设计出来的主要目的和大多数的自动化检测工具">
+<meta name="twitter:image" content="http://p6usvwwl2.bkt.clouddn.com/image001.png">
+  
+    <link rel="alternative" href="/atom.xml" title="伏宸安全实验室-Future-Sec Information Security Lab" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  
+
+  <!-- Global styles START -->   
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END --> 
+   
+  <!-- Page level plugin styles START -->
+  <link rel="stylesheet" href="/metronic/assets/pages/css/animate.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/owl.carousel/assets/owl.carousel.css">
+  <!-- Page level plugin styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/pages/css/components.css">
+  <link rel="stylesheet" href="/metronic/assets/pages/css/slider.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/pages/css/portfolio.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/red.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END -->
+</head>
+</html>
+<body class="corporate">
+  <!-- BEGIN HEADER -->
+<div class="header">
+  <div class="container">
+    <!--<a class="site-logo" href="/" id="logo">伏宸安全实验室-Future-Sec Information Security Lab</a>-->
+
+    <a class="site-logo" href="/">
+      <img src="/metronic/assets/corporate/img/logos/logo-corp-red.png" alt="Metronic FrontEnd">
+    </a>
+
+    <a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+
+    <!-- BEGIN NAVIGATION -->
+    <div class="header-navigation pull-right font-transform-inherit">
+      <ul>
+	
+	<li class="">
+	  <a href="/index.html">Home</a>
+	</li>
+	
+	<li class="">
+	  <a href="/archives/">Blog</a>
+	</li>
+	
+	<li class="">
+	  <a href="/vulnerabilities.html">Vulnerabilities</a>
+	</li>
+	
+	<li class="">
+	  <a href="/about/">About</a>
+	</li>
+	
+	<!-- BEGIN TOP SEARCH -->
+	<li class="menu-search">
+	  <span class="sep"></span>
+	  <i class="fa fa-search search-btn"></i>
+	  <div class="search-box">
+	   
+	    <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank" class="search-form">
+    <div class="input-group">
+		<input placeholder="Search" class="form-control st-default-search-input" name="word" maxlength="20" type="search">
+		  <input name="si" value="future-sec.com" type="hidden">
+  <input name="tn" value="bds" type="hidden">
+  <input name="cl" value="3" type="hidden">
+  <input name="ct" value="2097152" type="hidden">
+  <input name="s" value="on" type="hidden">
+		<span class="input-group-btn">
+		  <button class="btn btn-primary" type="submit">Search</button>
+		</span>
+	      </div>
+</form>
+	  </div> 
+	</li>
+	<!-- END TOP SEARCH -->
+      </ul>
+    </div>
+    <!-- END NAVIGATION -->
+  </div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/archives/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/introducing-qark.html">QARK工具的介绍和原理分析</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-introducing-qark" class="article article-type-post blog-item" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> 小马哥历险记</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2018-04-07T16:00:00.000Z" itemprop="datePublished">2018/04/08</time>
+
+	</li>
+	<li class="hidden-xs"><i class="fa fa-comments"></i>
+	  <a href="http://www.future-sec.com/introducing-qark.html#disqus_thread" class="article-comment-link">Comments</a>
+	</li>
+	<li class="hidden-xs"><i class="fa fa-tags"></i> 
+	  
+  
+    <a href="/tags/QARK/" title="QARK">QARK</a>
+  
+
+
+	</li>
+      </ul>
+      
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/移动安全/">移动安全</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      <!-- Table of Contents -->
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#前提条件"><span class="toc-number">2.</span> <span class="toc-text">前提条件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#功能"><span class="toc-number">3.</span> <span class="toc-text">功能</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#原理分析"><span class="toc-number">4.</span> <span class="toc-text">原理分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#操作步骤"><span class="toc-number">5.</span> <span class="toc-text">操作步骤</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">6.</span> <span class="toc-text">总结</span></a></li></ol>
+  </div>
+
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>QARK的核心是一个静态代码分析工具，旨在识别基于Java的Android应用程序的潜在安全漏洞和关注点。QARK还试图提供动态生成的ADB（Android调试桥）命令，以帮助验证其检测到的潜在漏洞。它甚至可以动态地创建一个定制的测试应用程序，以即用APK的形式，专门设计来展示它发现的潜在问题。<br>QARK的设计是基于社区的，可供所有人免费使用。QARK被设计出来的主要目的和大多数的自动化检测工具一样是教育开发人员和信息安全人员了解与Android应用程序安全相关的潜在风险 ，相应的开发人员和评估人员就可以在开发和检测阶段，针对于APP移动应用进行检测，及时修改相应的风险点。</p>
+<h2 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h2><p>•    python 2.7.<br>•    JRE 1.6+（最好1.7+）<br>•    Ubuntu环境（最好）<br>•    未加固的测试APK；<br>•    一台root过的手机<br>在前提条件中，有提到未加固的APK，从简介中，我们就提到该工具就是一个静态代码分析的工具，在其中QARK的脚本中是没有脱壳的脚本，所以是需要未加固的APK，其中的ubuntu环境不是唯一的，但是我只在ubuntu成功过，所以我建议试用该环境。</p>
+<h2 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h2><p>QARK是一款易于使用的工具，能够找到Android应用程序中的常见安全漏洞。与商业产品不同，它可以100％免费使用。QARK提供教育信息，允许安全审查人员找到对漏洞的精确和深入的解释。在反编译APK时，QARK可以自动使用多个反编译器，利用它们的组合输出来产生出色的结果。最后，QARK与传统工具相比的主要优势仅仅是指出可能存在的漏洞，它可以产生ADB命令甚至功能齐全的APK，将假设的漏洞转化为“POC”漏洞利用。<br>包含在此工具尝试查找的安全漏洞类型中的有：<br>•    无意中导出的组件<br>•    未妥善保护的导出组件<br>•    易受拦截或窃听的intent<br>•    不正确的x.509证书验证<br>•    创建事件可读或事件可写的文件<br>•    可能泄漏数据的Activity<br>•    粘滞的intent的使用<br>•    不安全地创建了Pending Intents<br>•    发送不安全的广播Intent<br>•    嵌入在源中的私钥<br>•    弱密码学使用不当或不适用<br>•    潜在可利用的WebView配置<br>•    导出偏好活动<br>•    Tapjacking<br>•    启用备份的应用程序<br>•    可调试的应用程序<br>•    支持过时API版本的应用程序，具有已知的漏洞</p>
+<h2 id="原理分析"><a href="#原理分析" class="headerlink" title="原理分析"></a>原理分析</h2><p>前面我们说过该工具就是静态代码分析的工具，所以首先我打开相应的qark.py脚本文件,其可以发现刚开始就使用到unpackAPK脚本，然后打开相应的unpackAPK,py，发现相应aapt和dex2jar，这里就可以知道还是老方法，对apk进行反编译，然后在进行相应的dex2jar把dex转换为jar文件，之后在进行查看源码。<br><img src="http://p6usvwwl2.bkt.clouddn.com/image001.png" alt=""><br><img src="http://p6usvwwl2.bkt.clouddn.com/image002.png" alt=""><br><img src="http://p6usvwwl2.bkt.clouddn.com/image003.png" alt=""> </p>
+<p>然后就是相应的代码静态分析，这里就需要对于检测项目的了解，其实说到底就是一个关键代码查找和匹配，因为这些检测项目大部分引起的原因就是编写代码没有注意到相关的安全措施，例如其中的组件暴露就是，组件的属性exported：设置为ture或者没有设置，则默认为true，这就会导致相应的组件暴露。<br>我们查看下mouble文件夹里面，基本上所有的检测项目都是这里的检测检测脚本。<br><img src="http://p6usvwwl2.bkt.clouddn.com/image004.png" alt=""><br>我们就分析其中的cryptoFlaws.py这个脚本，从字面意思就是密码缺陷，那这个部分就是针对于移动应用加解密子之类的风险。我们直接打开来查看其中方法。<br>这里我们看到相应的寻找ECB的特殊关键字，这个是检测AES和DES是否存在弱加密（ECB模式）的风险。<br><img src="http://p6usvwwl2.bkt.clouddn.com/image005.png" alt=""><br>这个地方是匹配PRIVATE\sKEY的1特殊关键字，寻找相应的加密算法的私钥，这个地方的私钥如果存在且是以明文形式存在，这个就是加密算法的密钥硬编码风险，会导致相关的加密算法被破解。<br><img src="http://p6usvwwl2.bkt.clouddn.com/image006.png" alt=""><br>这里还有一个地方，但是方法被注释掉了，这个是匹配SecureRandom.setseed（）方法，这个是伪随机数的一个风险点。<br><img src="http://p6usvwwl2.bkt.clouddn.com/image007.png" alt=""><br> 大部分的原理都是类似的。所以其他的脚本就看各位自己去分析。</p>
+<h2 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h2><p>QARK有两种模式：1.交互模式 2.无缝模式<br>交互模式使用户能够交互地一个接一个地选择选项。而无缝模式允许我们用一个命令完成整个工作。<br>我们主要看看交互模式的实际应用。<br>输入python qark.py<br><img src="http://p6usvwwl2.bkt.clouddn.com/image008.png" alt=""><br>接着会有选择apk或者soure，这些都是通过数字来进行选择。继续下去会有输入路径或者通过设备来进行检测。我们选择1，然后底下就开始提示是否导出mainfirst文件。<br><img src="http://p6usvwwl2.bkt.clouddn.com/image009.png" alt=""><br>接下来就直接导出相应的mainfist文件，这其实就是直接反编译获取到的。接下来就是先从mainfirst文件进行分析，分析相应组件暴露和allowback和debuggable等相关的风险点。<br><img src="http://p6usvwwl2.bkt.clouddn.com/image010.png" alt=""><br><img src="http://p6usvwwl2.bkt.clouddn.com/image011.png" alt=""><br>接下里，我们继续查看，直接检测broadcast广播是否有附带相应的敏感信息，然后就是相应的脚本进行检测，例如x509证书检验，这些都是该工具具有的代码静态分析。<br><img src="http://p6usvwwl2.bkt.clouddn.com/image012.png" alt=""><br><img src="http://p6usvwwl2.bkt.clouddn.com/image013.png" alt=""><br>最后会在qark的本身目录中的report.html文件，这个文件类似于mobsf生成的界面。这里面就是会把刚刚经过检测的所有风险都以报告的形式打印出来，都会在相应的选项中，详细的告诉你风险点存在的位置，以及相应的危害。<br>但是在这里我们只是看到很稀少的数据，其实这些数据只是mainfist文件暴露出来的风险点，但是代码中的分析根本没有进行分析。问题出在于apk本身，这是一个有进行加固的apk，我之前说过这个工具无法进行相应的脱壳，所以导致无法获取到相应的代码，就无法进行相应的分析，所以其他数据就是空的。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在安装的过程会有一个问题就是python no module named _curses的问题，这个问题最后解决了，经过对比python2.6 ，终于发现，原来 pythong2.7/lib-dynload 里没有相应的 curses 库，_curses_panel.so，_curses.so。说到底就是去缺少文件，所以此时你将python2.6 的 这2个so文件拷贝到 pythong2.7 的lib-dynload 文件夹下， 就解决了问题。或者你可以下载ncurses文件，然后重新跑下python就可以了。<br><img src="http://p6usvwwl2.bkt.clouddn.com/image014.png" alt=""><br>我们前面也说过这款工具是为了教育开发人员和信息安全人员了解与Android应用程序安全相关的潜在风险 ，相应的开发人员和评估人员就可以在开发和检测阶段，针对于APP移动应用进行检测，及时修改相应的风险点。<br>其实通过对于QARK的了解，我们不难看出这就是和大多数自动化工具一样就是，感觉就像个多了些脚步的Mobsf，作为一个安全评估人员，其实再多的检测工具也是辅助，我们仍然需要进行自己的分析，有些风险点也不一定是准确的，所以我们是需要好好利用该工具。</p>
+<p>参考的文章：<br><a href="http://resources.infosecinstitute.com/qark-a-tool-for-automated-android-app-assessments/#gref" rel="external nofollow noopener noreferrer" target="_blank">http://resources.infosecinstitute.com/qark-a-tool-for-automated-android-app-assessments/#gref</a><br><a href="https://github.com/linkedin/qark" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/linkedin/qark</a><br>工具下载链接：<br><a href="https://github.com/linkedin/qark" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/linkedin/qark</a></p>
+
+      
+    </div>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/king-of-zombie.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          谁是僵尸之王-如何进行高效的分布式爆破
+        
+      </div>
+    </a>
+  
+  
+    <a href="/bayesian-classifier.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">贝叶斯分类器</div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+
+
+
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- CATEGORIES START -->
+<h2 class="no-top-space">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/硬件安全/">硬件安全 (10)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/芯片安全/">芯片安全 (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/移动安全/">移动安全 (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/web安全/">web安全 (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/系统安全/">系统安全 (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- BEGIN BLOG TAGS -->
+<div class="blog-tags margin-bottom-20">
+  <h2>Tags</h2>
+  
+  <div class="widget-wrap">
+    <div class="widget">
+      
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MITMf/"><i class="fa fa-tags"></i>MITMf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/QARK/"><i class="fa fa-tags"></i>QARK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/"><i class="fa fa-tags"></i>Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UART串口调试/"><i class="fa fa-tags"></i>UART串口调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app签名/"><i class="fa fa-tags"></i>app签名</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goahead/"><i class="fa fa-tags"></i>goahead</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/"><i class="fa fa-tags"></i>https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/"><i class="fa fa-tags"></i>ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web安全/"><i class="fa fa-tags"></i>web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网渗透/"><i class="fa fa-tags"></i>内网渗透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/密码爆破/"><i class="fa fa-tags"></i>密码爆破</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/指纹识别/"><i class="fa fa-tags"></i>指纹识别</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/智能锁/"><i class="fa fa-tags"></i>智能锁</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件分析/"><i class="fa fa-tags"></i>硬件分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/移动安全/"><i class="fa fa-tags"></i>移动安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/芯片安全/"><i class="fa fa-tags"></i>芯片安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/蓝牙攻击/"><i class="fa fa-tags"></i>蓝牙攻击</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/贝叶斯分类/"><i class="fa fa-tags"></i>贝叶斯分类</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程代码执行/"><i class="fa fa-tags"></i>远程代码执行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
+    </div>
+  </div>
+
+
+</div>
+<!-- END BLOG TAGS -->
+
+
+<!-- BEGIN FEATURED POSTS -->                            
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->                            
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>伏宸安全实验室<br><br> 伏宸安全实验室是广东安创信息科技开发有限公司旗下的以网络安全研究为核心的专业实验室，主攻前沿安全技术，包括：渗透测试、黑产对抗、威胁情报、智能硬件与无线电安全等。</p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              广州市越秀区寺右新马路108号丰伟大厦15B、C单元<br>
+              BC 15/F Fengwei Buiding NO.108 Siyouxinma Road<br>
+              Guangzhou,China Code:510600<br>
+              Phone: 020-87392713<br>
+              Email: <a href="mailto:admin@future-sec.com" rel="external nofollow noopener noreferrer" target="_blank">admin@future-sec.com</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2018 伏宸安全实验室-Future-Sec Information Security Lab<br>
+ <a href="javascript:;">Future-sec</a> | <a href="javascript:;">广东安创信息科技开发有限公司</a>
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      <li><a href="https://github.com/Future-Sec/" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-github"></i></a></li>
+    
+      <li><a href="https://weibo.com/futuresec" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weibo"></i></a></li>
+    
+      <li><a href="https://mp.weixin.qq.com/s/QuDKBrMist8GL16EEO-u4Q" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weixin"></i></a></li>
+    
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+    
+      <li><a href="http://yaseng.org/" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-yahoo"></i></a></li>
+    
+  </ul>  
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]--> 
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/plugins/owl.carousel/owl.carousel.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/wow.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();    
+        Layout.initOWL();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling(); 
+	new WOW().init();
+    });
+</script>
+ <script>
+        // 给图片添加链接
+        $(document).ready(function() {
+            $("p img").each(function() {
+                var strA = "<a class='fancybox' href='" + this.src + "'></a>";
+                $(this).wrapAll(strA);
+            });
+        });
+    
+        // fancybox
+        $(".fancybox").fancybox({
+                                  openEffect    : 'elastic',
+                                  closeEffect   : 'elastic',
+                              });
+    </script>
+    <script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?9e36ea61528e32ab9a0bc86aa61db5f7";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- END CORE PLUGINS -->
+
+<!-- BEGIN PAGE-SPECIFIC PLUGINS --> 
+
+
+
+
+
+
+
+<!-- END PAGE-SPECIFIC PLUGINS --> 
+
+<!-- BEGIN INTEGRATIONS -->
+
+
+
+
+
+<!-- END INTEGRATIONS -->
+
+</body>
+
