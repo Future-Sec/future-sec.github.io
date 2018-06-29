@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://www.future-sec.com/android-account-manager-vulnerabilitys.html</loc>
+    
+    <lastmod>2018-06-29T10:16:12.555Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/iot-security-hardware-modification.html</loc>
+    
+    <lastmod>2018-06-29T09:45:30.762Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://www.future-sec.com/about/index.html</loc>
     
     <lastmod>2018-06-29T09:17:23.686Z</lastmod>
@@ -72,7 +86,7 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/mik.html</loc>
+    <loc>http://www.future-sec.com/MikroTik-RouterOS-lt-6.38.4-remote-code-execution.html</loc>
     
     <lastmod>2018-06-29T09:01:06.020Z</lastmod>
     
@@ -184,13 +198,6 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/tags/index.html</loc>
-    
-    <lastmod>2017-06-26T11:36:02.658Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://www.future-sec.com/categories/index.html</loc>
     
     <lastmod>2017-06-26T11:36:02.658Z</lastmod>
@@ -198,16 +205,9 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/contact/index.html</loc>
+    <loc>http://www.future-sec.com/tags/index.html</loc>
     
-    <lastmod>2016-04-26T13:44:54.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://www.future-sec.com/projects/index.html</loc>
-    
-    <lastmod>2016-04-26T13:44:54.000Z</lastmod>
+    <lastmod>2017-06-26T11:36:02.658Z</lastmod>
     
   </url>
   
@@ -220,6 +220,20 @@
   
   <url>
     <loc>http://www.future-sec.com/404.html</loc>
+    
+    <lastmod>2016-04-26T13:44:54.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/contact/index.html</loc>
+    
+    <lastmod>2016-04-26T13:44:54.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/projects/index.html</loc>
     
     <lastmod>2016-04-26T13:44:54.000Z</lastmod>
     
