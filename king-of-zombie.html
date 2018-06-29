@@ -19,17 +19,17 @@
 <meta property="og:url" content="http://www.future-sec.com/king-of-zombie.html">
 <meta property="og:site_name" content="伏宸安全实验室-Future-Sec Information Security Lab">
 <meta property="og:description" content="前言在研发漏洞扫描器的弱口令破解模块时，发现传统的通过字典遍历用户名密码的算法效率过低，当需要大批量高速爆破时，难以满足此类需求，因此需要引入新的算法，本文以一个分布式扫描器的爆破模块为例，演示如何进行高效快速的分布式爆破。 传统方法传统的密码穷举 效率非常低，而且还有可能触发报警   king of zombiekoz (king of zombie) 算法,即首先按照多种算法对用户名密码字典组">
-<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/6172922.jpg">
-<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/15156625175922.jpg">
-<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/15228255230476.jpg">
-<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/14703046762519.png">
-<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/14703047183607.jpg">
-<meta property="og:image" content="http://p1aqjecep.bkt.clouddn.com/147030475970560.jpg">
-<meta property="og:updated_time" content="2018-04-08T06:31:58.592Z">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/6172922.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/15156625175922.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/15228255230476.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/14703046762519.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/14703047183607.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/147030475970560.jpg">
+<meta property="og:updated_time" content="2018-06-29T08:59:05.620Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="谁是僵尸之王-如何进行高效的分布式爆破">
 <meta name="twitter:description" content="前言在研发漏洞扫描器的弱口令破解模块时，发现传统的通过字典遍历用户名密码的算法效率过低，当需要大批量高速爆破时，难以满足此类需求，因此需要引入新的算法，本文以一个分布式扫描器的爆破模块为例，演示如何进行高效快速的分布式爆破。 传统方法传统的密码穷举 效率非常低，而且还有可能触发报警   king of zombiekoz (king of zombie) 算法,即首先按照多种算法对用户名密码字典组">
-<meta name="twitter:image" content="http://p1aqjecep.bkt.clouddn.com/6172922.jpg">
+<meta name="twitter:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/6172922.jpg">
   
     <link rel="alternative" href="/atom.xml" title="伏宸安全实验室-Future-Sec Information Security Lab" type="application/atom+xml">
   
@@ -182,9 +182,9 @@
     <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#传统方法"><span class="toc-number">2.</span> <span class="toc-text">传统方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#king-of-zombie"><span class="toc-number">3.</span> <span class="toc-text">king of zombie</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#流程"><span class="toc-number">3.1.</span> <span class="toc-text">流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#表结构"><span class="toc-number">3.2.</span> <span class="toc-text">表结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#更新算法"><span class="toc-number">3.3.</span> <span class="toc-text">更新算法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#master"><span class="toc-number">3.3.1.</span> <span class="toc-text">master</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#koz-node"><span class="toc-number">3.3.2.</span> <span class="toc-text">koz node</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#爆破算法"><span class="toc-number">3.4.</span> <span class="toc-text">爆破算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#爆破结果"><span class="toc-number">3.5.</span> <span class="toc-text">爆破结果</span></a></li></ol></li></ol>
   </div>
 
-        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在研发漏洞扫描器的弱口令破解模块时，发现传统的通过字典遍历用户名密码的算法效率过低，当需要大批量高速爆破时，难以满足此类需求，因此需要引入新的算法，本文以一个分布式扫描器的爆破模块为例，演示如何进行高效快速的分布式爆破。<br><img src="http://p1aqjecep.bkt.clouddn.com/6172922.jpg" alt="617292"></p>
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在研发漏洞扫描器的弱口令破解模块时，发现传统的通过字典遍历用户名密码的算法效率过低，当需要大批量高速爆破时，难以满足此类需求，因此需要引入新的算法，本文以一个分布式扫描器的爆破模块为例，演示如何进行高效快速的分布式爆破。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/6172922.jpg" alt="617292"></p>
 <h2 id="传统方法"><a href="#传统方法" class="headerlink" title="传统方法"></a>传统方法</h2><p>传统的密码穷举</p>
-<p><img src="http://p1aqjecep.bkt.clouddn.com/15156625175922.jpg" alt=""><br>效率非常低，而且还有可能触发报警  </p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/15156625175922.jpg" alt=""><br>效率非常低，而且还有可能触发报警  </p>
 <h2 id="king-of-zombie"><a href="#king-of-zombie" class="headerlink" title="king of zombie"></a>king of zombie</h2><p>koz (king of zombie) 算法,即首先按照多种算法对用户名密码字典组合进行评分,然后用评分最高的组合去淘汰僵尸主机。</p>
 <h3 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h3><ol>
 <li>上游push ncrack任务到队列</li>
@@ -240,7 +240,7 @@
 <h3 id="更新算法"><a href="#更新算法" class="headerlink" title="更新算法"></a>更新算法</h3><p>目前数据来源有四个<br>第一个  扫描器爆破成功记录  score 值为 10<br>第二个  蜜罐记录   score 值 为 1<br>第三个  渗透进去提取到的有效密码(例如windows 明文)  ,score 10<br>第四个  收集的各种工具扫描字典  score 值为 1</p>
 <p>扫描的时候工具score 值来排序,命中一次之后+10 </p>
 <p>例如如下字典列表</p>
-<p><img src="http://p1aqjecep.bkt.clouddn.com/15228255230476.jpg" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/15228255230476.jpg" alt=""></p>
 <h4 id="master"><a href="#master" class="headerlink" title="master"></a>master</h4><p>推送任务之后使用无状态扫描工具扫描服务和指纹识别</p>
 <h4 id="koz-node"><a href="#koz-node" class="headerlink" title="koz node"></a>koz node</h4><p>KozTask 类来保存本地任务队列,接收处的代码为</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span>  <span class="title">pop_member</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">while</span> self.len() &gt;  <span class="number">0</span>:</div><div class="line">        str_member=self.pop()</div><div class="line">        koz_member=ast.literal_eval(str_member)</div><div class="line">        self.list_member[str(koz_member[<span class="string">'name'</span>])].append(koz_member)</div><div class="line">    util.log(<span class="string">"pop koz_member  done count:%d"</span>  % (self.count()),<span class="number">2</span>,<span class="string">'koztask'</span>)</div></pre></td></tr></table></figure>
@@ -250,11 +250,11 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">while</span>  <span class="number">1</span>:</div><div class="line">        <span class="keyword">if</span> self.work_queue.empty() == <span class="keyword">True</span>:</div><div class="line">            <span class="keyword">break</span></div><div class="line">        task = self.work_queue.get(block=<span class="keyword">False</span>)</div><div class="line">        <span class="keyword">if</span> ncrack.scan(task[<span class="string">'member'</span>],task[<span class="string">'level'</span>])  != <span class="keyword">False</span> :</div><div class="line">            koz_type=task[<span class="string">'member'</span>][<span class="string">'name'</span>]</div><div class="line">            koz_task.list_member[koz_type].remove(task[<span class="string">'member'</span>])</div></pre></td></tr></table></figure>
 <h3 id="爆破算法"><a href="#爆破算法" class="headerlink" title="爆破算法"></a>爆破算法</h3><p>负责爆破的为ncrack 模块,调用的爆破工具有  medusa,ncrack。<br>部分实现</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">scan</span><span class="params">(target,level)</span>:</span></div><div class="line">    <span class="keyword">if</span> target[<span class="string">'name'</span>]  == <span class="string">'ms-wbt-server'</span>  <span class="keyword">or</span>  target[<span class="string">'name'</span>]  == <span class="string">'telnet'</span> :</div><div class="line">        str_command = <span class="string">"ncrack --user %s --pass %s  %s:%d "</span>  %  (level[<span class="string">'username'</span>],level[<span class="string">'password'</span>],target[<span class="string">'host'</span>],target[<span class="string">'port'</span>])</div><div class="line">        str_ret=str(sys_exec([<span class="string">'ncrack'</span>, <span class="string">'--user'</span>,level[<span class="string">'username'</span>], <span class="string">'--pass'</span>, level[<span class="string">'password'</span>], target[<span class="string">'host'</span>]+<span class="string">':'</span>+ str(target[<span class="string">'port'</span>])]))</div><div class="line">    <span class="keyword">else</span> :</div><div class="line">        str_command = <span class="string">"medusa -u %s -p %s -h %s -n %d  -M %s"</span> % (level[<span class="string">'username'</span>], level[<span class="string">'password'</span>], target[<span class="string">'host'</span>], target[<span class="string">'port'</span>], target[<span class="string">'name'</span>])</div><div class="line">        str_ret=str(sys_exec([<span class="string">'medusa'</span>,<span class="string">'-u'</span>,level[<span class="string">'username'</span>],<span class="string">'-p'</span>,level[<span class="string">'password'</span>],<span class="string">'-h'</span>,target[<span class="string">'host'</span>],<span class="string">'-n'</span>,str(target[<span class="string">'port'</span>]),<span class="string">'-M'</span>,target[<span class="string">'name'</span>]]))</div><div class="line">    </div><div class="line">    util.log(str_command, <span class="number">2</span>, <span class="string">'ncrack'</span>)</div><div class="line">    <span class="comment">#need  change </span></div><div class="line">    <span class="keyword">if</span> <span class="string">'ACCOUNT FOUND'</span> <span class="keyword">in</span> str_ret  <span class="keyword">or</span>  <span class="string">'credentials'</span>  <span class="keyword">in</span> str_ret:</div><div class="line">        str_data=<span class="string">'[%s] %s %s:%s'</span>   %  (target[<span class="string">'name'</span>],target[<span class="string">'host'</span>],level[<span class="string">'username'</span>],level[<span class="string">'password'</span>])</div><div class="line">        util.log(<span class="string">'ncrack taskid:%d target:%s service:%s succeed'</span> % (target[<span class="string">'task_id'</span>], target[<span class="string">'host'</span>], target[<span class="string">'name'</span>]), <span class="number">1</span>, <span class="string">'ncrack'</span>)</div><div class="line">        <span class="keyword">return</span> report(target,str_data)</div><div class="line">        </div><div class="line">    <span class="keyword">else</span>  :</div><div class="line">        <span class="keyword">return</span> <span class="keyword">False</span></div></pre></td></tr></table></figure>
-<h3 id="爆破结果"><a href="#爆破结果" class="headerlink" title="爆破结果"></a>爆破结果</h3><p> 总览<br><img src="http://p1aqjecep.bkt.clouddn.com/14703046762519.png" alt=""></p>
+<h3 id="爆破结果"><a href="#爆破结果" class="headerlink" title="爆破结果"></a>爆破结果</h3><p> 总览<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/14703046762519.png" alt=""></p>
 <p>图文分析</p>
-<p><img src="http://p1aqjecep.bkt.clouddn.com/14703047183607.jpg" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/14703047183607.jpg" alt=""></p>
 <p>部分结果一览</p>
-<p><img src="http://p1aqjecep.bkt.clouddn.com/147030475970560.jpg" alt="147030475970560"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/147030475970560.jpg" alt="147030475970560"></p>
 
       
     </div>
@@ -263,11 +263,11 @@
     
 <nav id="article-nav">
   
-    <a href="/introducing-qark.html" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/mik.html" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
-          QARK工具的介绍和原理分析
+          MikroTik RouterOS &lt; 6.38.4 (x86) 远程代码执行漏洞分析
         
       </div>
     </a>
@@ -313,7 +313,11 @@
 	</li>
       
 	<li>
-	  <a href="/categories/系统安全/">系统安全 (1)</a>
+	  <a href="/categories/系统安全/">系统安全 (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/BROADCOM-WI-FI/">BROADCOM WI-FI (0)</a>
 	</li>
       
     </ul>
@@ -330,7 +334,7 @@
   <div class="widget-wrap">
     <div class="widget">
       
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MITMf/"><i class="fa fa-tags"></i>MITMf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/QARK/"><i class="fa fa-tags"></i>QARK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/"><i class="fa fa-tags"></i>Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UART串口调试/"><i class="fa fa-tags"></i>UART串口调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app签名/"><i class="fa fa-tags"></i>app签名</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goahead/"><i class="fa fa-tags"></i>goahead</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/"><i class="fa fa-tags"></i>https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/"><i class="fa fa-tags"></i>ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web安全/"><i class="fa fa-tags"></i>web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网渗透/"><i class="fa fa-tags"></i>内网渗透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/密码爆破/"><i class="fa fa-tags"></i>密码爆破</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/指纹识别/"><i class="fa fa-tags"></i>指纹识别</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/智能锁/"><i class="fa fa-tags"></i>智能锁</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件分析/"><i class="fa fa-tags"></i>硬件分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/移动安全/"><i class="fa fa-tags"></i>移动安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/芯片安全/"><i class="fa fa-tags"></i>芯片安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/蓝牙攻击/"><i class="fa fa-tags"></i>蓝牙攻击</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/贝叶斯分类/"><i class="fa fa-tags"></i>贝叶斯分类</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程代码执行/"><i class="fa fa-tags"></i>远程代码执行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MITMf/"><i class="fa fa-tags"></i>MITMf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/QARK/"><i class="fa fa-tags"></i>QARK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/"><i class="fa fa-tags"></i>Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UART串口调试/"><i class="fa fa-tags"></i>UART串口调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app签名/"><i class="fa fa-tags"></i>app签名</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goahead/"><i class="fa fa-tags"></i>goahead</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/"><i class="fa fa-tags"></i>https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/"><i class="fa fa-tags"></i>ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web安全/"><i class="fa fa-tags"></i>web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网渗透/"><i class="fa fa-tags"></i>内网渗透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/密码爆破/"><i class="fa fa-tags"></i>密码爆破</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/指纹识别/"><i class="fa fa-tags"></i>指纹识别</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/智能锁/"><i class="fa fa-tags"></i>智能锁</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件分析/"><i class="fa fa-tags"></i>硬件分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/移动安全/"><i class="fa fa-tags"></i>移动安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/系统安全/"><i class="fa fa-tags"></i>系统安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/芯片安全/"><i class="fa fa-tags"></i>芯片安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/蓝牙攻击/"><i class="fa fa-tags"></i>蓝牙攻击</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/贝叶斯分类/"><i class="fa fa-tags"></i>贝叶斯分类</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程代码执行/"><i class="fa fa-tags"></i>远程代码执行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
     </div>
   </div>
 
@@ -342,6 +346,8 @@
 <!-- BEGIN FEATURED POSTS -->                            
 <h2>Featured Posts</h2>
 <div class="recent-news margin-bottom-10">
+  
+    
   
     
   

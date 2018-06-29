@@ -4,63 +4,119 @@
   <url>
     <loc>http://www.future-sec.com/about/index.html</loc>
     
-    <lastmod>2018-04-10T02:30:01.203Z</lastmod>
+    <lastmod>2018-06-29T09:17:23.686Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/bayesian-classifier.html</loc>
+    <loc>http://www.future-sec.com/about/index.html</loc>
     
-    <lastmod>2018-04-08T06:52:02.330Z</lastmod>
+    <lastmod>2018-06-29T09:17:12.492Z</lastmod>
     
   </url>
   
   <url>
     <loc>http://www.future-sec.com/introducing-qark.html</loc>
     
-    <lastmod>2018-04-08T06:32:05.415Z</lastmod>
+    <lastmod>2018-06-29T09:01:13.691Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/king-of-zombie.html</loc>
+    <loc>http://www.future-sec.com/android-ssl-security.html</loc>
     
-    <lastmod>2018-04-08T06:31:58.592Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://www.future-sec.com/chip-security-let-us-cook.html</loc>
-    
-    <lastmod>2018-01-19T07:32:47.046Z</lastmod>
+    <lastmod>2018-06-29T09:01:12.637Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/analysis-of-a-4G-wireless-router.html</loc>
+    <loc>http://www.future-sec.com/bayesian-classifier.html</loc>
     
-    <lastmod>2018-01-19T07:23:47.442Z</lastmod>
+    <lastmod>2018-06-29T09:01:11.757Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/broadcom-wifi-3.html</loc>
+    <loc>http://www.future-sec.com/how-to-crack-a-ble-lock.html</loc>
     
-    <lastmod>2018-01-19T07:22:52.674Z</lastmod>
+    <lastmod>2018-06-29T09:01:11.356Z</lastmod>
     
   </url>
   
   <url>
     <loc>http://www.future-sec.com/iot-security-hardware-debuging.html</loc>
     
-    <lastmod>2017-12-26T03:06:07.555Z</lastmod>
+    <lastmod>2018-06-29T09:01:11.049Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/iot-security-hardware-obtain.html</loc>
+    
+    <lastmod>2018-06-29T09:01:10.629Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/using-MITMF-attack-not-80-port-http.html</loc>
+    
+    <lastmod>2018-06-29T09:01:10.244Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/yet-another-web-fingerprinter.html</loc>
+    
+    <lastmod>2018-06-29T09:01:09.765Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/mik.html</loc>
+    
+    <lastmod>2018-06-29T09:01:06.020Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/analysis-of-a-4G-wireless-router.html</loc>
+    
+    <lastmod>2018-06-29T08:59:12.972Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/broadcom-wifi-3.html</loc>
+    
+    <lastmod>2018-06-29T08:59:12.388Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/chip-security-let-us-cook.html</loc>
+    
+    <lastmod>2018-06-29T08:59:11.900Z</lastmod>
     
   </url>
   
   <url>
     <loc>http://www.future-sec.com/GoAhead-CVE-2017-17562-analysis-and-pwn-a-router.html</loc>
     
-    <lastmod>2017-12-26T03:03:58.834Z</lastmod>
+    <lastmod>2018-06-29T08:59:11.358Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html</loc>
+    
+    <lastmod>2018-06-29T08:59:10.780Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/king-of-zombie.html</loc>
+    
+    <lastmod>2018-06-29T08:59:05.620Z</lastmod>
     
   </url>
   
@@ -68,27 +124,6 @@
     <loc>http://www.future-sec.com/iot-security-hardware-analysis.html</loc>
     
     <lastmod>2017-12-26T03:01:45.419Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html</loc>
-    
-    <lastmod>2017-12-21T07:53:50.474Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://www.future-sec.com/using-MITMF-attack-not-80-port-http.html</loc>
-    
-    <lastmod>2017-12-21T07:42:22.081Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://www.future-sec.com/android-ssl-security.html</loc>
-    
-    <lastmod>2017-12-21T07:35:04.370Z</lastmod>
     
   </url>
   
@@ -103,27 +138,6 @@
     <loc>http://www.future-sec.com/broadcom-wifi-1.html</loc>
     
     <lastmod>2017-12-21T07:33:30.953Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://www.future-sec.com/yet-another-web-fingerprinter.html</loc>
-    
-    <lastmod>2017-11-27T11:19:40.481Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://www.future-sec.com/how-to-crack-a-ble-lock.html</loc>
-    
-    <lastmod>2017-11-27T11:01:32.347Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://www.future-sec.com/iot-security-hardware-obtain.html</loc>
-    
-    <lastmod>2017-11-27T11:00:50.268Z</lastmod>
     
   </url>
   
@@ -163,23 +177,9 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/about/index.html</loc>
-    
-    <lastmod>2017-07-07T03:57:31.778Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://www.future-sec.com/login/index.html</loc>
     
     <lastmod>2017-06-29T11:20:40.672Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://www.future-sec.com/categories/index.html</loc>
-    
-    <lastmod>2017-06-26T11:36:02.658Z</lastmod>
     
   </url>
   
@@ -191,7 +191,21 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/404.html</loc>
+    <loc>http://www.future-sec.com/categories/index.html</loc>
+    
+    <lastmod>2017-06-26T11:36:02.658Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/contact/index.html</loc>
+    
+    <lastmod>2016-04-26T13:44:54.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/projects/index.html</loc>
     
     <lastmod>2016-04-26T13:44:54.000Z</lastmod>
     
@@ -205,14 +219,7 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/contact/index.html</loc>
-    
-    <lastmod>2016-04-26T13:44:54.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://www.future-sec.com/projects/index.html</loc>
+    <loc>http://www.future-sec.com/404.html</loc>
     
     <lastmod>2016-04-26T13:44:54.000Z</lastmod>
     

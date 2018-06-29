@@ -19,45 +19,45 @@
 <meta property="og:url" content="http://www.future-sec.com/iot-security-hardware-debuging.html">
 <meta property="og:site_name" content="伏宸安全实验室-Future-Sec Information Security Lab">
 <meta property="og:description" content="前言上篇介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态调试。 UART串口调试UART调试第一步需要先找到对应的四个PIN，在通电情况下，VCC口可以不要接，判断 GND, RX, TX三个引脚是调试的关键，找四个引脚可以先看PCB上的印字。但多数厂商在量产前会去掉用于调试的串口印字，如果找不到对应引脚的印字">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image65.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image66.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image67.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image68.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image69.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image70.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image101.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image102.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image71.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image72.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image73.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image35.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image74.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image75.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image76.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image77.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image78.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image79.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image80.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image81.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image82.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image83.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image84.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image85.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image86.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image87.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image88.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image89.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image90.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image91.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image122.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image123.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image124.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/image125.jpg">
-<meta property="og:updated_time" content="2017-12-26T03:06:07.555Z">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image65.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image66.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image67.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image68.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image69.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image70.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image101.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image102.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image71.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image72.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image73.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image35.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image74.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image75.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image76.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image77.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image78.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image79.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image80.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image81.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image82.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image83.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image84.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image85.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image86.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image87.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image88.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image89.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image90.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image91.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image122.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image123.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image124.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image125.jpg">
+<meta property="og:updated_time" content="2018-06-29T09:01:11.049Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="物联网硬件安全分析基础-串口调试">
 <meta name="twitter:description" content="前言上篇介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态调试。 UART串口调试UART调试第一步需要先找到对应的四个PIN，在通电情况下，VCC口可以不要接，判断 GND, RX, TX三个引脚是调试的关键，找四个引脚可以先看PCB上的印字。但多数厂商在量产前会去掉用于调试的串口印字，如果找不到对应引脚的印字">
-<meta name="twitter:image" content="http://ozuqqvmm5.bkt.clouddn.com/image65.jpg">
+<meta name="twitter:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image65.jpg">
   
     <link rel="alternative" href="/atom.xml" title="伏宸安全实验室-Future-Sec Information Security Lab" type="application/atom+xml">
   
@@ -213,13 +213,13 @@
   </div>
 
         <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上篇介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态调试。</p>
-<h2 id="UART串口调试"><a href="#UART串口调试" class="headerlink" title="UART串口调试"></a>UART串口调试</h2><p>UART调试第一步需要先找到对应的四个PIN，在通电情况下，VCC口可以不要接，判断 GND, RX, TX三个引脚是调试的关键，找四个引脚可以先看PCB上的印字。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image65.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image66.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image67.jpg" alt="img"><br>但多数厂商在量产前会去掉用于调试的串口印字，如果找不到对应引脚的印字，就需要先分析PCB的结构，一般PCB上有3、4 、5个并排或相距不远的焊点或通孔，就有可能是UART调试串口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image68.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image69.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image70.jpg" alt="img"><br>但PCB上可能存在多个这样的焊点或通孔，从多个口中找出真正的调试串口，就需要借助到万用表。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image101.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image102.jpg" alt="img"><br>万用表找串口首先需要找到GND口，就是接地口，在疑似串口的焊点处，通过测量电势差，可以判断出GND口，通过连接焊点和输入负极，如果电势为0，就可能是GND口，如果电势为最大值，例如3.6V、5V等，就可能是VCC口。然后通过UART转换器对应的4个口，引出导线，并设置好串口输出环境后，就可以依次尝试。也可以通过短接其中的两口，如果机器重启，就可以判断这两口为VCC和GND。<br>需要注意的是，在TTL电平模式下，UATR转换接口上的RX、TX口与上位设备，也就是PCB上的UART口的RX和TX是需要反接的。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image71.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image72.jpg" alt="img"></p>
-<h3 id="案例一：调试某智能摄像头"><a href="#案例一：调试某智能摄像头" class="headerlink" title="案例一：调试某智能摄像头"></a>案例一：调试某智能摄像头</h3><p>通过万用表测量电势差之后，在靠近CPU的地方有三个通孔，有可能是UART串口，用导线连接之后，设置波特率为115200。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image73.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image35.jpg" alt="img"><br>用SecureCRT连接串口，给机器通上电之后，串口立马输出了启动信息，并可以执行命令，说明串口正确，如果遇到无法输入的情况，首先检查接线是否松动，然后在SecureCRT中的， Session Options -&gt; Connection -&gt; Serial -&gt; Flow Control，将原先选中的 RTS/CTS取消掉，这是因为如果选中了RTS/CTS ，则硬件上要有对应接口，软件上实现对应协议，才能实现此流控制。如果串口输出为乱码，则需要切换波特率，直至输出正常。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image74.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image75.jpg" alt="img"></p>
-<h3 id="案例二：调试某路由器"><a href="#案例二：调试某路由器" class="headerlink" title="案例二：调试某路由器"></a>案例二：调试某路由器</h3><p>在靠近cpu的地方有四个通孔，测量电势差后，利用导线探针，确定了三个PIN，连接转换器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image76.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image77.jpg" alt="img"><br>串口中输出调试信息，因波特率设置问题，初始输出为乱码，改为38400即可正常输出。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image78.jpg" alt="img"></p>
-<h3 id="案例三：调试某路由器"><a href="#案例三：调试某路由器" class="headerlink" title="案例三：调试某路由器"></a>案例三：调试某路由器</h3><p>在PCB上有四个焊点，先测量电势差，分出GND和VCC，在利用焊枪分别焊上导线，连接转换接口，测试出TX和RX口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image79.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image80.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image81.jpg" alt="img"></p>
-<h3 id="案例四：调试某路由器"><a href="#案例四：调试某路由器" class="headerlink" title="案例四：调试某路由器"></a>案例四：调试某路由器</h3><p>在PCB一侧有5个通孔，并标注有UART-0字样，通电后，测试各口电势差，确实GND和VCC后，连接转换接口，并测试出RX和TX口。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image82.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image83.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image84.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image85.jpg" alt="img"><br>通过本地架设的tftp服务器，并在串口输入命令，开启相关服务，就可以通过tftp与机器传输文件。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image86.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image87.jpg" alt="img"></p>
-<h3 id="案例五：调试某无线数据终端"><a href="#案例五：调试某无线数据终端" class="headerlink" title="案例五：调试某无线数据终端"></a>案例五：调试某无线数据终端</h3><p>拆开正面压板，发现PCB上标注有印字，利用PCB夹具和探针，引出RX和TX口，连接转换器，因该无线终端串口电压不超过1.7V，焊接容易造成信号衰减，因此采用夹具。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image88.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image89.jpg" alt="img"><br>因串口输出信息过多，影响输入和输出结果，因此采用串口调试助手，设置波特率为115200，输入命令并发送，可以成功执行。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image90.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image91.jpg" alt="img"></p>
-<h3 id="案例六：调试某语音机器人"><a href="#案例六：调试某语音机器人" class="headerlink" title="案例六：调试某语音机器人"></a>案例六：调试某语音机器人</h3><p>拆解机器，该型机器采用多块电路板层级设计，其主要处理芯片位于顶部，拆解时注意走线位置，防止拉坏接线口，在PCB上有UART的PIN口印字，给每一个PIN口焊上导线，连接转换器。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image122.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image123.jpg" alt="img"><br>设置波特率为921600，连接串口，用root账号登陆，密码为空，成功进入系统，执行命令。<br><img src="http://ozuqqvmm5.bkt.clouddn.com/image124.jpg" alt="img"><br><img src="http://ozuqqvmm5.bkt.clouddn.com/image125.jpg" alt="img"></p>
+<h2 id="UART串口调试"><a href="#UART串口调试" class="headerlink" title="UART串口调试"></a>UART串口调试</h2><p>UART调试第一步需要先找到对应的四个PIN，在通电情况下，VCC口可以不要接，判断 GND, RX, TX三个引脚是调试的关键，找四个引脚可以先看PCB上的印字。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image65.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image66.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image67.jpg" alt="img"><br>但多数厂商在量产前会去掉用于调试的串口印字，如果找不到对应引脚的印字，就需要先分析PCB的结构，一般PCB上有3、4 、5个并排或相距不远的焊点或通孔，就有可能是UART调试串口。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image68.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image69.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image70.jpg" alt="img"><br>但PCB上可能存在多个这样的焊点或通孔，从多个口中找出真正的调试串口，就需要借助到万用表。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image101.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image102.jpg" alt="img"><br>万用表找串口首先需要找到GND口，就是接地口，在疑似串口的焊点处，通过测量电势差，可以判断出GND口，通过连接焊点和输入负极，如果电势为0，就可能是GND口，如果电势为最大值，例如3.6V、5V等，就可能是VCC口。然后通过UART转换器对应的4个口，引出导线，并设置好串口输出环境后，就可以依次尝试。也可以通过短接其中的两口，如果机器重启，就可以判断这两口为VCC和GND。<br>需要注意的是，在TTL电平模式下，UATR转换接口上的RX、TX口与上位设备，也就是PCB上的UART口的RX和TX是需要反接的。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image71.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image72.jpg" alt="img"></p>
+<h3 id="案例一：调试某智能摄像头"><a href="#案例一：调试某智能摄像头" class="headerlink" title="案例一：调试某智能摄像头"></a>案例一：调试某智能摄像头</h3><p>通过万用表测量电势差之后，在靠近CPU的地方有三个通孔，有可能是UART串口，用导线连接之后，设置波特率为115200。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image73.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image35.jpg" alt="img"><br>用SecureCRT连接串口，给机器通上电之后，串口立马输出了启动信息，并可以执行命令，说明串口正确，如果遇到无法输入的情况，首先检查接线是否松动，然后在SecureCRT中的， Session Options -&gt; Connection -&gt; Serial -&gt; Flow Control，将原先选中的 RTS/CTS取消掉，这是因为如果选中了RTS/CTS ，则硬件上要有对应接口，软件上实现对应协议，才能实现此流控制。如果串口输出为乱码，则需要切换波特率，直至输出正常。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image74.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image75.jpg" alt="img"></p>
+<h3 id="案例二：调试某路由器"><a href="#案例二：调试某路由器" class="headerlink" title="案例二：调试某路由器"></a>案例二：调试某路由器</h3><p>在靠近cpu的地方有四个通孔，测量电势差后，利用导线探针，确定了三个PIN，连接转换器。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image76.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image77.jpg" alt="img"><br>串口中输出调试信息，因波特率设置问题，初始输出为乱码，改为38400即可正常输出。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image78.jpg" alt="img"></p>
+<h3 id="案例三：调试某路由器"><a href="#案例三：调试某路由器" class="headerlink" title="案例三：调试某路由器"></a>案例三：调试某路由器</h3><p>在PCB上有四个焊点，先测量电势差，分出GND和VCC，在利用焊枪分别焊上导线，连接转换接口，测试出TX和RX口。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image79.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image80.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image81.jpg" alt="img"></p>
+<h3 id="案例四：调试某路由器"><a href="#案例四：调试某路由器" class="headerlink" title="案例四：调试某路由器"></a>案例四：调试某路由器</h3><p>在PCB一侧有5个通孔，并标注有UART-0字样，通电后，测试各口电势差，确实GND和VCC后，连接转换接口，并测试出RX和TX口。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image82.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image83.jpg" alt="img"><br>设置波特率为57600，串口输出正确，并可执行命令。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image84.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image85.jpg" alt="img"><br>通过本地架设的tftp服务器，并在串口输入命令，开启相关服务，就可以通过tftp与机器传输文件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image86.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image87.jpg" alt="img"></p>
+<h3 id="案例五：调试某无线数据终端"><a href="#案例五：调试某无线数据终端" class="headerlink" title="案例五：调试某无线数据终端"></a>案例五：调试某无线数据终端</h3><p>拆开正面压板，发现PCB上标注有印字，利用PCB夹具和探针，引出RX和TX口，连接转换器，因该无线终端串口电压不超过1.7V，焊接容易造成信号衰减，因此采用夹具。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image88.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image89.jpg" alt="img"><br>因串口输出信息过多，影响输入和输出结果，因此采用串口调试助手，设置波特率为115200，输入命令并发送，可以成功执行。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image90.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image91.jpg" alt="img"></p>
+<h3 id="案例六：调试某语音机器人"><a href="#案例六：调试某语音机器人" class="headerlink" title="案例六：调试某语音机器人"></a>案例六：调试某语音机器人</h3><p>拆解机器，该型机器采用多块电路板层级设计，其主要处理芯片位于顶部，拆解时注意走线位置，防止拉坏接线口，在PCB上有UART的PIN口印字，给每一个PIN口焊上导线，连接转换器。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image122.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image123.jpg" alt="img"><br>设置波特率为921600，连接串口，用root账号登陆，密码为空，成功进入系统，执行命令。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image124.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/image125.jpg" alt="img"></p>
 
       
     </div>
@@ -228,19 +228,19 @@
     
 <nav id="article-nav">
   
-    <a href="/using-MITMF-attack-not-80-port-http.html" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/android-ssl-security.html" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
-          使用MITMF中间人攻击非80端口的HTTP
+          你在互联网上的数据还在裸奔吗？
         
       </div>
     </a>
   
   
-    <a href="/android-ssl-security.html" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/iot-security-hardware-obtain.html" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">你在互联网上的数据还在裸奔吗？</div>
+      <div class="article-nav-title">物联网硬件安全分析基础-固件提取</div>
     </a>
   
 </nav>
@@ -278,7 +278,11 @@
 	</li>
       
 	<li>
-	  <a href="/categories/系统安全/">系统安全 (1)</a>
+	  <a href="/categories/系统安全/">系统安全 (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/BROADCOM-WI-FI/">BROADCOM WI-FI (0)</a>
 	</li>
       
     </ul>
@@ -295,7 +299,7 @@
   <div class="widget-wrap">
     <div class="widget">
       
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MITMf/"><i class="fa fa-tags"></i>MITMf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/QARK/"><i class="fa fa-tags"></i>QARK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/"><i class="fa fa-tags"></i>Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UART串口调试/"><i class="fa fa-tags"></i>UART串口调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app签名/"><i class="fa fa-tags"></i>app签名</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goahead/"><i class="fa fa-tags"></i>goahead</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/"><i class="fa fa-tags"></i>https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/"><i class="fa fa-tags"></i>ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web安全/"><i class="fa fa-tags"></i>web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网渗透/"><i class="fa fa-tags"></i>内网渗透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/密码爆破/"><i class="fa fa-tags"></i>密码爆破</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/指纹识别/"><i class="fa fa-tags"></i>指纹识别</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/智能锁/"><i class="fa fa-tags"></i>智能锁</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件分析/"><i class="fa fa-tags"></i>硬件分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/移动安全/"><i class="fa fa-tags"></i>移动安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/芯片安全/"><i class="fa fa-tags"></i>芯片安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/蓝牙攻击/"><i class="fa fa-tags"></i>蓝牙攻击</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/贝叶斯分类/"><i class="fa fa-tags"></i>贝叶斯分类</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程代码执行/"><i class="fa fa-tags"></i>远程代码执行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MITMf/"><i class="fa fa-tags"></i>MITMf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/QARK/"><i class="fa fa-tags"></i>QARK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/"><i class="fa fa-tags"></i>Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UART串口调试/"><i class="fa fa-tags"></i>UART串口调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app签名/"><i class="fa fa-tags"></i>app签名</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goahead/"><i class="fa fa-tags"></i>goahead</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/"><i class="fa fa-tags"></i>https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/"><i class="fa fa-tags"></i>ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web安全/"><i class="fa fa-tags"></i>web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网渗透/"><i class="fa fa-tags"></i>内网渗透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/密码爆破/"><i class="fa fa-tags"></i>密码爆破</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/指纹识别/"><i class="fa fa-tags"></i>指纹识别</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/智能锁/"><i class="fa fa-tags"></i>智能锁</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件分析/"><i class="fa fa-tags"></i>硬件分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/移动安全/"><i class="fa fa-tags"></i>移动安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/系统安全/"><i class="fa fa-tags"></i>系统安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/芯片安全/"><i class="fa fa-tags"></i>芯片安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/蓝牙攻击/"><i class="fa fa-tags"></i>蓝牙攻击</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/贝叶斯分类/"><i class="fa fa-tags"></i>贝叶斯分类</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程代码执行/"><i class="fa fa-tags"></i>远程代码执行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
     </div>
   </div>
 
@@ -307,6 +311,8 @@
 <!-- BEGIN FEATURED POSTS -->                            
 <h2>Featured Posts</h2>
 <div class="recent-news margin-bottom-10">
+  
+    
   
     
   

