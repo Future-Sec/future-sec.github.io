@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.future-sec.com/"/>
-  <updated>2018-08-20T11:14:20.224Z</updated>
+  <updated>2018-08-20T11:19:38.565Z</updated>
   <id>http://www.future-sec.com/</id>
   
   <author>
@@ -17,10 +17,10 @@
   
   <entry>
     <title>LimeSDR 上手指南</title>
-    <link href="http://www.future-sec.com/lime.html"/>
-    <id>http://www.future-sec.com/lime.html</id>
+    <link href="http://www.future-sec.com/Limesdr-introduce.html"/>
+    <id>http://www.future-sec.com/Limesdr-introduce.html</id>
     <published>2018-08-19T16:00:00.000Z</published>
-    <updated>2018-08-20T11:14:20.224Z</updated>
+    <updated>2018-08-20T11:19:38.565Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>LimeSDR 是一款完全开源的SDR产品，和 HackRF 一样，包括 PCB 设计图，FPGA 代码，HOST代码完全公开，方便研究和学习 SDR 系统原理。虽然市面上有很多 SDR 产品，但很少有像 LimeSDR 性价比这么高的。</p>
 <p>LimeSDR 支持 100kHz 到 3.8GHz 频率范围，已经可以不需外置上变频器，即可完成短波应用的使用，另外LimeSDR 是一款完全开源的SDR产品包含了 2×2 MIMO 的支持，满足了大部分应用场景。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b76b90f617c7.png" alt=""></p>
@@ -66,10 +66,10 @@
   
   <entry>
     <title>芯片物理攻击平台 ChipWhisperer 初探</title>
-    <link href="http://www.future-sec.com/chip.html"/>
-    <id>http://www.future-sec.com/chip.html</id>
+    <link href="http://www.future-sec.com/ChipWhisperer-introduce.html"/>
+    <id>http://www.future-sec.com/ChipWhisperer-introduce.html</id>
     <published>2018-08-19T16:00:00.000Z</published>
-    <updated>2018-08-20T11:14:29.241Z</updated>
+    <updated>2018-08-20T11:22:22.409Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>传统基于穷举或纯数学理论层面的分析，对于现代高强度加密算法而言，算力有限导致无法实现穷举，算法的复杂性也无法通过数学工具直接破解，根据近代物理学发展出来的理论，电子设备依赖外部电源提供动力，设备在运行过程中会消耗能量，同时会跟外界环境存在声、光、电、磁等物理交互现象产生，设备本身也可能存在设计薄弱点，通过这些物理泄露或人为进行物理层的修改获取数据，然后运用各类数学工具和模型实现破解。</p>
 <p>然而在做物理攻击时，往往需要昂贵的设备，并要具备数学、物理学、微电子学、半导体学、密码学、化学等等多学科的交叉理论知识，因此其技术门槛和攻击成本都很高，目前在刚刚结束的 Blackhat 2018 上，展台上展示了多款 ChipWhisperer 硬件工具,作为亲民型的物理攻击平台，获得了一致的好评。</p>
@@ -141,7 +141,7 @@
     <link href="http://www.future-sec.com/iot-security-hardware-modification.html"/>
     <id>http://www.future-sec.com/iot-security-hardware-modification.html</id>
     <published>2018-06-26T16:00:00.000Z</published>
-    <updated>2018-06-29T10:39:02.844Z</updated>
+    <updated>2018-08-20T11:21:17.984Z</updated>
     
     <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>硬件层面的修改在现实生活中是相当常见的事情，所谓的硬改、魔改、硬破等等说法，指的就是在硬件层面对设备进行diy功能改造。例如针对传统路由器的硬件架构，替换大容量的内存和闪存芯片，使之能够刷openwrt系统；对某些设备进行配置层的升级，如iPhone，小米等手机内存扩容，使之具有更大容量的存储空间和运行内存； 以及对设备的破解，例如ps,xbox等游戏主机系列的硬破、软破，还有对各种加密录音笔，摄像头，加密U盘和硬盘的破解。<br>研究硬件修改对硬件diy改造，以及厂商在硬件层的安全防护具有非常重要意义。硬件层修改分为硬改和软改两个部分，硬改是对硬件中芯片和电路的改造、替换等，软改是针对芯片固件的修改、重打包等。本节将用具体的几个实例展示如何对设备进行硬改。</p>
 <h2 id="硬改路由器刷openwrt"><a href="#硬改路由器刷openwrt" class="headerlink" title="硬改路由器刷openwrt"></a>硬改路由器刷openwrt</h2><h3 id="修改方案"><a href="#修改方案" class="headerlink" title="修改方案"></a>修改方案</h3><p>目前市面上主流的路由器，平时家用功能或许够用，但如果需要一些高级功能，比如屏蔽广告，挂vpn等等又难以实现，而采用openwrt系统可以充分满足定制化和diy的需求，openwrt是一个高度模块化、高度自动化的嵌入式Linux系统，拥有强大的网络组件和扩展性，但如果专门购买openwrt系统的路由器，价格却又不是十分亲民，如果能把传统路由器通过硬件修改，刷入openwrt系统，就是个低成本的解决方案了，本次用来硬改的路由器具体参数如下：品牌：TP-Link， 型号：WR842N，版本：v4.3，采用高通QCA9533的主控，16M的闪存、2M的flash芯片，虽然是老机器，但除了不能外接usb，基本满足需求，当然价格也便宜。</p>
@@ -226,7 +226,7 @@
     
     </summary>
     
-      <category term="硬改" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E6%94%B9/"/>
+      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
     
     
       <category term="硬件分析" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%88%86%E6%9E%90/"/>
@@ -373,6 +373,101 @@
     
     
       <category term="系统安全" scheme="http://www.future-sec.com/tags/%E7%B3%BB%E7%BB%9F%E5%AE%89%E5%85%A8/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>谁是僵尸之王-如何进行高效的分布式爆破</title>
+    <link href="http://www.future-sec.com/king-of-zombie.html"/>
+    <id>http://www.future-sec.com/king-of-zombie.html</id>
+    <published>2018-04-07T16:00:00.000Z</published>
+    <updated>2018-06-29T08:59:05.620Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在研发漏洞扫描器的弱口令破解模块时，发现传统的通过字典遍历用户名密码的算法效率过低，当需要大批量高速爆破时，难以满足此类需求，因此需要引入新的算法，本文以一个分布式扫描器的爆破模块为例，演示如何进行高效快速的分布式爆破。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/6172922.jpg" alt="617292"></p>
+<h2 id="传统方法"><a href="#传统方法" class="headerlink" title="传统方法"></a>传统方法</h2><p>传统的密码穷举</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/15156625175922.jpg" alt=""><br>效率非常低，而且还有可能触发报警  </p>
+<h2 id="king-of-zombie"><a href="#king-of-zombie" class="headerlink" title="king of zombie"></a>king of zombie</h2><p>koz (king of zombie) 算法,即首先按照多种算法对用户名密码字典组合进行评分,然后用评分最高的组合去淘汰僵尸主机。</p>
+<h3 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h3><ol>
+<li>上游push ncrack任务到队列</li>
+<li>koz 节点开始瓜分队列任务,保存为任务列表 (根据cpu,网速来分配多少任务) 。</li>
+<li>使用账号密码字典爆破来遍历任务列表,hit中 即从列表中淘汰(字典按评分优先级排序)。</li>
+</ol>
+<ul>
+<li>说明</li>
+</ul>
+<ol>
+<li><p>字典评分按照爆破成功记录次数和蜜罐记录次数来计算,master 端实时更新,koz node 每日定时更新。</p>
+</li>
+<li><p>淘汰机制具体为先去除一大部分普遍存在的弱口令,例如某一批次中,第一次使用 ubnt/ubnt 来爆破ssh服务,就能淘汰 15% 的任务,第二次使用 root/123456 能淘汰 3% 。</p>
+</li>
+</ol>
+<h3 id="表结构"><a href="#表结构" class="headerlink" title="表结构"></a>表结构</h3><p>pw_koz_level </p>
+<table>
+<thead>
+<tr>
+<th>列</th>
+<th>类型</th>
+<th>注释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>int(11)</td>
+<td>自动增量</td>
+</tr>
+<tr>
+<td>username</td>
+<td>varchar(255)</td>
+<td>用户名</td>
+</tr>
+<tr>
+<td>password</td>
+<td>varchar(255)</td>
+<td>密码</td>
+</tr>
+<tr>
+<td>type</td>
+<td>varchar(255)</td>
+<td>类型</td>
+</tr>
+<tr>
+<td>score</td>
+<td>int(11)</td>
+<td>评分</td>
+</tr>
+</tbody>
+</table>
+<h3 id="更新算法"><a href="#更新算法" class="headerlink" title="更新算法"></a>更新算法</h3><p>目前数据来源有四个<br>第一个  扫描器爆破成功记录  score 值为 10<br>第二个  蜜罐记录   score 值 为 1<br>第三个  渗透进去提取到的有效密码(例如windows 明文)  ,score 10<br>第四个  收集的各种工具扫描字典  score 值为 1</p>
+<p>扫描的时候工具score 值来排序,命中一次之后+10 </p>
+<p>例如如下字典列表</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/15228255230476.jpg" alt=""></p>
+<h4 id="master"><a href="#master" class="headerlink" title="master"></a>master</h4><p>推送任务之后使用无状态扫描工具扫描服务和指纹识别</p>
+<h4 id="koz-node"><a href="#koz-node" class="headerlink" title="koz node"></a>koz node</h4><p>KozTask 类来保存本地任务队列,接收处的代码为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span>  <span class="title">pop_member</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">while</span> self.len() &gt;  <span class="number">0</span>:</div><div class="line">        str_member=self.pop()</div><div class="line">        koz_member=ast.literal_eval(str_member)</div><div class="line">        self.list_member[str(koz_member[<span class="string">'name'</span>])].append(koz_member)</div><div class="line">    util.log(<span class="string">"pop koz_member  done count:%d"</span>  % (self.count()),<span class="number">2</span>,<span class="string">'koztask'</span>)</div></pre></td></tr></table></figure>
+<p>本地队列处理完毕之后,开始foreach 循环用户名密码组合(根据score 大小优先级)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">koz_levels=get_koz_level()</div><div class="line"><span class="keyword">for</span> koz_level  <span class="keyword">in</span>  koz_levels :</div><div class="line">    koz_queue.queue.clear()</div><div class="line">    <span class="comment">#member=&#123;'name': 'ssh', 'task_id': 1124, 'url': '', 'host': '168.167.45.250', 'version': '', 'type': 'service', 'port': 22&#125;</span></div><div class="line">    <span class="comment">#ncrack.scan(member,koz_level)</span></div><div class="line">    <span class="comment">#break</span></div><div class="line">    <span class="keyword">try</span> :</div><div class="line">        <span class="keyword">for</span> member  <span class="keyword">in</span>   koz_task.list_member[koz_level[<span class="string">'type'</span>]] :</div><div class="line">            koz_queue.put(&#123;<span class="string">'member'</span>:member,<span class="string">'level'</span>:koz_level&#125;)</div><div class="line"></div><div class="line">        work_manager = WorkManager(koz_queue, config.koz_thread)  <span class="comment"># thread</span></div><div class="line">        work_manager.wait_allcomplete()</div><div class="line">    <span class="keyword">except</span> Exception, e:</div><div class="line">        util.log(<span class="string">"error info:"</span>+str(e),<span class="number">3</span>,<span class="string">'koz_node'</span>)</div><div class="line">    util.log(<span class="string">'koz_member len:%d'</span> % (koz_task.count()),<span class="number">1</span>,<span class="string">'koz_node'</span>)</div></pre></td></tr></table></figure>
+<p>当扫描出来结果时,直接把它从 koz_member 队列里面remove 掉,如此循环往复,直到跑完所有的密码。<br>remove </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">while</span>  <span class="number">1</span>:</div><div class="line">        <span class="keyword">if</span> self.work_queue.empty() == <span class="keyword">True</span>:</div><div class="line">            <span class="keyword">break</span></div><div class="line">        task = self.work_queue.get(block=<span class="keyword">False</span>)</div><div class="line">        <span class="keyword">if</span> ncrack.scan(task[<span class="string">'member'</span>],task[<span class="string">'level'</span>])  != <span class="keyword">False</span> :</div><div class="line">            koz_type=task[<span class="string">'member'</span>][<span class="string">'name'</span>]</div><div class="line">            koz_task.list_member[koz_type].remove(task[<span class="string">'member'</span>])</div></pre></td></tr></table></figure>
+<h3 id="爆破算法"><a href="#爆破算法" class="headerlink" title="爆破算法"></a>爆破算法</h3><p>负责爆破的为ncrack 模块,调用的爆破工具有  medusa,ncrack。<br>部分实现</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">scan</span><span class="params">(target,level)</span>:</span></div><div class="line">    <span class="keyword">if</span> target[<span class="string">'name'</span>]  == <span class="string">'ms-wbt-server'</span>  <span class="keyword">or</span>  target[<span class="string">'name'</span>]  == <span class="string">'telnet'</span> :</div><div class="line">        str_command = <span class="string">"ncrack --user %s --pass %s  %s:%d "</span>  %  (level[<span class="string">'username'</span>],level[<span class="string">'password'</span>],target[<span class="string">'host'</span>],target[<span class="string">'port'</span>])</div><div class="line">        str_ret=str(sys_exec([<span class="string">'ncrack'</span>, <span class="string">'--user'</span>,level[<span class="string">'username'</span>], <span class="string">'--pass'</span>, level[<span class="string">'password'</span>], target[<span class="string">'host'</span>]+<span class="string">':'</span>+ str(target[<span class="string">'port'</span>])]))</div><div class="line">    <span class="keyword">else</span> :</div><div class="line">        str_command = <span class="string">"medusa -u %s -p %s -h %s -n %d  -M %s"</span> % (level[<span class="string">'username'</span>], level[<span class="string">'password'</span>], target[<span class="string">'host'</span>], target[<span class="string">'port'</span>], target[<span class="string">'name'</span>])</div><div class="line">        str_ret=str(sys_exec([<span class="string">'medusa'</span>,<span class="string">'-u'</span>,level[<span class="string">'username'</span>],<span class="string">'-p'</span>,level[<span class="string">'password'</span>],<span class="string">'-h'</span>,target[<span class="string">'host'</span>],<span class="string">'-n'</span>,str(target[<span class="string">'port'</span>]),<span class="string">'-M'</span>,target[<span class="string">'name'</span>]]))</div><div class="line">    </div><div class="line">    util.log(str_command, <span class="number">2</span>, <span class="string">'ncrack'</span>)</div><div class="line">    <span class="comment">#need  change </span></div><div class="line">    <span class="keyword">if</span> <span class="string">'ACCOUNT FOUND'</span> <span class="keyword">in</span> str_ret  <span class="keyword">or</span>  <span class="string">'credentials'</span>  <span class="keyword">in</span> str_ret:</div><div class="line">        str_data=<span class="string">'[%s] %s %s:%s'</span>   %  (target[<span class="string">'name'</span>],target[<span class="string">'host'</span>],level[<span class="string">'username'</span>],level[<span class="string">'password'</span>])</div><div class="line">        util.log(<span class="string">'ncrack taskid:%d target:%s service:%s succeed'</span> % (target[<span class="string">'task_id'</span>], target[<span class="string">'host'</span>], target[<span class="string">'name'</span>]), <span class="number">1</span>, <span class="string">'ncrack'</span>)</div><div class="line">        <span class="keyword">return</span> report(target,str_data)</div><div class="line">        </div><div class="line">    <span class="keyword">else</span>  :</div><div class="line">        <span class="keyword">return</span> <span class="keyword">False</span></div></pre></td></tr></table></figure>
+<h3 id="爆破结果"><a href="#爆破结果" class="headerlink" title="爆破结果"></a>爆破结果</h3><p> 总览<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/14703046762519.png" alt=""></p>
+<p>图文分析</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/14703047183607.jpg" alt=""></p>
+<p>部分结果一览</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/147030475970560.jpg" alt="147030475970560"></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;在研发漏洞扫描器的弱口令破解模块时，发现传统的通过字典遍历用户名密码的算法效率过低，当需要大批量高速爆破时，难以满足此类需求，因此需要引入新
+    
+    </summary>
+    
+      <category term="web安全" scheme="http://www.future-sec.com/categories/web%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="密码爆破" scheme="http://www.future-sec.com/tags/%E5%AF%86%E7%A0%81%E7%88%86%E7%A0%B4/"/>
     
   </entry>
   
@@ -813,101 +908,6 @@ H2 = 0
   </entry>
   
   <entry>
-    <title>谁是僵尸之王-如何进行高效的分布式爆破</title>
-    <link href="http://www.future-sec.com/king-of-zombie.html"/>
-    <id>http://www.future-sec.com/king-of-zombie.html</id>
-    <published>2018-04-07T16:00:00.000Z</published>
-    <updated>2018-06-29T08:59:05.620Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在研发漏洞扫描器的弱口令破解模块时，发现传统的通过字典遍历用户名密码的算法效率过低，当需要大批量高速爆破时，难以满足此类需求，因此需要引入新的算法，本文以一个分布式扫描器的爆破模块为例，演示如何进行高效快速的分布式爆破。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/6172922.jpg" alt="617292"></p>
-<h2 id="传统方法"><a href="#传统方法" class="headerlink" title="传统方法"></a>传统方法</h2><p>传统的密码穷举</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/15156625175922.jpg" alt=""><br>效率非常低，而且还有可能触发报警  </p>
-<h2 id="king-of-zombie"><a href="#king-of-zombie" class="headerlink" title="king of zombie"></a>king of zombie</h2><p>koz (king of zombie) 算法,即首先按照多种算法对用户名密码字典组合进行评分,然后用评分最高的组合去淘汰僵尸主机。</p>
-<h3 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h3><ol>
-<li>上游push ncrack任务到队列</li>
-<li>koz 节点开始瓜分队列任务,保存为任务列表 (根据cpu,网速来分配多少任务) 。</li>
-<li>使用账号密码字典爆破来遍历任务列表,hit中 即从列表中淘汰(字典按评分优先级排序)。</li>
-</ol>
-<ul>
-<li>说明</li>
-</ul>
-<ol>
-<li><p>字典评分按照爆破成功记录次数和蜜罐记录次数来计算,master 端实时更新,koz node 每日定时更新。</p>
-</li>
-<li><p>淘汰机制具体为先去除一大部分普遍存在的弱口令,例如某一批次中,第一次使用 ubnt/ubnt 来爆破ssh服务,就能淘汰 15% 的任务,第二次使用 root/123456 能淘汰 3% 。</p>
-</li>
-</ol>
-<h3 id="表结构"><a href="#表结构" class="headerlink" title="表结构"></a>表结构</h3><p>pw_koz_level </p>
-<table>
-<thead>
-<tr>
-<th>列</th>
-<th>类型</th>
-<th>注释</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>id</td>
-<td>int(11)</td>
-<td>自动增量</td>
-</tr>
-<tr>
-<td>username</td>
-<td>varchar(255)</td>
-<td>用户名</td>
-</tr>
-<tr>
-<td>password</td>
-<td>varchar(255)</td>
-<td>密码</td>
-</tr>
-<tr>
-<td>type</td>
-<td>varchar(255)</td>
-<td>类型</td>
-</tr>
-<tr>
-<td>score</td>
-<td>int(11)</td>
-<td>评分</td>
-</tr>
-</tbody>
-</table>
-<h3 id="更新算法"><a href="#更新算法" class="headerlink" title="更新算法"></a>更新算法</h3><p>目前数据来源有四个<br>第一个  扫描器爆破成功记录  score 值为 10<br>第二个  蜜罐记录   score 值 为 1<br>第三个  渗透进去提取到的有效密码(例如windows 明文)  ,score 10<br>第四个  收集的各种工具扫描字典  score 值为 1</p>
-<p>扫描的时候工具score 值来排序,命中一次之后+10 </p>
-<p>例如如下字典列表</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/15228255230476.jpg" alt=""></p>
-<h4 id="master"><a href="#master" class="headerlink" title="master"></a>master</h4><p>推送任务之后使用无状态扫描工具扫描服务和指纹识别</p>
-<h4 id="koz-node"><a href="#koz-node" class="headerlink" title="koz node"></a>koz node</h4><p>KozTask 类来保存本地任务队列,接收处的代码为</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span>  <span class="title">pop_member</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">while</span> self.len() &gt;  <span class="number">0</span>:</div><div class="line">        str_member=self.pop()</div><div class="line">        koz_member=ast.literal_eval(str_member)</div><div class="line">        self.list_member[str(koz_member[<span class="string">'name'</span>])].append(koz_member)</div><div class="line">    util.log(<span class="string">"pop koz_member  done count:%d"</span>  % (self.count()),<span class="number">2</span>,<span class="string">'koztask'</span>)</div></pre></td></tr></table></figure>
-<p>本地队列处理完毕之后,开始foreach 循环用户名密码组合(根据score 大小优先级)</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">koz_levels=get_koz_level()</div><div class="line"><span class="keyword">for</span> koz_level  <span class="keyword">in</span>  koz_levels :</div><div class="line">    koz_queue.queue.clear()</div><div class="line">    <span class="comment">#member=&#123;'name': 'ssh', 'task_id': 1124, 'url': '', 'host': '168.167.45.250', 'version': '', 'type': 'service', 'port': 22&#125;</span></div><div class="line">    <span class="comment">#ncrack.scan(member,koz_level)</span></div><div class="line">    <span class="comment">#break</span></div><div class="line">    <span class="keyword">try</span> :</div><div class="line">        <span class="keyword">for</span> member  <span class="keyword">in</span>   koz_task.list_member[koz_level[<span class="string">'type'</span>]] :</div><div class="line">            koz_queue.put(&#123;<span class="string">'member'</span>:member,<span class="string">'level'</span>:koz_level&#125;)</div><div class="line"></div><div class="line">        work_manager = WorkManager(koz_queue, config.koz_thread)  <span class="comment"># thread</span></div><div class="line">        work_manager.wait_allcomplete()</div><div class="line">    <span class="keyword">except</span> Exception, e:</div><div class="line">        util.log(<span class="string">"error info:"</span>+str(e),<span class="number">3</span>,<span class="string">'koz_node'</span>)</div><div class="line">    util.log(<span class="string">'koz_member len:%d'</span> % (koz_task.count()),<span class="number">1</span>,<span class="string">'koz_node'</span>)</div></pre></td></tr></table></figure>
-<p>当扫描出来结果时,直接把它从 koz_member 队列里面remove 掉,如此循环往复,直到跑完所有的密码。<br>remove </p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">while</span>  <span class="number">1</span>:</div><div class="line">        <span class="keyword">if</span> self.work_queue.empty() == <span class="keyword">True</span>:</div><div class="line">            <span class="keyword">break</span></div><div class="line">        task = self.work_queue.get(block=<span class="keyword">False</span>)</div><div class="line">        <span class="keyword">if</span> ncrack.scan(task[<span class="string">'member'</span>],task[<span class="string">'level'</span>])  != <span class="keyword">False</span> :</div><div class="line">            koz_type=task[<span class="string">'member'</span>][<span class="string">'name'</span>]</div><div class="line">            koz_task.list_member[koz_type].remove(task[<span class="string">'member'</span>])</div></pre></td></tr></table></figure>
-<h3 id="爆破算法"><a href="#爆破算法" class="headerlink" title="爆破算法"></a>爆破算法</h3><p>负责爆破的为ncrack 模块,调用的爆破工具有  medusa,ncrack。<br>部分实现</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">scan</span><span class="params">(target,level)</span>:</span></div><div class="line">    <span class="keyword">if</span> target[<span class="string">'name'</span>]  == <span class="string">'ms-wbt-server'</span>  <span class="keyword">or</span>  target[<span class="string">'name'</span>]  == <span class="string">'telnet'</span> :</div><div class="line">        str_command = <span class="string">"ncrack --user %s --pass %s  %s:%d "</span>  %  (level[<span class="string">'username'</span>],level[<span class="string">'password'</span>],target[<span class="string">'host'</span>],target[<span class="string">'port'</span>])</div><div class="line">        str_ret=str(sys_exec([<span class="string">'ncrack'</span>, <span class="string">'--user'</span>,level[<span class="string">'username'</span>], <span class="string">'--pass'</span>, level[<span class="string">'password'</span>], target[<span class="string">'host'</span>]+<span class="string">':'</span>+ str(target[<span class="string">'port'</span>])]))</div><div class="line">    <span class="keyword">else</span> :</div><div class="line">        str_command = <span class="string">"medusa -u %s -p %s -h %s -n %d  -M %s"</span> % (level[<span class="string">'username'</span>], level[<span class="string">'password'</span>], target[<span class="string">'host'</span>], target[<span class="string">'port'</span>], target[<span class="string">'name'</span>])</div><div class="line">        str_ret=str(sys_exec([<span class="string">'medusa'</span>,<span class="string">'-u'</span>,level[<span class="string">'username'</span>],<span class="string">'-p'</span>,level[<span class="string">'password'</span>],<span class="string">'-h'</span>,target[<span class="string">'host'</span>],<span class="string">'-n'</span>,str(target[<span class="string">'port'</span>]),<span class="string">'-M'</span>,target[<span class="string">'name'</span>]]))</div><div class="line">    </div><div class="line">    util.log(str_command, <span class="number">2</span>, <span class="string">'ncrack'</span>)</div><div class="line">    <span class="comment">#need  change </span></div><div class="line">    <span class="keyword">if</span> <span class="string">'ACCOUNT FOUND'</span> <span class="keyword">in</span> str_ret  <span class="keyword">or</span>  <span class="string">'credentials'</span>  <span class="keyword">in</span> str_ret:</div><div class="line">        str_data=<span class="string">'[%s] %s %s:%s'</span>   %  (target[<span class="string">'name'</span>],target[<span class="string">'host'</span>],level[<span class="string">'username'</span>],level[<span class="string">'password'</span>])</div><div class="line">        util.log(<span class="string">'ncrack taskid:%d target:%s service:%s succeed'</span> % (target[<span class="string">'task_id'</span>], target[<span class="string">'host'</span>], target[<span class="string">'name'</span>]), <span class="number">1</span>, <span class="string">'ncrack'</span>)</div><div class="line">        <span class="keyword">return</span> report(target,str_data)</div><div class="line">        </div><div class="line">    <span class="keyword">else</span>  :</div><div class="line">        <span class="keyword">return</span> <span class="keyword">False</span></div></pre></td></tr></table></figure>
-<h3 id="爆破结果"><a href="#爆破结果" class="headerlink" title="爆破结果"></a>爆破结果</h3><p> 总览<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/14703046762519.png" alt=""></p>
-<p>图文分析</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/14703047183607.jpg" alt=""></p>
-<p>部分结果一览</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/147030475970560.jpg" alt="147030475970560"></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;在研发漏洞扫描器的弱口令破解模块时，发现传统的通过字典遍历用户名密码的算法效率过低，当需要大批量高速爆破时，难以满足此类需求，因此需要引入新
-    
-    </summary>
-    
-      <category term="web安全" scheme="http://www.future-sec.com/categories/web%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="密码爆破" scheme="http://www.future-sec.com/tags/%E5%AF%86%E7%A0%81%E7%88%86%E7%A0%B4/"/>
-    
-  </entry>
-  
-  <entry>
     <title>芯片安全系列-Let&#39;s cook!</title>
     <link href="http://www.future-sec.com/chip-security-let-us-cook.html"/>
     <id>http://www.future-sec.com/chip-security-let-us-cook.html</id>
@@ -1139,39 +1139,6 @@ H2 = 0
   </entry>
   
   <entry>
-    <title>Janus漏洞(CVE-2017-13156)分析</title>
-    <link href="http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html"/>
-    <id>http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html</id>
-    <published>2017-12-20T16:00:00.000Z</published>
-    <updated>2018-06-29T08:59:10.780Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签名，是没有办法安装到系统中的。Android通过数字签名来标识应用程序的作者和在应用程序之间建立信任关系，不是用来决定最终用户可以安装哪些应用程序。这个数字签名由应用程序的作者完成，并不需要权威的数字证书签名机构认证，它只是用来让应用程序包自我认证的。然而Google在本月4日发布的Android安全公告中编号为CVE-2017-13156，这个漏洞被称为Janus漏洞，利用该漏洞可修改app而不影响原始签名。</p>
-<h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h3 id="Android-app签名校验简单介绍"><a href="#Android-app签名校验简单介绍" class="headerlink" title="Android app签名校验简单介绍"></a>Android app签名校验简单介绍</h3><p>在Android源码中“frameworks/base/core/java/android/content/pm/PackageParser.java”中。PackageParser类的collectCertificates方法会对APK进行签名校验，并且遍历APK中的所有文件，对每个文件进行校验。下面是该方法的源码：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image002.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image004.jpg" alt="img"><br>APK是一个ZIP格式的文件，因此使用ZIP相关的类进行读写。在上面代码中调用了loadCertificates，这个方法会返回一个二维数组，当APK中的文件签名校验失败，loadCertificates方法会返回一个空数组（可能是null，可能是数组长度为0），那么依照上面代码的逻辑如果数组为空则会抛出异常。<br>loadCertificates方法的代码见下：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image006.jpg" alt="img"><br>其中is是JarFile.JarFileInputStream类的对象。loadCertificates调用了readFullyIgnoringContents，在readFullyIgnoringContents中会调用JarFile.JarFileInputStream.read（JarFile类在“libcore/luni/src/main/java/java/util/jar/JarFile.java”文件中）<br>读取APK中一项数据，在read方法中会校验读取到的数据项的签名，如果签名校验失败，则会抛出SecurityException类型的异常，即签名校验失败。<br>上面代码调用了StrictJarFile.getCertificateChains方法，在/ libcore / luni / src / main / java / java / util / jar / StrictJarFile.java里面。下面是它的代码：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image007.jpg" alt="img"><br>上面的isSigned在下面的代码里面获取的：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image009.jpg" alt="img"><br>当证书读取成功，而且APK经过了签名，isSigned为true。<br>回到StrictJarFile.getCertificateChains中，当isSigned为true时会调用JarVerifier.getCertificateChains方法，下面是它的代码：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image010.jpg" alt="img"><br>verifiedEntries的声明：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image012.jpg" alt="img"><br>verifiedEntries是一个键值对，键是APK中经过了签名的文件名，如：classes.dex文件，值是证书数组。如果向已经签过名的APK中新添加一个文件然后安装这个APK，当程序逻辑执行到JarVerifier.getCertificateChains中时，在verifiedEntries里面无法找到新添加的文件名（因为这个新文件是在APK签名之后添加），那么JarVerifier.getCertificateChains方法将返回null。<br>以上就是整个对于app签名的简单分析。</p>
-<h3 id="签名方案"><a href="#签名方案" class="headerlink" title="签名方案"></a>签名方案</h3><p>参考google官方文档获得:<br>APK 签名方案<br>Android 支持两种应用签名方案，一种是基于 JAR 签名的方案（v1 方案），另一种是 Android Nougat (Android 7.0) 中引入的 APK 签名方案 v2（v2 方案）。<br>JAR 签名（v1 方案）<br>v1 签名并非保护整个apk文件，例如 ZIP 元数据就不受保护。再者，APK 验证程序需要处理大量不可信（尚未经过验证）的数据结构，而不受签名保护的数据不在处理的行列中。这会导致相当大的受攻击面。此外，APK 验证程序必须解压所有已压缩的条目，而这需要花费更多时间和内存。为了解决这些问题，Android 7.0 中引入了 APK 签名方案 v2。<br>APK 签名方案 v2（v2 方案）<br>Android 7.0 中引入了 APK 签名方案 v2（v2 方案）。该方案会对 APK 的内容进行hash处理和签名，然后将生成的“APK 签名分块”插入到 APK 中。<br>在验证期间，v2 方案会将 APK 文件视为 Blob，并对整个文件进行签名检查。对 APK 进行的任何修改（包括对 ZIP 元数据进行的修改）都会使 APK 签名作废。这种形式的 APK 验证不仅速度要快得多，而且能够发现更多种未经授权的修改。<br>同时，新的签名格式向后兼容，使用这种新格式签名的 APK（必须也使用v1） 可在更低版本的 Android 设备上进行安装（会直接忽略添加到 APK 的额外数据）。</p>
-<h3 id="apk签名校验方式"><a href="#apk签名校验方式" class="headerlink" title="apk签名校验方式"></a>apk签名校验方式</h3><p>为了提高兼容性，应同时采用 v1 和 v2 这两种方案对应用进行签名。与只使用v1 方案签名的应用相比，经过 v2 方案签名的应用能够更快速地安装到 Android Nougat 以及更高版本的设备上。但是更低版本的 Android 平台会忽略 v2 签名，这就需要应用包含 v1 签名。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image014.jpg" alt="img"><br>验证程序会对照存储在“APK 签名分块”中的 v2 签名对 APK 的全文件hash进行验证。该hash涵盖除“APK 签名分块”（其中包含 v2 签名）之外的所有内容。在“APK 签名分块”以外对 APK 进行的任何修改都会使 APK 的 v2 签名作废。v2 签名被删除的 APK 也会被拒绝，因为 v1 签名指明相应 APK 带有 v2 签名，所以 Android Nougat 及更高版本会拒绝使用 v1 签名验证 APK。</p>
-<h2 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h2><p>Janus漏洞主要是向APK里面添加额外的DEX文件。一方面，APK文件是zip文件，可以包含初始时的任意字节，在它的zip条目（实际情况下更多是在zip条目里面）。但是JAR签名方案只考虑了zip入口。当计算或者校验apk的签名的时候，它忽略了其他字节。另一方面，在字符串、类、方法定义等常规部分之后，一个DEX文件可以包含任意的字节。综上所述，一个文件可以同时包含一个APK文件和一个DEX文件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image016.jpg" alt="img"><br>另一个关键点是Dalvik / ART虚拟机方面。android运行加载APK文件，提取它的DEX文件，然后运行它的代码。在实践中，虚拟机可以加载和执行APK文件。当它得到APK文件时，它仍然会查看header的magic字节来判断它是什么类型的文件，如果找到一个DEX类型的，就会将文件载入为DEX文件，否则就会将文件加载为一个APK文件，其中包括一个带有DEX的zip文件。因此，既可以读取DEX文件又可以读取APK文件。<br>所以攻击者可以利用着这种二元性，在不影响其签名的情况下将一个恶意DEX文件预先添加到APK文件里面，然后，android运行时接受APK文件作为一个合法的早期版本的应用程序的有效更新，但是Dalvik虚拟机从注入的DEX文件中加载代码，从而实现攻击。</p>
-<h2 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h2><p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image018.jpg" alt="img"><br>原来的apk主要代码<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image019.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image021.jpg" alt="img"><br>修改了dex文件，将Log.i(“janus”,”点击事件”);修改为Toast.makeText(getApplicationContext(),”I steal your car.”,Toast.LENGTH_LONG).show();<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image023.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image024.jpg" alt="img"><br>安装合并好的1.apk<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image026.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image027.jpg" alt="img"><br>测试<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image029.jpg" alt="img"><br>攻击完成</p>
-<h2 id="影响范围"><a href="#影响范围" class="headerlink" title="影响范围"></a>影响范围</h2><p>该漏洞仅影响基于 JAR 签名的方案（v1 方案）。不影响自Android 7.0 以来引入的 APK 签名方案 v2（v2 方案）。</p>
-<h2 id="漏洞危害"><a href="#漏洞危害" class="headerlink" title="漏洞危害"></a>漏洞危害</h2><p>可被添加恶意dex文件可以进行一些敏感性的操作，例如窃取用户数据、监控手机等高危操作。</p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://source.android.com/security/apksigning/v2#verification" rel="external nofollow noopener noreferrer" target="_blank">https://source.android.com/security/apksigning/v2#verification</a><br><a href="https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures" rel="external nofollow noopener noreferrer" target="_blank">https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签
-    
-    </summary>
-    
-      <category term="移动安全" scheme="http://www.future-sec.com/categories/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="移动安全" scheme="http://www.future-sec.com/tags/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
-    
-      <category term="app签名" scheme="http://www.future-sec.com/tags/app%E7%AD%BE%E5%90%8D/"/>
-    
-  </entry>
-  
-  <entry>
     <title>使用MITMF中间人攻击非80端口的HTTP</title>
     <link href="http://www.future-sec.com/using-MITMF-attack-not-80-port-http.html"/>
     <id>http://www.future-sec.com/using-MITMF-attack-not-80-port-http.html</id>
@@ -1209,6 +1176,39 @@ H2 = 0
       <category term="web安全" scheme="http://www.future-sec.com/tags/web%E5%AE%89%E5%85%A8/"/>
     
       <category term="MITMf" scheme="http://www.future-sec.com/tags/MITMf/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Janus漏洞(CVE-2017-13156)分析</title>
+    <link href="http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html"/>
+    <id>http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html</id>
+    <published>2017-12-20T16:00:00.000Z</published>
+    <updated>2018-06-29T08:59:10.780Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签名，是没有办法安装到系统中的。Android通过数字签名来标识应用程序的作者和在应用程序之间建立信任关系，不是用来决定最终用户可以安装哪些应用程序。这个数字签名由应用程序的作者完成，并不需要权威的数字证书签名机构认证，它只是用来让应用程序包自我认证的。然而Google在本月4日发布的Android安全公告中编号为CVE-2017-13156，这个漏洞被称为Janus漏洞，利用该漏洞可修改app而不影响原始签名。</p>
+<h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h3 id="Android-app签名校验简单介绍"><a href="#Android-app签名校验简单介绍" class="headerlink" title="Android app签名校验简单介绍"></a>Android app签名校验简单介绍</h3><p>在Android源码中“frameworks/base/core/java/android/content/pm/PackageParser.java”中。PackageParser类的collectCertificates方法会对APK进行签名校验，并且遍历APK中的所有文件，对每个文件进行校验。下面是该方法的源码：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image002.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image004.jpg" alt="img"><br>APK是一个ZIP格式的文件，因此使用ZIP相关的类进行读写。在上面代码中调用了loadCertificates，这个方法会返回一个二维数组，当APK中的文件签名校验失败，loadCertificates方法会返回一个空数组（可能是null，可能是数组长度为0），那么依照上面代码的逻辑如果数组为空则会抛出异常。<br>loadCertificates方法的代码见下：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image006.jpg" alt="img"><br>其中is是JarFile.JarFileInputStream类的对象。loadCertificates调用了readFullyIgnoringContents，在readFullyIgnoringContents中会调用JarFile.JarFileInputStream.read（JarFile类在“libcore/luni/src/main/java/java/util/jar/JarFile.java”文件中）<br>读取APK中一项数据，在read方法中会校验读取到的数据项的签名，如果签名校验失败，则会抛出SecurityException类型的异常，即签名校验失败。<br>上面代码调用了StrictJarFile.getCertificateChains方法，在/ libcore / luni / src / main / java / java / util / jar / StrictJarFile.java里面。下面是它的代码：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image007.jpg" alt="img"><br>上面的isSigned在下面的代码里面获取的：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image009.jpg" alt="img"><br>当证书读取成功，而且APK经过了签名，isSigned为true。<br>回到StrictJarFile.getCertificateChains中，当isSigned为true时会调用JarVerifier.getCertificateChains方法，下面是它的代码：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image010.jpg" alt="img"><br>verifiedEntries的声明：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image012.jpg" alt="img"><br>verifiedEntries是一个键值对，键是APK中经过了签名的文件名，如：classes.dex文件，值是证书数组。如果向已经签过名的APK中新添加一个文件然后安装这个APK，当程序逻辑执行到JarVerifier.getCertificateChains中时，在verifiedEntries里面无法找到新添加的文件名（因为这个新文件是在APK签名之后添加），那么JarVerifier.getCertificateChains方法将返回null。<br>以上就是整个对于app签名的简单分析。</p>
+<h3 id="签名方案"><a href="#签名方案" class="headerlink" title="签名方案"></a>签名方案</h3><p>参考google官方文档获得:<br>APK 签名方案<br>Android 支持两种应用签名方案，一种是基于 JAR 签名的方案（v1 方案），另一种是 Android Nougat (Android 7.0) 中引入的 APK 签名方案 v2（v2 方案）。<br>JAR 签名（v1 方案）<br>v1 签名并非保护整个apk文件，例如 ZIP 元数据就不受保护。再者，APK 验证程序需要处理大量不可信（尚未经过验证）的数据结构，而不受签名保护的数据不在处理的行列中。这会导致相当大的受攻击面。此外，APK 验证程序必须解压所有已压缩的条目，而这需要花费更多时间和内存。为了解决这些问题，Android 7.0 中引入了 APK 签名方案 v2。<br>APK 签名方案 v2（v2 方案）<br>Android 7.0 中引入了 APK 签名方案 v2（v2 方案）。该方案会对 APK 的内容进行hash处理和签名，然后将生成的“APK 签名分块”插入到 APK 中。<br>在验证期间，v2 方案会将 APK 文件视为 Blob，并对整个文件进行签名检查。对 APK 进行的任何修改（包括对 ZIP 元数据进行的修改）都会使 APK 签名作废。这种形式的 APK 验证不仅速度要快得多，而且能够发现更多种未经授权的修改。<br>同时，新的签名格式向后兼容，使用这种新格式签名的 APK（必须也使用v1） 可在更低版本的 Android 设备上进行安装（会直接忽略添加到 APK 的额外数据）。</p>
+<h3 id="apk签名校验方式"><a href="#apk签名校验方式" class="headerlink" title="apk签名校验方式"></a>apk签名校验方式</h3><p>为了提高兼容性，应同时采用 v1 和 v2 这两种方案对应用进行签名。与只使用v1 方案签名的应用相比，经过 v2 方案签名的应用能够更快速地安装到 Android Nougat 以及更高版本的设备上。但是更低版本的 Android 平台会忽略 v2 签名，这就需要应用包含 v1 签名。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image014.jpg" alt="img"><br>验证程序会对照存储在“APK 签名分块”中的 v2 签名对 APK 的全文件hash进行验证。该hash涵盖除“APK 签名分块”（其中包含 v2 签名）之外的所有内容。在“APK 签名分块”以外对 APK 进行的任何修改都会使 APK 的 v2 签名作废。v2 签名被删除的 APK 也会被拒绝，因为 v1 签名指明相应 APK 带有 v2 签名，所以 Android Nougat 及更高版本会拒绝使用 v1 签名验证 APK。</p>
+<h2 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h2><p>Janus漏洞主要是向APK里面添加额外的DEX文件。一方面，APK文件是zip文件，可以包含初始时的任意字节，在它的zip条目（实际情况下更多是在zip条目里面）。但是JAR签名方案只考虑了zip入口。当计算或者校验apk的签名的时候，它忽略了其他字节。另一方面，在字符串、类、方法定义等常规部分之后，一个DEX文件可以包含任意的字节。综上所述，一个文件可以同时包含一个APK文件和一个DEX文件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image016.jpg" alt="img"><br>另一个关键点是Dalvik / ART虚拟机方面。android运行加载APK文件，提取它的DEX文件，然后运行它的代码。在实践中，虚拟机可以加载和执行APK文件。当它得到APK文件时，它仍然会查看header的magic字节来判断它是什么类型的文件，如果找到一个DEX类型的，就会将文件载入为DEX文件，否则就会将文件加载为一个APK文件，其中包括一个带有DEX的zip文件。因此，既可以读取DEX文件又可以读取APK文件。<br>所以攻击者可以利用着这种二元性，在不影响其签名的情况下将一个恶意DEX文件预先添加到APK文件里面，然后，android运行时接受APK文件作为一个合法的早期版本的应用程序的有效更新，但是Dalvik虚拟机从注入的DEX文件中加载代码，从而实现攻击。</p>
+<h2 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h2><p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image018.jpg" alt="img"><br>原来的apk主要代码<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image019.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image021.jpg" alt="img"><br>修改了dex文件，将Log.i(“janus”,”点击事件”);修改为Toast.makeText(getApplicationContext(),”I steal your car.”,Toast.LENGTH_LONG).show();<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image023.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image024.jpg" alt="img"><br>安装合并好的1.apk<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image026.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image027.jpg" alt="img"><br>测试<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image029.jpg" alt="img"><br>攻击完成</p>
+<h2 id="影响范围"><a href="#影响范围" class="headerlink" title="影响范围"></a>影响范围</h2><p>该漏洞仅影响基于 JAR 签名的方案（v1 方案）。不影响自Android 7.0 以来引入的 APK 签名方案 v2（v2 方案）。</p>
+<h2 id="漏洞危害"><a href="#漏洞危害" class="headerlink" title="漏洞危害"></a>漏洞危害</h2><p>可被添加恶意dex文件可以进行一些敏感性的操作，例如窃取用户数据、监控手机等高危操作。</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://source.android.com/security/apksigning/v2#verification" rel="external nofollow noopener noreferrer" target="_blank">https://source.android.com/security/apksigning/v2#verification</a><br><a href="https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures" rel="external nofollow noopener noreferrer" target="_blank">https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签
+    
+    </summary>
+    
+      <category term="移动安全" scheme="http://www.future-sec.com/categories/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="移动安全" scheme="http://www.future-sec.com/tags/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+    
+      <category term="app签名" scheme="http://www.future-sec.com/tags/app%E7%AD%BE%E5%90%8D/"/>
     
   </entry>
   
@@ -1262,7 +1262,7 @@ H2 = 0
     <link href="http://www.future-sec.com/iot-security-hardware-debuging.html"/>
     <id>http://www.future-sec.com/iot-security-hardware-debuging.html</id>
     <published>2017-12-04T16:00:00.000Z</published>
-    <updated>2018-06-29T10:45:13.094Z</updated>
+    <updated>2018-08-20T11:22:10.646Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上节介绍了关于通过编程器直接读取芯片获取固件用来静态分析的一点思路，本篇将介绍通过UART串口来直接与机器交互，通过串口输出输入信息，做动态调试。<br>通用异步收发传输器（Universal Asynchronous Receiver/Transmitter)，通常称作UART，是一种异步收发传输器，是电脑硬件的一部分。它将要传输的资料在串行通信与并行通信之间加以转换。作为把并行输入信号转成串行输出信号的芯片，UART通常被集成于其他通讯接口的连结上。<br>对于物联网硬件的串口调试，多数情况下指的就是通过UART串口进行数据通讯， 但是我们经常搞不清楚它和COM口的区别,  以及RS232, TTL等关系,             实际上UART、COM指的物理接口形式(硬件), 而TTL、RS-232是指的电平标准(电信号).<br>UART有4个pin（VCC, GND, RX, TX）, 用的TTL电平， 低电平为0(0V)、高电平为1（3.3V或以上），Uart串口的RXD、TXD等一般直接与处理器芯片的引脚相连，而RS232串口的RXD、TXD等一般需要经过电平转换(通常由Max232等芯片进行电平转换)才能接到处理器芯片的引脚上，否则这么高的电压很可能会把芯片烧坏。<br> 在调试的时候, 多数情况下我们只引出rx、tx、gnd即可，但是UART的数据要传到电脑上分析就要匹配电脑的接口，通常我们电脑使用接口有COM口和USB口（最终在电脑上是一个虚拟的COM口），但是要想连上这两种接口都要需要进行硬件接口转换和电平转换。</p>
 <p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image32.jpg" alt=""></p>
@@ -1391,6 +1391,66 @@ H2 = 0
   </entry>
   
   <entry>
+    <title>如何破解一个蓝牙锁</title>
+    <link href="http://www.future-sec.com/how-to-crack-a-ble-lock.html"/>
+    <id>http://www.future-sec.com/how-to-crack-a-ble-lock.html</id>
+    <published>2017-11-26T16:00:00.000Z</published>
+    <updated>2018-06-29T09:01:11.356Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>随着物联网各类技术的逐步进步，越来越多的智能设备出现在我们生活中，智能锁在锁具市场上所占的份额将会越来越大，甚至超过传统锁，成为主流。而在智能锁中，因为低功耗蓝牙技术的推广，以及受外部环境限制小，通过手机APP交互方便等特点，很多智能锁采用的就是以BLE蓝牙芯片作为控制单元，控制电机或锁簧转动的模式，实现开关锁功能。与其他的安全问题相比，锁具的被破解，可能造成的危害更大，本文通过以破解某型号蓝牙锁，来展示目前蓝牙智能锁可能面临的安全风险。</p>
+<h2 id="蓝牙锁介绍"><a href="#蓝牙锁介绍" class="headerlink" title="蓝牙锁介绍"></a>蓝牙锁介绍</h2><p> 蓝牙锁由于不受外部环境限制，功耗较低，和手机交互方便，目前用的比较多,形状也五花八门，例如目前使用最广泛的一些智能蓝牙锁。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage9.jpg" alt="img"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage10.jpg" alt="img"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage11.jpg" alt="img"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage12.jpg" alt="img"></p>
+<h2 id="如何去破解一个蓝牙锁"><a href="#如何去破解一个蓝牙锁" class="headerlink" title="如何去破解一个蓝牙锁"></a>如何去破解一个蓝牙锁</h2><p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage13.jpg" alt="img"></p>
+<h3 id="目标介绍"><a href="#目标介绍" class="headerlink" title="目标介绍"></a>目标介绍</h3><p>这个属于低功耗蓝牙锁，使用app 绑定之后可以开启，还能共享密码，修改密码。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage14.jpg" alt="img"></p>
+<h3 id="内部构架"><a href="#内部构架" class="headerlink" title="内部构架"></a>内部构架</h3><p>显微镜查看电路板<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/IMG_2214.jpg" alt="img"></p>
+<p>拆解<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/IMG_2216.jpg" alt="img"></p>
+<p>蓝牙锁内部搭载了一块CC2541蓝牙芯片，通过控制电机驱动芯片，带动卡榫运转，从而形成拉锁的开关。CC2541是TI推出的一款专门适用于BLE和专用的2.4GHz应用的SOC芯片解决方案,CC254X在目前物联网蓝牙通信解决方案中，市场占有率很高，应用场景非常广泛。</p>
+<h3 id="探测"><a href="#探测" class="headerlink" title="探测"></a>探测</h3><p>使用app初步连接探测，可以看到</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage16.jpg" alt="img"></p>
+<h3 id="开锁流程"><a href="#开锁流程" class="headerlink" title="开锁流程"></a>开锁流程</h3><p>Logcat 查看app日志</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage17.jpg" alt="img"></p>
+<p>流程为</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/QQ截图20171123170725.jpg" alt="img"></p>
+<h3 id="攻击方式"><a href="#攻击方式" class="headerlink" title="攻击方式"></a>攻击方式</h3><p>一般对于蓝牙锁的攻击方式有三种</p>
+<p>1、重放攻击<br>2、暴力破解(6位数字)<br>3、云端漏洞</p>
+<h3 id="重放攻击"><a href="#重放攻击" class="headerlink" title="重放攻击"></a>重放攻击</h3><p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage18.jpg" alt="img"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage19.jpg" alt="img"></p>
+<p>通过蓝牙抓包分析，发现通信过程没有加密，可以重放获取认证密码，但如果要模拟真实的智能锁攻击场景，显然不能通过如此显眼的方式，真实环境中往往很难有一个给我们抓包或劫持的场景，所以最好的方式是远程无接触开锁，需要去找云端的漏洞。</p>
+<h3 id="云端漏洞"><a href="#云端漏洞" class="headerlink" title="云端漏洞"></a>云端漏洞</h3><p>云端是Thinkphp5 写的，稍微看了一下,存在有两个漏洞。无认证可以遍历所有id拿到所有锁的信息</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage20.jpg" alt="img"></p>
+<p>没有关闭调试模式会泄露信息,传入一个空的id会吧所有锁的信息报错显示出来，泄露所有锁的密码以及绑定的电话号码mac地址等信息。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage21.jpg" alt="img"></p>
+<h3 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h3><p>对于真实的破解锁场景，最好用一个手机app来开锁掩人耳目，综合以上分析，编写一个开锁Android app 。<br>工作流程为</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/QQ截图20171123170725.jpg" alt="img"></p>
+<p>利用 com.inuker.bluetooth 库快速开发</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage22.jpg" alt="img"></p>
+<p>APP界面</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/15117578788731.jpg" alt="img"></p>
+<p>视频演示</p>
+<p> <a href="https://v.qq.com/x/page/b051058vicv.html" rel="external nofollow noopener noreferrer" target="_blank">https://v.qq.com/x/page/b051058vicv.html</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>ti官方页面  <a href="http://www.ti.com.cn/product/cn/CC2541" rel="external nofollow noopener noreferrer" target="_blank">http://www.ti.com.cn/product/cn/CC2541</a><br>cc2541蓝牙芯片手册  <a href="https://wenku.baidu.com/view/c7f99ac7376baf1ffd4fad31.html" rel="external nofollow noopener noreferrer" target="_blank">https://wenku.baidu.com/view/c7f99ac7376baf1ffd4fad31.html</a> </p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;随着物联网各类技术的逐步进步，越来越多的智能设备出现在我们生活中，智能锁在锁具市场上所占的份额将会越来越大，甚至超过传统锁，成为主流。而在智
+    
+    </summary>
+    
+      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="智能锁" scheme="http://www.future-sec.com/tags/%E6%99%BA%E8%83%BD%E9%94%81/"/>
+    
+      <category term="蓝牙攻击" scheme="http://www.future-sec.com/tags/%E8%93%9D%E7%89%99%E6%94%BB%E5%87%BB/"/>
+    
+  </entry>
+  
+  <entry>
     <title>物联网硬件安全分析基础-固件提取</title>
     <link href="http://www.future-sec.com/iot-security-hardware-obtain.html"/>
     <id>http://www.future-sec.com/iot-security-hardware-obtain.html</id>
@@ -1474,66 +1534,6 @@ H2 = 0
       <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
     
       <category term="硬件分析" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%88%86%E6%9E%90/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>如何破解一个蓝牙锁</title>
-    <link href="http://www.future-sec.com/how-to-crack-a-ble-lock.html"/>
-    <id>http://www.future-sec.com/how-to-crack-a-ble-lock.html</id>
-    <published>2017-11-26T16:00:00.000Z</published>
-    <updated>2018-06-29T09:01:11.356Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>随着物联网各类技术的逐步进步，越来越多的智能设备出现在我们生活中，智能锁在锁具市场上所占的份额将会越来越大，甚至超过传统锁，成为主流。而在智能锁中，因为低功耗蓝牙技术的推广，以及受外部环境限制小，通过手机APP交互方便等特点，很多智能锁采用的就是以BLE蓝牙芯片作为控制单元，控制电机或锁簧转动的模式，实现开关锁功能。与其他的安全问题相比，锁具的被破解，可能造成的危害更大，本文通过以破解某型号蓝牙锁，来展示目前蓝牙智能锁可能面临的安全风险。</p>
-<h2 id="蓝牙锁介绍"><a href="#蓝牙锁介绍" class="headerlink" title="蓝牙锁介绍"></a>蓝牙锁介绍</h2><p> 蓝牙锁由于不受外部环境限制，功耗较低，和手机交互方便，目前用的比较多,形状也五花八门，例如目前使用最广泛的一些智能蓝牙锁。</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage9.jpg" alt="img"></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage10.jpg" alt="img"></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage11.jpg" alt="img"></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage12.jpg" alt="img"></p>
-<h2 id="如何去破解一个蓝牙锁"><a href="#如何去破解一个蓝牙锁" class="headerlink" title="如何去破解一个蓝牙锁"></a>如何去破解一个蓝牙锁</h2><p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage13.jpg" alt="img"></p>
-<h3 id="目标介绍"><a href="#目标介绍" class="headerlink" title="目标介绍"></a>目标介绍</h3><p>这个属于低功耗蓝牙锁，使用app 绑定之后可以开启，还能共享密码，修改密码。</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage14.jpg" alt="img"></p>
-<h3 id="内部构架"><a href="#内部构架" class="headerlink" title="内部构架"></a>内部构架</h3><p>显微镜查看电路板<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/IMG_2214.jpg" alt="img"></p>
-<p>拆解<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/IMG_2216.jpg" alt="img"></p>
-<p>蓝牙锁内部搭载了一块CC2541蓝牙芯片，通过控制电机驱动芯片，带动卡榫运转，从而形成拉锁的开关。CC2541是TI推出的一款专门适用于BLE和专用的2.4GHz应用的SOC芯片解决方案,CC254X在目前物联网蓝牙通信解决方案中，市场占有率很高，应用场景非常广泛。</p>
-<h3 id="探测"><a href="#探测" class="headerlink" title="探测"></a>探测</h3><p>使用app初步连接探测，可以看到</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage16.jpg" alt="img"></p>
-<h3 id="开锁流程"><a href="#开锁流程" class="headerlink" title="开锁流程"></a>开锁流程</h3><p>Logcat 查看app日志</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage17.jpg" alt="img"></p>
-<p>流程为</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/QQ截图20171123170725.jpg" alt="img"></p>
-<h3 id="攻击方式"><a href="#攻击方式" class="headerlink" title="攻击方式"></a>攻击方式</h3><p>一般对于蓝牙锁的攻击方式有三种</p>
-<p>1、重放攻击<br>2、暴力破解(6位数字)<br>3、云端漏洞</p>
-<h3 id="重放攻击"><a href="#重放攻击" class="headerlink" title="重放攻击"></a>重放攻击</h3><p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage18.jpg" alt="img"></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage19.jpg" alt="img"></p>
-<p>通过蓝牙抓包分析，发现通信过程没有加密，可以重放获取认证密码，但如果要模拟真实的智能锁攻击场景，显然不能通过如此显眼的方式，真实环境中往往很难有一个给我们抓包或劫持的场景，所以最好的方式是远程无接触开锁，需要去找云端的漏洞。</p>
-<h3 id="云端漏洞"><a href="#云端漏洞" class="headerlink" title="云端漏洞"></a>云端漏洞</h3><p>云端是Thinkphp5 写的，稍微看了一下,存在有两个漏洞。无认证可以遍历所有id拿到所有锁的信息</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage20.jpg" alt="img"></p>
-<p>没有关闭调试模式会泄露信息,传入一个空的id会吧所有锁的信息报错显示出来，泄露所有锁的密码以及绑定的电话号码mac地址等信息。</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage21.jpg" alt="img"></p>
-<h3 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h3><p>对于真实的破解锁场景，最好用一个手机app来开锁掩人耳目，综合以上分析，编写一个开锁Android app 。<br>工作流程为</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/QQ截图20171123170725.jpg" alt="img"></p>
-<p>利用 com.inuker.bluetooth 库快速开发</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/bimage22.jpg" alt="img"></p>
-<p>APP界面</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/15117578788731.jpg" alt="img"></p>
-<p>视频演示</p>
-<p> <a href="https://v.qq.com/x/page/b051058vicv.html" rel="external nofollow noopener noreferrer" target="_blank">https://v.qq.com/x/page/b051058vicv.html</a></p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>ti官方页面  <a href="http://www.ti.com.cn/product/cn/CC2541" rel="external nofollow noopener noreferrer" target="_blank">http://www.ti.com.cn/product/cn/CC2541</a><br>cc2541蓝牙芯片手册  <a href="https://wenku.baidu.com/view/c7f99ac7376baf1ffd4fad31.html" rel="external nofollow noopener noreferrer" target="_blank">https://wenku.baidu.com/view/c7f99ac7376baf1ffd4fad31.html</a> </p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;随着物联网各类技术的逐步进步，越来越多的智能设备出现在我们生活中，智能锁在锁具市场上所占的份额将会越来越大，甚至超过传统锁，成为主流。而在智
-    
-    </summary>
-    
-      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="智能锁" scheme="http://www.future-sec.com/tags/%E6%99%BA%E8%83%BD%E9%94%81/"/>
-    
-      <category term="蓝牙攻击" scheme="http://www.future-sec.com/tags/%E8%93%9D%E7%89%99%E6%94%BB%E5%87%BB/"/>
     
   </entry>
   

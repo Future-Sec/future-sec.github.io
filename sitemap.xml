@@ -2,16 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://www.future-sec.com/chip.html</loc>
+    <loc>http://www.future-sec.com/ChipWhisperer-introduce.html</loc>
     
-    <lastmod>2018-08-20T11:14:29.241Z</lastmod>
+    <lastmod>2018-08-20T11:22:22.409Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/lime.html</loc>
+    <loc>http://www.future-sec.com/iot-security-hardware-debuging.html</loc>
     
-    <lastmod>2018-08-20T11:14:20.224Z</lastmod>
+    <lastmod>2018-08-20T11:22:10.646Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/iot-security-hardware-modification.html</loc>
+    
+    <lastmod>2018-08-20T11:21:17.984Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/Limesdr-introduce.html</loc>
+    
+    <lastmod>2018-08-20T11:19:38.565Z</lastmod>
     
   </url>
   
@@ -26,20 +40,6 @@
     <loc>http://www.future-sec.com/iot-security-hardware-analysis.html</loc>
     
     <lastmod>2018-06-29T10:45:35.148Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://www.future-sec.com/iot-security-hardware-debuging.html</loc>
-    
-    <lastmod>2018-06-29T10:45:13.094Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://www.future-sec.com/iot-security-hardware-modification.html</loc>
-    
-    <lastmod>2018-06-29T10:39:02.844Z</lastmod>
     
   </url>
   
@@ -233,7 +233,7 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/index.html</loc>
+    <loc>http://www.future-sec.com/projects/index.html</loc>
     
     <lastmod>2016-04-26T13:44:54.000Z</lastmod>
     
@@ -247,7 +247,7 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/projects/index.html</loc>
+    <loc>http://www.future-sec.com/index.html</loc>
     
     <lastmod>2016-04-26T13:44:54.000Z</lastmod>
     
