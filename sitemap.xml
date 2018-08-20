@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://www.future-sec.com/chip.html</loc>
+    
+    <lastmod>2018-08-20T11:14:29.241Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/lime.html</loc>
+    
+    <lastmod>2018-08-20T11:14:20.224Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://www.future-sec.com/iot-security-hardware-obtain.html</loc>
     
     <lastmod>2018-06-29T10:47:15.653Z</lastmod>
@@ -198,13 +212,6 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/tags/index.html</loc>
-    
-    <lastmod>2017-06-26T11:36:02.658Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://www.future-sec.com/categories/index.html</loc>
     
     <lastmod>2017-06-26T11:36:02.658Z</lastmod>
@@ -212,9 +219,9 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/contact/index.html</loc>
+    <loc>http://www.future-sec.com/tags/index.html</loc>
     
-    <lastmod>2016-04-26T13:44:54.000Z</lastmod>
+    <lastmod>2017-06-26T11:36:02.658Z</lastmod>
     
   </url>
   
@@ -226,14 +233,21 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/projects/index.html</loc>
+    <loc>http://www.future-sec.com/index.html</loc>
     
     <lastmod>2016-04-26T13:44:54.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/index.html</loc>
+    <loc>http://www.future-sec.com/contact/index.html</loc>
+    
+    <lastmod>2016-04-26T13:44:54.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.future-sec.com/projects/index.html</loc>
     
     <lastmod>2016-04-26T13:44:54.000Z</lastmod>
     

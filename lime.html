@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <title>LimeSDR 上手指南 | 伏宸安全实验室-Future-Sec Information Security Lab</title>
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <meta name="description" content="前言LimeSDR 是一款完全开源的SDR产品，和 HackRF 一样，包括 PCB 设计图，FPGA 代码，HOST代码完全公开，方便研究和学习 SDR 系统原理。虽然市面上有很多 SDR 产品，但很少有像 LimeSDR 性价比这么高的。 LimeSDR 支持 100kHz 到 3.8GHz 频率范围，已经可以不需外置上变频器，即可完成短波应用的使用，另外LimeSDR 是一款完全开源的SDR">
+<meta name="keywords" content="LimeSDR,无线电">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LimeSDR 上手指南">
+<meta property="og:url" content="http://www.future-sec.com/lime.html">
+<meta property="og:site_name" content="伏宸安全实验室-Future-Sec Information Security Lab">
+<meta property="og:description" content="前言LimeSDR 是一款完全开源的SDR产品，和 HackRF 一样，包括 PCB 设计图，FPGA 代码，HOST代码完全公开，方便研究和学习 SDR 系统原理。虽然市面上有很多 SDR 产品，但很少有像 LimeSDR 性价比这么高的。 LimeSDR 支持 100kHz 到 3.8GHz 频率范围，已经可以不需外置上变频器，即可完成短波应用的使用，另外LimeSDR 是一款完全开源的SDR">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b76b90f617c7.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b75c152a8b34.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b75c56bdcda8.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b75c571305ca.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b75cab7f3135.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b75cabd28388.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b75cac1b4a75.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b75cc570512a.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b76b80f982d0.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b76b8266f403.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b76b8302335b.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b76b8370cdd9.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b5b1a8de685f.png">
+<meta property="og:updated_time" content="2018-08-20T11:14:20.224Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="LimeSDR 上手指南">
+<meta name="twitter:description" content="前言LimeSDR 是一款完全开源的SDR产品，和 HackRF 一样，包括 PCB 设计图，FPGA 代码，HOST代码完全公开，方便研究和学习 SDR 系统原理。虽然市面上有很多 SDR 产品，但很少有像 LimeSDR 性价比这么高的。 LimeSDR 支持 100kHz 到 3.8GHz 频率范围，已经可以不需外置上变频器，即可完成短波应用的使用，另外LimeSDR 是一款完全开源的SDR">
+<meta name="twitter:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b76b90f617c7.png">
+  
+    <link rel="alternative" href="/atom.xml" title="伏宸安全实验室-Future-Sec Information Security Lab" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  
+
+  <!-- Global styles START -->   
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END --> 
+   
+  <!-- Page level plugin styles START -->
+  <link rel="stylesheet" href="/metronic/assets/pages/css/animate.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/owl.carousel/assets/owl.carousel.css">
+  <!-- Page level plugin styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/pages/css/components.css">
+  <link rel="stylesheet" href="/metronic/assets/pages/css/slider.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/pages/css/portfolio.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/red.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END -->
+</head>
+</html>
+<body class="corporate">
+  <!-- BEGIN HEADER -->
+<div class="header">
+  <div class="container">
+    <!--<a class="site-logo" href="/" id="logo">伏宸安全实验室-Future-Sec Information Security Lab</a>-->
+
+    <a class="site-logo" href="/">
+      <img src="/metronic/assets/corporate/img/logos/logo-corp-red.png" alt="Metronic FrontEnd">
+    </a>
+
+    <a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+
+    <!-- BEGIN NAVIGATION -->
+    <div class="header-navigation pull-right font-transform-inherit">
+      <ul>
+	
+	<li class="">
+	  <a href="/index.html">Home</a>
+	</li>
+	
+	<li class="">
+	  <a href="/archives/">Blog</a>
+	</li>
+	
+	<li class="">
+	  <a href="/vulnerabilities.html">Vulnerabilities</a>
+	</li>
+	
+	<li class="">
+	  <a href="/about/">About</a>
+	</li>
+	
+	<!-- BEGIN TOP SEARCH -->
+	<li class="menu-search">
+	  <span class="sep"></span>
+	  <i class="fa fa-search search-btn"></i>
+	  <div class="search-box">
+	   
+	    <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank" class="search-form">
+    <div class="input-group">
+		<input placeholder="Search" class="form-control st-default-search-input" name="word" maxlength="20" type="search">
+		  <input name="si" value="future-sec.com" type="hidden">
+  <input name="tn" value="bds" type="hidden">
+  <input name="cl" value="3" type="hidden">
+  <input name="ct" value="2097152" type="hidden">
+  <input name="s" value="on" type="hidden">
+		<span class="input-group-btn">
+		  <button class="btn btn-primary" type="submit">Search</button>
+		</span>
+	      </div>
+</form>
+	  </div> 
+	</li>
+	<!-- END TOP SEARCH -->
+      </ul>
+    </div>
+    <!-- END NAVIGATION -->
+  </div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/archives/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/lime.html">LimeSDR 上手指南</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-lime" class="article article-type-post blog-item" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> BG7YWL</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2018-08-19T16:00:00.000Z" itemprop="datePublished">2018/08/20</time>
+
+	</li>
+	<li class="hidden-xs"><i class="fa fa-comments"></i>
+	  <a href="http://www.future-sec.com/lime.html#disqus_thread" class="article-comment-link">Comments</a>
+	</li>
+	<li class="hidden-xs"><i class="fa fa-tags"></i> 
+	  
+  
+    <a href="/tags/LimeSDR/" title="LimeSDR">LimeSDR</a>,
+  
+    <a href="/tags/无线电/" title="无线电">无线电</a>
+  
+
+
+	</li>
+      </ul>
+      
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/无线电安全/">无线电安全</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      <!-- Table of Contents -->
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编译环境"><span class="toc-number">2.</span> <span class="toc-text">编译环境</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#软件结构"><span class="toc-number">2.1.</span> <span class="toc-text">软件结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装UHD"><span class="toc-number">2.2.</span> <span class="toc-text">安装UHD</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装SoapySDR"><span class="toc-number">2.3.</span> <span class="toc-text">安装SoapySDR</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装SoapyUHD"><span class="toc-number">2.4.</span> <span class="toc-text">安装SoapyUHD</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装LimeSuite"><span class="toc-number">2.5.</span> <span class="toc-text">安装LimeSuite</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装GNU-Radio、gr-osmosdr"><span class="toc-number">2.6.</span> <span class="toc-text">安装GNU Radio、gr-osmosdr</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#测试LimeSDR接收、发射通道"><span class="toc-number">3.</span> <span class="toc-text">测试LimeSDR接收、发射通道</span></a></li></ol>
+  </div>
+
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>LimeSDR 是一款完全开源的SDR产品，和 HackRF 一样，包括 PCB 设计图，FPGA 代码，HOST代码完全公开，方便研究和学习 SDR 系统原理。虽然市面上有很多 SDR 产品，但很少有像 LimeSDR 性价比这么高的。</p>
+<p>LimeSDR 支持 100kHz 到 3.8GHz 频率范围，已经可以不需外置上变频器，即可完成短波应用的使用，另外LimeSDR 是一款完全开源的SDR产品包含了 2×2 MIMO 的支持，满足了大部分应用场景。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b76b90f617c7.png" alt=""></p>
+<p>通过它的一些应用来了解一下其灵活性：<br>蜂窝网络、WiFi、蓝牙、IoT协议（LoRa/SigFox等）、导航、气象信息、航空信息、海事信息、空间通信、还有广播和电视。</p>
+<p>这只是 LimeSDR 应用场景的一小部分，你可以应用到你能想到的任何领域。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b75c152a8b34.jpg" alt=""></p>
+<h2 id="编译环境"><a href="#编译环境" class="headerlink" title="编译环境"></a>编译环境</h2><h3 id="软件结构"><a href="#软件结构" class="headerlink" title="软件结构"></a>软件结构</h3><p>Lime Suite 是一款支持多种硬件平台的软件，包括LimeSDR，LMS7002M收发器，以及使用基于 LMS7 开发的其他硬件。安装 Lime Suite 可以使许多 SDR 应用程序（如GQRX）可以通过中间适配组件 SoapySDR 适配多种 SDR 设备配合使用。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b75c56bdcda8.png" alt=""></p>
+<p>SoapySDR 是位于 LimeSDR 的驱动程序和 SDR 应用程序之间的胶水层。使用一个简单的包装器 (SoapyLMS7), LimeSDR 可以在任何 SoapySDR 或 Gr-OsmoSDR 支持的应用程序中使用。这包括编程环境, 如 Pothos 框架和 GNU Radio，以及像 GQRX 和 CubicSDR 这样的图形应用程序。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b75c571305ca.png" alt=""></p>
+<h3 id="安装UHD"><a href="#安装UHD" class="headerlink" title="安装UHD"></a>安装UHD</h3><p>Wiki：<a href="http://files.ettus.com/manual/page_build_guide.html" rel="external nofollow noopener noreferrer" target="_blank">http://files.ettus.com/manual/page_build_guide.html</a><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> sudo apt-get install libboost-all-dev libusb-1.0-0-dev python-mako doxygen python-docutils cmake build-essential git</span></div><div class="line"><span class="meta">$</span><span class="bash"> git <span class="built_in">clone</span> https://github.com/EttusResearch/uhd</span></div><div class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> uhd</span></div><div class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> host &amp;&amp; mkdir build &amp;&amp; <span class="built_in">cd</span> build</span></div><div class="line"><span class="meta">$</span><span class="bash"> cmake ../</span></div><div class="line"><span class="meta">$</span><span class="bash"> make -j5</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo make install</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo ldconfig</span></div></pre></td></tr></table></figure></p>
+<h3 id="安装SoapySDR"><a href="#安装SoapySDR" class="headerlink" title="安装SoapySDR"></a>安装SoapySDR</h3><p>Wiki：<a href="https://github.com/pothosware/SoapySDR/wiki/BuildGuide" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/pothosware/SoapySDR/wiki/BuildGuide</a><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> sudo apt-get install cmake g++ libpython-dev python-numpy swig</span></div><div class="line"><span class="meta">$</span><span class="bash"> git <span class="built_in">clone</span> https://github.com/pothosware/SoapySDR.git</span></div><div class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> SoapySDR</span></div><div class="line"><span class="meta">$</span><span class="bash"> git pull origin master</span></div><div class="line"><span class="meta">$</span><span class="bash"> mkdir build &amp;&amp; <span class="built_in">cd</span> build</span></div><div class="line"><span class="meta">$</span><span class="bash"> cmake ..</span></div><div class="line"><span class="meta">$</span><span class="bash"> make -j5</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo make install</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo ldconfig</span></div></pre></td></tr></table></figure></p>
+<h3 id="安装SoapyUHD"><a href="#安装SoapyUHD" class="headerlink" title="安装SoapyUHD"></a>安装SoapyUHD</h3><p>Wiki：<a href="https://github.com/pothosware/SoapyUHD/wiki" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/pothosware/SoapyUHD/wiki</a><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> git <span class="built_in">clone</span> https://github.com/pothosware/SoapyUHD.git</span></div><div class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> SoapyUHD</span></div><div class="line"><span class="meta">$</span><span class="bash"> mkdir build &amp;&amp; <span class="built_in">cd</span> build</span></div><div class="line"><span class="meta">$</span><span class="bash"> cmake ..</span></div><div class="line"><span class="meta">$</span><span class="bash"> make</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo make install</span></div></pre></td></tr></table></figure></p>
+<h3 id="安装LimeSuite"><a href="#安装LimeSuite" class="headerlink" title="安装LimeSuite"></a>安装LimeSuite</h3><p>Wiki：<a href="http://wiki.myriadrf.org/Lime_Suite" rel="external nofollow noopener noreferrer" target="_blank">http://wiki.myriadrf.org/Lime_Suite</a><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> sudo add-apt-repository -y ppa:myriadrf/drivers</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo apt-get update</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo apt-get install git g++ cmake libsqlite3-dev libsoapysdr-dev libi2c-dev libusb-1.0-0-dev libwxgtk3.0-dev freeglut3-dev</span></div><div class="line"><span class="meta">$</span><span class="bash"> git <span class="built_in">clone</span> https://github.com/myriadrf/LimeSuite.git</span></div><div class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> LimeSuite</span></div><div class="line"><span class="meta">$</span><span class="bash"> mkdir builddir &amp;&amp; <span class="built_in">cd</span> builddir</span></div><div class="line"><span class="meta">$</span><span class="bash"> cmake ../</span></div><div class="line"><span class="meta">$</span><span class="bash"> make -j5</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo make install</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo ldconfig</span></div></pre></td></tr></table></figure></p>
+<p>输入下列命令使非ROOT用户可以访问LimeSDR这样基于USB的设备<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> LimeSuite/udev-rules</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo sh ./install.sh</span></div></pre></td></tr></table></figure></p>
+<p>安装上述驱动后，运行命令检查驱动是否安装成功<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b75cab7f3135.png" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b75cabd28388.png" alt=""></p>
+<p>然后查看能不能找到设备<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b75cac1b4a75.png" alt=""></p>
+<h3 id="安装GNU-Radio、gr-osmosdr"><a href="#安装GNU-Radio、gr-osmosdr" class="headerlink" title="安装GNU Radio、gr-osmosdr"></a>安装GNU Radio、gr-osmosdr</h3><p>Wiki：<a href="https://www.gnuradio.org/doc/doxygen/build_guide.html" rel="external nofollow noopener noreferrer" target="_blank">https://www.gnuradio.org/doc/doxygen/build_guide.html</a><br>从源码构建<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> sudo apt-get -y install git-core cmake g++ python-dev swig \</span></div><div class="line"><span class="meta">$</span><span class="bash"> pkg-config libfftw3-dev libboost-all-dev libcppunit-dev libgsl0-dev \</span></div><div class="line"><span class="meta">$</span><span class="bash"> libusb-dev libsdl1.2-dev python-wxgtk3.0 python-numpy \</span></div><div class="line"><span class="meta">$</span><span class="bash"> python-cheetah python-lxml doxygen libxi-dev python-sip \</span></div><div class="line"><span class="meta">$</span><span class="bash"> libqt4-opengl-dev libqwt-dev libfontconfig1-dev libxrender-dev \</span></div><div class="line"><span class="meta">$</span><span class="bash"> python-sip python-sip-dev python-qt4 python-sphinx libusb-1.0-0-dev \</span></div><div class="line"><span class="meta">$</span><span class="bash"> libcomedi-dev libzmq-dev</span></div><div class="line"><span class="meta">$</span><span class="bash"> git <span class="built_in">clone</span> --recursive https://github.com/gnuradio/gnuradio.git</span></div><div class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> gnuradio &amp;&amp; mkdir build &amp;&amp; <span class="built_in">cd</span> build</span></div><div class="line"><span class="meta">$</span><span class="bash"> cmake ../</span></div><div class="line"><span class="meta">$</span><span class="bash"> make -j5</span></div><div class="line"><span class="meta">$</span><span class="bash"> make <span class="built_in">test</span></span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo make install</span></div></pre></td></tr></table></figure></p>
+<p>安装gr-osmosdr支持包<br>Wiki：<a href="http://osmocom.org/projects/gr-osmosdr/wiki" rel="external nofollow noopener noreferrer" target="_blank">http://osmocom.org/projects/gr-osmosdr/wiki</a><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> sudo apt-get install libsoapysdr-dev gr-fcdproplus</span></div><div class="line"><span class="meta">$</span><span class="bash"> git <span class="built_in">clone</span> git://git.osmocom.org/gr-osmosdr</span></div><div class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> gr-osmosdr &amp;&amp; mkdir build &amp;&amp; <span class="built_in">cd</span> build/</span></div><div class="line"><span class="meta">$</span><span class="bash"> cmake ../</span></div><div class="line"><span class="meta">$</span><span class="bash"> make</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo make install</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo ldconfig</span></div></pre></td></tr></table></figure></p>
+<p>安装之后，会看到Soapysdr support在Gnuradio enabled里<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b75cc570512a.png" alt=""></p>
+<h2 id="测试LimeSDR接收、发射通道"><a href="#测试LimeSDR接收、发射通道" class="headerlink" title="测试LimeSDR接收、发射通道"></a>测试LimeSDR接收、发射通道</h2><p>GNU Radio和gr-osmosdr安装完成后，我们加载一个接收信号的grc流程图<br>Grc流程图下载地址：<a href="https://1drv.ms/f/s!AsE4BpolygfCjGfspV7_Gno3rpy5" rel="external nofollow noopener noreferrer" target="_blank">https://1drv.ms/f/s!AsE4BpolygfCjGfspV7_Gno3rpy5</a><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b76b80f982d0.png" alt=""></p>
+<p>RF增益设置为20，IF中频增益设置成12，BB基带增益设置成19<br>天线设置为LNAL 对应的是RX Channel 0<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b76b8266f403.png" alt=""></p>
+<p>然后运行，按下遥控钥匙，可以看到成功接收到433MHz遥控钥匙的信号，说明GNU Radio和gr-osmosdr安装没有问题。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b76b8302335b.png" alt=""></p>
+<p>测试通完接收通道后，我们测试下发射通道，做一个小型FM电台试试<br>*注意请在不干扰正常无线通讯的基础上进行实验<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b76b8370cdd9.png" alt=""></p>
+<p>在另一台电脑上打开SDRSharp将FM频率调到104MHz可以明显看到我们发射的信号<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b7a9d/5b5b1a8de685f.png" alt=""></p>
+
+      
+    </div>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/chip.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">芯片物理攻击平台 ChipWhisperer 初探</div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+
+
+
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- CATEGORIES START -->
+<h2 class="no-top-space">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/系统安全/">系统安全 (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/移动安全/">移动安全 (4)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/硬件安全/">硬件安全 (10)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/web安全/">web安全 (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/芯片安全/">芯片安全 (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/硬改/">硬改 (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/无线电安全/">无线电安全 (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- BEGIN BLOG TAGS -->
+<div class="blog-tags margin-bottom-20">
+  <h2>Tags</h2>
+  
+  <div class="widget-wrap">
+    <div class="widget">
+      
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/"><i class="fa fa-tags"></i>Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ChipWhisperer/"><i class="fa fa-tags"></i>ChipWhisperer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LimeSDR/"><i class="fa fa-tags"></i>LimeSDR</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MITMf/"><i class="fa fa-tags"></i>MITMf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/QARK/"><i class="fa fa-tags"></i>QARK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/"><i class="fa fa-tags"></i>Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UART串口调试/"><i class="fa fa-tags"></i>UART串口调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app签名/"><i class="fa fa-tags"></i>app签名</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goahead/"><i class="fa fa-tags"></i>goahead</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/"><i class="fa fa-tags"></i>https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/"><i class="fa fa-tags"></i>ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web安全/"><i class="fa fa-tags"></i>web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/侧信道/"><i class="fa fa-tags"></i>侧信道</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网渗透/"><i class="fa fa-tags"></i>内网渗透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/密码爆破/"><i class="fa fa-tags"></i>密码爆破</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/指纹识别/"><i class="fa fa-tags"></i>指纹识别</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/无线电/"><i class="fa fa-tags"></i>无线电</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/智能锁/"><i class="fa fa-tags"></i>智能锁</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件分析/"><i class="fa fa-tags"></i>硬件分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬改/"><i class="fa fa-tags"></i>硬改</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/移动安全/"><i class="fa fa-tags"></i>移动安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/系统安全/"><i class="fa fa-tags"></i>系统安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/芯片安全/"><i class="fa fa-tags"></i>芯片安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/蓝牙攻击/"><i class="fa fa-tags"></i>蓝牙攻击</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/贝叶斯分类/"><i class="fa fa-tags"></i>贝叶斯分类</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程代码执行/"><i class="fa fa-tags"></i>远程代码执行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
+    </div>
+  </div>
+
+
+</div>
+<!-- END BLOG TAGS -->
+
+
+<!-- BEGIN FEATURED POSTS -->                            
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->                            
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>伏宸安全实验室<br><br> 伏宸安全实验室是广东安创信息科技开发有限公司旗下的以网络安全研究为核心的专业实验室，主攻前沿安全技术，包括：渗透测试、黑产对抗、威胁情报、智能硬件与无线电安全等。</p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              广州市越秀区寺右新马路108号丰伟大厦15B、C单元<br>
+              BC 15/F Fengwei Buiding NO.108 Siyouxinma Road<br>
+              Guangzhou,China Code:510600<br>
+              Phone: 020-87392713<br>
+              Email: <a href="mailto:admin@future-sec.com" rel="external nofollow noopener noreferrer" target="_blank">admin@future-sec.com</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2018 伏宸安全实验室-Future-Sec Information Security Lab<br>
+ <a href="javascript:;">Future-sec</a> | <a href="javascript:;">广东安创信息科技开发有限公司</a>
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      <li><a href="https://github.com/Future-Sec/" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-github"></i></a></li>
+    
+      <li><a href="https://weibo.com/futuresec" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weibo"></i></a></li>
+    
+      <li><a href="https://mp.weixin.qq.com/s/QuDKBrMist8GL16EEO-u4Q" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weixin"></i></a></li>
+    
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+    
+      <li><a href="http://yaseng.org/" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-yahoo"></i></a></li>
+    
+  </ul>  
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]--> 
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/plugins/owl.carousel/owl.carousel.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/wow.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();    
+        Layout.initOWL();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling(); 
+	new WOW().init();
+    });
+</script>
+ <script>
+        // 给图片添加链接
+        $(document).ready(function() {
+            $("p img").each(function() {
+                var strA = "<a class='fancybox' href='" + this.src + "'></a>";
+                $(this).wrapAll(strA);
+            });
+        });
+    
+        // fancybox
+        $(".fancybox").fancybox({
+                                  openEffect    : 'elastic',
+                                  closeEffect   : 'elastic',
+                              });
+    </script>
+    <script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?a224b8ad11f845d05c44aadb8c4c3ace";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- END CORE PLUGINS -->
+
+<!-- BEGIN PAGE-SPECIFIC PLUGINS --> 
+
+
+
+
+
+
+
+<!-- END PAGE-SPECIFIC PLUGINS --> 
+
+<!-- BEGIN INTEGRATIONS -->
+
+
+
+
+
+<!-- END INTEGRATIONS -->
+
+</body>
+

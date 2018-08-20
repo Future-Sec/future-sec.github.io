@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <title>芯片物理攻击平台 ChipWhisperer 初探 | 伏宸安全实验室-Future-Sec Information Security Lab</title>
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <meta name="description" content="前言传统基于穷举或纯数学理论层面的分析，对于现代高强度加密算法而言，算力有限导致无法实现穷举，算法的复杂性也无法通过数学工具直接破解，根据近代物理学发展出来的理论，电子设备依赖外部电源提供动力，设备在运行过程中会消耗能量，同时会跟外界环境存在声、光、电、磁等物理交互现象产生，设备本身也可能存在设计薄弱点，通过这些物理泄露或人为进行物理层的修改获取数据，然后运用各类数学工具和模型实现破解。 然而在做">
+<meta name="keywords" content="侧信道,ChipWhisperer">
+<meta property="og:type" content="article">
+<meta property="og:title" content="芯片物理攻击平台 ChipWhisperer 初探">
+<meta property="og:url" content="http://www.future-sec.com/chip.html">
+<meta property="og:site_name" content="伏宸安全实验室-Future-Sec Information Security Lab">
+<meta property="og:description" content="前言传统基于穷举或纯数学理论层面的分析，对于现代高强度加密算法而言，算力有限导致无法实现穷举，算法的复杂性也无法通过数学工具直接破解，根据近代物理学发展出来的理论，电子设备依赖外部电源提供动力，设备在运行过程中会消耗能量，同时会跟外界环境存在声、光、电、磁等物理交互现象产生，设备本身也可能存在设计薄弱点，通过这些物理泄露或人为进行物理层的修改获取数据，然后运用各类数学工具和模型实现破解。 然而在做">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b757e51c171d.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b75d2d4909b4.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b75d2e0a0337.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b75cdb77361a.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b75cdd85fc54.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b75ce4f3b061.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b75cee97b9cb.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b7a9d9287a75.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b7a9d9c0bf77.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b756e8a59f7b.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5we5t3654h.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5dgy2565fe.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b7582856ba4f.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b75816101da2.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b757f60339ab.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b757f906ba76.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b76d1077021e.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b76d0fef3796.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/588201161020.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/1sdt4543h54.jpg">
+<meta property="og:updated_time" content="2018-08-20T11:14:29.241Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="芯片物理攻击平台 ChipWhisperer 初探">
+<meta name="twitter:description" content="前言传统基于穷举或纯数学理论层面的分析，对于现代高强度加密算法而言，算力有限导致无法实现穷举，算法的复杂性也无法通过数学工具直接破解，根据近代物理学发展出来的理论，电子设备依赖外部电源提供动力，设备在运行过程中会消耗能量，同时会跟外界环境存在声、光、电、磁等物理交互现象产生，设备本身也可能存在设计薄弱点，通过这些物理泄露或人为进行物理层的修改获取数据，然后运用各类数学工具和模型实现破解。 然而在做">
+<meta name="twitter:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b757e51c171d.jpg">
+  
+    <link rel="alternative" href="/atom.xml" title="伏宸安全实验室-Future-Sec Information Security Lab" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  
+
+  <!-- Global styles START -->   
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END --> 
+   
+  <!-- Page level plugin styles START -->
+  <link rel="stylesheet" href="/metronic/assets/pages/css/animate.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/owl.carousel/assets/owl.carousel.css">
+  <!-- Page level plugin styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/pages/css/components.css">
+  <link rel="stylesheet" href="/metronic/assets/pages/css/slider.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/pages/css/portfolio.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/red.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END -->
+</head>
+</html>
+<body class="corporate">
+  <!-- BEGIN HEADER -->
+<div class="header">
+  <div class="container">
+    <!--<a class="site-logo" href="/" id="logo">伏宸安全实验室-Future-Sec Information Security Lab</a>-->
+
+    <a class="site-logo" href="/">
+      <img src="/metronic/assets/corporate/img/logos/logo-corp-red.png" alt="Metronic FrontEnd">
+    </a>
+
+    <a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+
+    <!-- BEGIN NAVIGATION -->
+    <div class="header-navigation pull-right font-transform-inherit">
+      <ul>
+	
+	<li class="">
+	  <a href="/index.html">Home</a>
+	</li>
+	
+	<li class="">
+	  <a href="/archives/">Blog</a>
+	</li>
+	
+	<li class="">
+	  <a href="/vulnerabilities.html">Vulnerabilities</a>
+	</li>
+	
+	<li class="">
+	  <a href="/about/">About</a>
+	</li>
+	
+	<!-- BEGIN TOP SEARCH -->
+	<li class="menu-search">
+	  <span class="sep"></span>
+	  <i class="fa fa-search search-btn"></i>
+	  <div class="search-box">
+	   
+	    <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank" class="search-form">
+    <div class="input-group">
+		<input placeholder="Search" class="form-control st-default-search-input" name="word" maxlength="20" type="search">
+		  <input name="si" value="future-sec.com" type="hidden">
+  <input name="tn" value="bds" type="hidden">
+  <input name="cl" value="3" type="hidden">
+  <input name="ct" value="2097152" type="hidden">
+  <input name="s" value="on" type="hidden">
+		<span class="input-group-btn">
+		  <button class="btn btn-primary" type="submit">Search</button>
+		</span>
+	      </div>
+</form>
+	  </div> 
+	</li>
+	<!-- END TOP SEARCH -->
+      </ul>
+    </div>
+    <!-- END NAVIGATION -->
+  </div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/archives/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/chip.html">芯片物理攻击平台 ChipWhisperer 初探</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-chip" class="article article-type-post blog-item" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> DuShu</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2018-08-19T16:00:00.000Z" itemprop="datePublished">2018/08/20</time>
+
+	</li>
+	<li class="hidden-xs"><i class="fa fa-comments"></i>
+	  <a href="http://www.future-sec.com/chip.html#disqus_thread" class="article-comment-link">Comments</a>
+	</li>
+	<li class="hidden-xs"><i class="fa fa-tags"></i> 
+	  
+  
+    <a href="/tags/侧信道/" title="侧信道">侧信道</a>,
+  
+    <a href="/tags/ChipWhisperer/" title="ChipWhisperer">ChipWhisperer</a>
+  
+
+
+	</li>
+      </ul>
+      
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/芯片安全/">芯片安全</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      <!-- Table of Contents -->
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#物理攻击"><span class="toc-number">2.</span> <span class="toc-text">物理攻击</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ChipWhisperer"><span class="toc-number">3.</span> <span class="toc-text">ChipWhisperer</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#简介"><span class="toc-number">3.1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#能量攻击"><span class="toc-number">3.2.</span> <span class="toc-text">能量攻击</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#毛刺攻击"><span class="toc-number">3.3.</span> <span class="toc-text">毛刺攻击</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#更多"><span class="toc-number">4.</span> <span class="toc-text">更多</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-number">5.</span> <span class="toc-text">参考</span></a></li></ol>
+  </div>
+
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>传统基于穷举或纯数学理论层面的分析，对于现代高强度加密算法而言，算力有限导致无法实现穷举，算法的复杂性也无法通过数学工具直接破解，根据近代物理学发展出来的理论，电子设备依赖外部电源提供动力，设备在运行过程中会消耗能量，同时会跟外界环境存在声、光、电、磁等物理交互现象产生，设备本身也可能存在设计薄弱点，通过这些物理泄露或人为进行物理层的修改获取数据，然后运用各类数学工具和模型实现破解。</p>
+<p>然而在做物理攻击时，往往需要昂贵的设备，并要具备数学、物理学、微电子学、半导体学、密码学、化学等等多学科的交叉理论知识，因此其技术门槛和攻击成本都很高，目前在刚刚结束的 Blackhat 2018 上，展台上展示了多款 ChipWhisperer 硬件工具,作为亲民型的物理攻击平台，获得了一致的好评。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b757e51c171d.jpg" alt=""><br>(图片来源 Newae 官方)</p>
+<p>ChipWhisperer Lite 版官方商店售价 $250 ，不管是实验学习，还是实战入门，都是极具性价比的，本文主要介绍主流的一些物理攻击手段，以及对 ChipWhisperer 的初步认知，后续将会据此从理论、原理、实验以及实战等角度详细介绍该平台。</p>
+<h2 id="物理攻击"><a href="#物理攻击" class="headerlink" title="物理攻击"></a>物理攻击</h2><p>真正的安全研究不能凌驾于真实的攻防场景，对于物联网安全而言，其核心目标是真实物理世界中的各种硬件设备，真实的攻击场景往往发生在直接针对硬件设备的攻击，因此物联网安全的基石在于物理层的安全，而针对物联网物理攻击手段，是当前物联网面临的最大安全风险之一。</p>
+<p>物理攻击就是直接攻击设备本身和运行过程中的物理泄露，根据攻击过程和手段可以分为非侵入攻击、半侵入式攻击和侵入式攻击。ChipWhisperer 平台主要用做非侵入式攻击，包括侧信道和故障注入攻击等。</p>
+<p>传统密码分析学认为一个密码算法在数学上安全就绝对安全,这一思想被Kelsey等学者在1998年提出的侧信道攻击(Side-channel Attacks,SCA)理论所打破。侧信道攻击与传统密码分析不同,侧信道攻击利用功耗、电磁辐射等方式所泄露的能量信息与内部运算操作数之间的相关性,通过对所泄露的信息与已知输入或输出数据之间的关系作理论分析,选择合适的攻击方案,获得与安全算法有关的关键信息。目前侧信道理论发展越发迅速，从最初的简单功耗分析（SPA），到多阶功耗分析（CPA），碰撞攻击、模板攻击、电磁功耗分析以及基于人工智能和机器学习的侧信道分析方式，侧信道攻击方式也推陈出新，从传统的直接能量采集发展到非接触式采集、远距离采集、行为侧信道等等。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b75d2d4909b4.png" alt=""><br>利用麦克风进行声波侧信道</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b75d2e0a0337.png" alt=""><br>利用软件无线电实施非接触电磁侧信道</p>
+<p>故障攻击就是在设备执行加密过程中，引入一些外部因素使得加密的一些运算操作出现错误，从而泄露出跟密钥相关的信息的一种攻击。一些基本的假设：设定的攻击目标是中间状态值； 故障注入引起的中间状态值的变化；攻击者可以使用一些特定算法（故障分析）来从错误/正确密文对中获得密钥。<br>使用故障的不同场景： 利用故障来绕过一些安全机制（口令检测，文件访问权限，安全启动链）；产生错误的密文或者签名（故障分析）；组合攻击（故障+旁路）。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b75cdb77361a.png" alt=""><br>非侵入式电磁注入</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b75cdd85fc54.png" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b75ce4f3b061.png" alt=""><br>半侵入式光子故障注入</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b75cee97b9cb.png" alt=""><br>侵入式故障注入</p>
+<h2 id="ChipWhisperer"><a href="#ChipWhisperer" class="headerlink" title="ChipWhisperer"></a>ChipWhisperer</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>本系列使用的版本是  CW1173 ChipWhisperer-Lite ，搭载 SAKURA-G 实验板，配合一块 CW303 XMEGA 作为目标测试板。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b7a9d9287a75.png" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b7a9d9c0bf77.jpg" alt=""></p>
+<p>CW1173 是基于FPGA实现的硬件，软件端基于 python，具有丰富的扩展接口和官方提供的各类 API 供开发调用，硬件通过自带的 OpenADC 模块可以实现波形的捕获，不需要额外的示波器。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b756e8a59f7b.png" alt=""></p>
+<p>板上自带有波形采集端口（MeaSure）和毛刺输出（Glitch）端口，并自带 MOSFET 管进行功率放大。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5we5t3654h.jpg" alt=""></p>
+<p>并提供多种接口触发设置，基本满足一般的攻击需求。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5dgy2565fe.jpg" alt=""></p>
+<h3 id="能量攻击"><a href="#能量攻击" class="headerlink" title="能量攻击"></a>能量攻击</h3><p>芯片物理结构为许多CMOS电路组合而成，CMOS 电路根据输入的不同电信号动态改变输出状态，实现0或1的表示，完成相应的运算，而不同的运算指令就是通过 CMOS 组合电路完成的，但 CMOS电路根据不同的输入和输出，其消耗的能量是不同的，例如汇编指令 ADD 和 MOV ，消耗的能量是不同的，同样的指令操作数不同，消耗的能量也是不同的，例如 MOV 1 和 MOV 2其能量消耗就是不同的，能量攻击就是利用芯片在执行不同的指令时，消耗能量不同的原理，实现秘钥破解。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b7582856ba4f.png" alt=""></p>
+<p>常用的能量攻击方式就是在芯片的电源输入端（VCC）或接地端（GND）串联一个1到50欧姆的电阻，然后用示波器不断采集电阻两端的电压变化，形成波形图，根据欧姆定律，电压的变化等同于功耗的变化，因此在波形图中可以观察到芯片在执行不同加密运算时的功耗变化。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b75816101da2.png" alt=""></p>
+<p>CW1173 提供能量波形采集端口，通过连接 板上的 MeaSure SMA 接口，就可以对能量波形进行采集，在利用chipwhisperer 开源软件就可以进行分析，可以实现简单能量分析、CPA攻击、模板攻击等。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b757f60339ab.png" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b757f906ba76.png" alt=""><br>通过 cpa 攻击 AES 加密算法获取密钥</p>
+<h3 id="毛刺攻击"><a href="#毛刺攻击" class="headerlink" title="毛刺攻击"></a>毛刺攻击</h3><p>ChipWhisperer  提供对时钟、电压毛刺的自动化攻击功能，类似于 web 渗透工具 Burpsuite ，可以对毛刺的宽度、偏移、位置等等参数进行 fuzz ，通过连接板上的 Glitch SMA 接口，就可以输出毛刺，然后通过串口、web 等获取结果，判断毛刺是否注入成功。</p>
+<p>时钟毛刺攻击是针对微控制器需要外部时钟晶振提供时钟信号，通过在原本的时钟信号上造成一个干扰，通过多路时钟信号的叠加产生时钟毛刺，也可以通过自定义的时钟选择器产生，CW1173  提供高达 300MHZ 的时钟周期控制，时钟是芯片执行指令的动力来源，通过时钟毛刺可以跳过某些关键逻辑判断，或输出错误数据。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b76d1077021e.png" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/5b76d0fef3796.png" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/588201161020.jpg" alt=""><br>通过 CW1173 时钟毛刺攻击跳过密码验证</p>
+<p>电压毛刺是对芯片电源进行干扰造成故障，在一个很短的时间内，使电压迅速下降，造成芯片瞬间掉电，然后迅速恢复正常，确保芯片继续正常工作，可以实现如对加密算法中某些轮运算过程的干扰，造成错误输出，或跳过某些设备中的关键逻辑判断等等 。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/5b5a0b1/1sdt4543h54.jpg" alt=""></p>
+<p>对嵌入式设备的电压毛刺攻击</p>
+<h2 id="更多"><a href="#更多" class="headerlink" title="更多"></a>更多</h2><p>随着物理攻击理论和技术的进步，针对硬件芯片的防护手段也随之提高，芯片物理层的攻防一直在不断角力 ，现实环境中，能量采集会受到各种噪声因素的干扰，硬件厂商也会主动实施一些针对物理攻击的防护，单纯依靠  ChipWhisperer 平台难以实现真实场景的攻击，因此还需要结合电磁、声波、红外、光子等多重信息，以及对硬件进行修改，多重故障注入，引入智能分析模型等等组合手段，今后会进一步介绍一些基于 ChipWhisperer  的高级攻击方式和实战分析方法。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li>ChipWhisperer 官网 wiki <a href="https://wiki.newae.com/Main_Page" rel="external nofollow noopener noreferrer" target="_blank">https://wiki.newae.com/Main_Page</a></li>
+<li>开源项目 <a href="https://github.com/newaetech/chipwhisperer" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/newaetech/chipwhisperer</a></li>
+<li>ChipSHOUTER 电磁故障平台  <a href="https://github.com/newaetech/ChipSHOUTER" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/newaetech/ChipSHOUTER</a></li>
+<li>USB 附加模块  <a href="https://github.com/scanlime/facewhisperer" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/scanlime/facewhisperer</a></li>
+<li>深度学习侧信道攻击 <a href="https://www.riscure.com/publication/lowering-bar-deep-learning-side-channel-analysis/" rel="external nofollow noopener noreferrer" target="_blank">https://www.riscure.com/publication/lowering-bar-deep-learning-side-channel-analysis/</a></li>
+<li>使用毛刺攻击提取汽车 ECU 固件 <a href="https://www.riscure.com/publication/fault-injection-automotive-diagnostic-protocols/" rel="external nofollow noopener noreferrer" target="_blank">https://www.riscure.com/publication/fault-injection-automotive-diagnostic-protocols/</a></li>
+<li>《物联网安全百科》 <a href="https://iot-security.wiki" rel="external nofollow noopener noreferrer" target="_blank">https://iot-security.wiki</a></li>
+</ol>
+<!--  -->
+      
+    </div>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/lime.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          LimeSDR 上手指南
+        
+      </div>
+    </a>
+  
+  
+    <a href="/iot-security-hardware-modification.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">物联网安全硬件修改系列-硬改</div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+
+
+
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- CATEGORIES START -->
+<h2 class="no-top-space">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/系统安全/">系统安全 (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/移动安全/">移动安全 (4)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/硬件安全/">硬件安全 (10)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/web安全/">web安全 (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/芯片安全/">芯片安全 (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/硬改/">硬改 (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/无线电安全/">无线电安全 (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- BEGIN BLOG TAGS -->
+<div class="blog-tags margin-bottom-20">
+  <h2>Tags</h2>
+  
+  <div class="widget-wrap">
+    <div class="widget">
+      
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/"><i class="fa fa-tags"></i>Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ChipWhisperer/"><i class="fa fa-tags"></i>ChipWhisperer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LimeSDR/"><i class="fa fa-tags"></i>LimeSDR</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MITMf/"><i class="fa fa-tags"></i>MITMf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/QARK/"><i class="fa fa-tags"></i>QARK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/"><i class="fa fa-tags"></i>Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UART串口调试/"><i class="fa fa-tags"></i>UART串口调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app签名/"><i class="fa fa-tags"></i>app签名</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goahead/"><i class="fa fa-tags"></i>goahead</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/"><i class="fa fa-tags"></i>https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/"><i class="fa fa-tags"></i>ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web安全/"><i class="fa fa-tags"></i>web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/侧信道/"><i class="fa fa-tags"></i>侧信道</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网渗透/"><i class="fa fa-tags"></i>内网渗透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/密码爆破/"><i class="fa fa-tags"></i>密码爆破</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/指纹识别/"><i class="fa fa-tags"></i>指纹识别</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/无线电/"><i class="fa fa-tags"></i>无线电</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/智能锁/"><i class="fa fa-tags"></i>智能锁</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件分析/"><i class="fa fa-tags"></i>硬件分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬改/"><i class="fa fa-tags"></i>硬改</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/移动安全/"><i class="fa fa-tags"></i>移动安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/系统安全/"><i class="fa fa-tags"></i>系统安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/芯片安全/"><i class="fa fa-tags"></i>芯片安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/蓝牙攻击/"><i class="fa fa-tags"></i>蓝牙攻击</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/贝叶斯分类/"><i class="fa fa-tags"></i>贝叶斯分类</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程代码执行/"><i class="fa fa-tags"></i>远程代码执行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
+    </div>
+  </div>
+
+
+</div>
+<!-- END BLOG TAGS -->
+
+
+<!-- BEGIN FEATURED POSTS -->                            
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->                            
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>伏宸安全实验室<br><br> 伏宸安全实验室是广东安创信息科技开发有限公司旗下的以网络安全研究为核心的专业实验室，主攻前沿安全技术，包括：渗透测试、黑产对抗、威胁情报、智能硬件与无线电安全等。</p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              广州市越秀区寺右新马路108号丰伟大厦15B、C单元<br>
+              BC 15/F Fengwei Buiding NO.108 Siyouxinma Road<br>
+              Guangzhou,China Code:510600<br>
+              Phone: 020-87392713<br>
+              Email: <a href="mailto:admin@future-sec.com" rel="external nofollow noopener noreferrer" target="_blank">admin@future-sec.com</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2018 伏宸安全实验室-Future-Sec Information Security Lab<br>
+ <a href="javascript:;">Future-sec</a> | <a href="javascript:;">广东安创信息科技开发有限公司</a>
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      <li><a href="https://github.com/Future-Sec/" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-github"></i></a></li>
+    
+      <li><a href="https://weibo.com/futuresec" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weibo"></i></a></li>
+    
+      <li><a href="https://mp.weixin.qq.com/s/QuDKBrMist8GL16EEO-u4Q" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weixin"></i></a></li>
+    
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+    
+      <li><a href="http://yaseng.org/" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-yahoo"></i></a></li>
+    
+  </ul>  
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]--> 
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/plugins/owl.carousel/owl.carousel.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/wow.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();    
+        Layout.initOWL();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling(); 
+	new WOW().init();
+    });
+</script>
+ <script>
+        // 给图片添加链接
+        $(document).ready(function() {
+            $("p img").each(function() {
+                var strA = "<a class='fancybox' href='" + this.src + "'></a>";
+                $(this).wrapAll(strA);
+            });
+        });
+    
+        // fancybox
+        $(".fancybox").fancybox({
+                                  openEffect    : 'elastic',
+                                  closeEffect   : 'elastic',
+                              });
+    </script>
+    <script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?a224b8ad11f845d05c44aadb8c4c3ace";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- END CORE PLUGINS -->
+
+<!-- BEGIN PAGE-SPECIFIC PLUGINS --> 
+
+
+
+
+
+
+
+<!-- END PAGE-SPECIFIC PLUGINS --> 
+
+<!-- BEGIN INTEGRATIONS -->
+
+
+
+
+
+<!-- END INTEGRATIONS -->
+
+</body>
+
