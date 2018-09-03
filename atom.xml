@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.future-sec.com/"/>
-  <updated>2018-09-03T10:02:25.718Z</updated>
+  <updated>2018-09-03T10:38:47.325Z</updated>
   <id>http://www.future-sec.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://www.future-sec.com/wireless-signal-replay-attack-and-reverse-with-LimeSDR.html"/>
     <id>http://www.future-sec.com/wireless-signal-replay-attack-and-reverse-with-LimeSDR.html</id>
     <published>2018-09-02T16:00:00.000Z</published>
-    <updated>2018-09-03T10:02:25.718Z</updated>
+    <updated>2018-09-03T10:38:47.325Z</updated>
     
     <content type="html"><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在这篇文章中，我们将对某宝销量最高的一款无线门铃进行无线重放攻击和逆向分析其遥控信号的演示。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61bb3542766.png" alt=""></p>
 <p>国内常见的无线遥控通常工作在315Mhz、433Mhz频率，欧美的采用868Mhz、915Mhz这2个频率。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61c47b42c4e.jpg" alt=""></p>
@@ -89,6 +89,8 @@
     
     
       <category term="LimeSDR" scheme="http://www.future-sec.com/tags/LimeSDR/"/>
+    
+      <category term="无线电" scheme="http://www.future-sec.com/tags/%E6%97%A0%E7%BA%BF%E7%94%B5/"/>
     
       <category term="无线电重放攻击" scheme="http://www.future-sec.com/tags/%E6%97%A0%E7%BA%BF%E7%94%B5%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/"/>
     
@@ -316,9 +318,9 @@
       <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
     
     
-      <category term="硬件分析" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%88%86%E6%9E%90/"/>
-    
       <category term="硬改" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E6%94%B9/"/>
+    
+      <category term="硬件分析" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%88%86%E6%9E%90/"/>
     
   </entry>
   
@@ -460,6 +462,101 @@
     
     
       <category term="系统安全" scheme="http://www.future-sec.com/tags/%E7%B3%BB%E7%BB%9F%E5%AE%89%E5%85%A8/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>谁是僵尸之王-如何进行高效的分布式爆破</title>
+    <link href="http://www.future-sec.com/king-of-zombie.html"/>
+    <id>http://www.future-sec.com/king-of-zombie.html</id>
+    <published>2018-04-07T16:00:00.000Z</published>
+    <updated>2018-06-29T08:59:05.620Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在研发漏洞扫描器的弱口令破解模块时，发现传统的通过字典遍历用户名密码的算法效率过低，当需要大批量高速爆破时，难以满足此类需求，因此需要引入新的算法，本文以一个分布式扫描器的爆破模块为例，演示如何进行高效快速的分布式爆破。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/6172922.jpg" alt="617292"></p>
+<h2 id="传统方法"><a href="#传统方法" class="headerlink" title="传统方法"></a>传统方法</h2><p>传统的密码穷举</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/15156625175922.jpg" alt=""><br>效率非常低，而且还有可能触发报警  </p>
+<h2 id="king-of-zombie"><a href="#king-of-zombie" class="headerlink" title="king of zombie"></a>king of zombie</h2><p>koz (king of zombie) 算法,即首先按照多种算法对用户名密码字典组合进行评分,然后用评分最高的组合去淘汰僵尸主机。</p>
+<h3 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h3><ol>
+<li>上游push ncrack任务到队列</li>
+<li>koz 节点开始瓜分队列任务,保存为任务列表 (根据cpu,网速来分配多少任务) 。</li>
+<li>使用账号密码字典爆破来遍历任务列表,hit中 即从列表中淘汰(字典按评分优先级排序)。</li>
+</ol>
+<ul>
+<li>说明</li>
+</ul>
+<ol>
+<li><p>字典评分按照爆破成功记录次数和蜜罐记录次数来计算,master 端实时更新,koz node 每日定时更新。</p>
+</li>
+<li><p>淘汰机制具体为先去除一大部分普遍存在的弱口令,例如某一批次中,第一次使用 ubnt/ubnt 来爆破ssh服务,就能淘汰 15% 的任务,第二次使用 root/123456 能淘汰 3% 。</p>
+</li>
+</ol>
+<h3 id="表结构"><a href="#表结构" class="headerlink" title="表结构"></a>表结构</h3><p>pw_koz_level </p>
+<table>
+<thead>
+<tr>
+<th>列</th>
+<th>类型</th>
+<th>注释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>int(11)</td>
+<td>自动增量</td>
+</tr>
+<tr>
+<td>username</td>
+<td>varchar(255)</td>
+<td>用户名</td>
+</tr>
+<tr>
+<td>password</td>
+<td>varchar(255)</td>
+<td>密码</td>
+</tr>
+<tr>
+<td>type</td>
+<td>varchar(255)</td>
+<td>类型</td>
+</tr>
+<tr>
+<td>score</td>
+<td>int(11)</td>
+<td>评分</td>
+</tr>
+</tbody>
+</table>
+<h3 id="更新算法"><a href="#更新算法" class="headerlink" title="更新算法"></a>更新算法</h3><p>目前数据来源有四个<br>第一个  扫描器爆破成功记录  score 值为 10<br>第二个  蜜罐记录   score 值 为 1<br>第三个  渗透进去提取到的有效密码(例如windows 明文)  ,score 10<br>第四个  收集的各种工具扫描字典  score 值为 1</p>
+<p>扫描的时候工具score 值来排序,命中一次之后+10 </p>
+<p>例如如下字典列表</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/15228255230476.jpg" alt=""></p>
+<h4 id="master"><a href="#master" class="headerlink" title="master"></a>master</h4><p>推送任务之后使用无状态扫描工具扫描服务和指纹识别</p>
+<h4 id="koz-node"><a href="#koz-node" class="headerlink" title="koz node"></a>koz node</h4><p>KozTask 类来保存本地任务队列,接收处的代码为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span>  <span class="title">pop_member</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">while</span> self.len() &gt;  <span class="number">0</span>:</div><div class="line">        str_member=self.pop()</div><div class="line">        koz_member=ast.literal_eval(str_member)</div><div class="line">        self.list_member[str(koz_member[<span class="string">'name'</span>])].append(koz_member)</div><div class="line">    util.log(<span class="string">"pop koz_member  done count:%d"</span>  % (self.count()),<span class="number">2</span>,<span class="string">'koztask'</span>)</div></pre></td></tr></table></figure>
+<p>本地队列处理完毕之后,开始foreach 循环用户名密码组合(根据score 大小优先级)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">koz_levels=get_koz_level()</div><div class="line"><span class="keyword">for</span> koz_level  <span class="keyword">in</span>  koz_levels :</div><div class="line">    koz_queue.queue.clear()</div><div class="line">    <span class="comment">#member=&#123;'name': 'ssh', 'task_id': 1124, 'url': '', 'host': '168.167.45.250', 'version': '', 'type': 'service', 'port': 22&#125;</span></div><div class="line">    <span class="comment">#ncrack.scan(member,koz_level)</span></div><div class="line">    <span class="comment">#break</span></div><div class="line">    <span class="keyword">try</span> :</div><div class="line">        <span class="keyword">for</span> member  <span class="keyword">in</span>   koz_task.list_member[koz_level[<span class="string">'type'</span>]] :</div><div class="line">            koz_queue.put(&#123;<span class="string">'member'</span>:member,<span class="string">'level'</span>:koz_level&#125;)</div><div class="line"></div><div class="line">        work_manager = WorkManager(koz_queue, config.koz_thread)  <span class="comment"># thread</span></div><div class="line">        work_manager.wait_allcomplete()</div><div class="line">    <span class="keyword">except</span> Exception, e:</div><div class="line">        util.log(<span class="string">"error info:"</span>+str(e),<span class="number">3</span>,<span class="string">'koz_node'</span>)</div><div class="line">    util.log(<span class="string">'koz_member len:%d'</span> % (koz_task.count()),<span class="number">1</span>,<span class="string">'koz_node'</span>)</div></pre></td></tr></table></figure>
+<p>当扫描出来结果时,直接把它从 koz_member 队列里面remove 掉,如此循环往复,直到跑完所有的密码。<br>remove </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">while</span>  <span class="number">1</span>:</div><div class="line">        <span class="keyword">if</span> self.work_queue.empty() == <span class="keyword">True</span>:</div><div class="line">            <span class="keyword">break</span></div><div class="line">        task = self.work_queue.get(block=<span class="keyword">False</span>)</div><div class="line">        <span class="keyword">if</span> ncrack.scan(task[<span class="string">'member'</span>],task[<span class="string">'level'</span>])  != <span class="keyword">False</span> :</div><div class="line">            koz_type=task[<span class="string">'member'</span>][<span class="string">'name'</span>]</div><div class="line">            koz_task.list_member[koz_type].remove(task[<span class="string">'member'</span>])</div></pre></td></tr></table></figure>
+<h3 id="爆破算法"><a href="#爆破算法" class="headerlink" title="爆破算法"></a>爆破算法</h3><p>负责爆破的为ncrack 模块,调用的爆破工具有  medusa,ncrack。<br>部分实现</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">scan</span><span class="params">(target,level)</span>:</span></div><div class="line">    <span class="keyword">if</span> target[<span class="string">'name'</span>]  == <span class="string">'ms-wbt-server'</span>  <span class="keyword">or</span>  target[<span class="string">'name'</span>]  == <span class="string">'telnet'</span> :</div><div class="line">        str_command = <span class="string">"ncrack --user %s --pass %s  %s:%d "</span>  %  (level[<span class="string">'username'</span>],level[<span class="string">'password'</span>],target[<span class="string">'host'</span>],target[<span class="string">'port'</span>])</div><div class="line">        str_ret=str(sys_exec([<span class="string">'ncrack'</span>, <span class="string">'--user'</span>,level[<span class="string">'username'</span>], <span class="string">'--pass'</span>, level[<span class="string">'password'</span>], target[<span class="string">'host'</span>]+<span class="string">':'</span>+ str(target[<span class="string">'port'</span>])]))</div><div class="line">    <span class="keyword">else</span> :</div><div class="line">        str_command = <span class="string">"medusa -u %s -p %s -h %s -n %d  -M %s"</span> % (level[<span class="string">'username'</span>], level[<span class="string">'password'</span>], target[<span class="string">'host'</span>], target[<span class="string">'port'</span>], target[<span class="string">'name'</span>])</div><div class="line">        str_ret=str(sys_exec([<span class="string">'medusa'</span>,<span class="string">'-u'</span>,level[<span class="string">'username'</span>],<span class="string">'-p'</span>,level[<span class="string">'password'</span>],<span class="string">'-h'</span>,target[<span class="string">'host'</span>],<span class="string">'-n'</span>,str(target[<span class="string">'port'</span>]),<span class="string">'-M'</span>,target[<span class="string">'name'</span>]]))</div><div class="line">    </div><div class="line">    util.log(str_command, <span class="number">2</span>, <span class="string">'ncrack'</span>)</div><div class="line">    <span class="comment">#need  change </span></div><div class="line">    <span class="keyword">if</span> <span class="string">'ACCOUNT FOUND'</span> <span class="keyword">in</span> str_ret  <span class="keyword">or</span>  <span class="string">'credentials'</span>  <span class="keyword">in</span> str_ret:</div><div class="line">        str_data=<span class="string">'[%s] %s %s:%s'</span>   %  (target[<span class="string">'name'</span>],target[<span class="string">'host'</span>],level[<span class="string">'username'</span>],level[<span class="string">'password'</span>])</div><div class="line">        util.log(<span class="string">'ncrack taskid:%d target:%s service:%s succeed'</span> % (target[<span class="string">'task_id'</span>], target[<span class="string">'host'</span>], target[<span class="string">'name'</span>]), <span class="number">1</span>, <span class="string">'ncrack'</span>)</div><div class="line">        <span class="keyword">return</span> report(target,str_data)</div><div class="line">        </div><div class="line">    <span class="keyword">else</span>  :</div><div class="line">        <span class="keyword">return</span> <span class="keyword">False</span></div></pre></td></tr></table></figure>
+<h3 id="爆破结果"><a href="#爆破结果" class="headerlink" title="爆破结果"></a>爆破结果</h3><p> 总览<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/14703046762519.png" alt=""></p>
+<p>图文分析</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/14703047183607.jpg" alt=""></p>
+<p>部分结果一览</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/147030475970560.jpg" alt="147030475970560"></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;在研发漏洞扫描器的弱口令破解模块时，发现传统的通过字典遍历用户名密码的算法效率过低，当需要大批量高速爆破时，难以满足此类需求，因此需要引入新
+    
+    </summary>
+    
+      <category term="web安全" scheme="http://www.future-sec.com/categories/web%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="密码爆破" scheme="http://www.future-sec.com/tags/%E5%AF%86%E7%A0%81%E7%88%86%E7%A0%B4/"/>
     
   </entry>
   
@@ -870,101 +967,6 @@ H2 = 0
   </entry>
   
   <entry>
-    <title>谁是僵尸之王-如何进行高效的分布式爆破</title>
-    <link href="http://www.future-sec.com/king-of-zombie.html"/>
-    <id>http://www.future-sec.com/king-of-zombie.html</id>
-    <published>2018-04-07T16:00:00.000Z</published>
-    <updated>2018-06-29T08:59:05.620Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在研发漏洞扫描器的弱口令破解模块时，发现传统的通过字典遍历用户名密码的算法效率过低，当需要大批量高速爆破时，难以满足此类需求，因此需要引入新的算法，本文以一个分布式扫描器的爆破模块为例，演示如何进行高效快速的分布式爆破。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/6172922.jpg" alt="617292"></p>
-<h2 id="传统方法"><a href="#传统方法" class="headerlink" title="传统方法"></a>传统方法</h2><p>传统的密码穷举</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/15156625175922.jpg" alt=""><br>效率非常低，而且还有可能触发报警  </p>
-<h2 id="king-of-zombie"><a href="#king-of-zombie" class="headerlink" title="king of zombie"></a>king of zombie</h2><p>koz (king of zombie) 算法,即首先按照多种算法对用户名密码字典组合进行评分,然后用评分最高的组合去淘汰僵尸主机。</p>
-<h3 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h3><ol>
-<li>上游push ncrack任务到队列</li>
-<li>koz 节点开始瓜分队列任务,保存为任务列表 (根据cpu,网速来分配多少任务) 。</li>
-<li>使用账号密码字典爆破来遍历任务列表,hit中 即从列表中淘汰(字典按评分优先级排序)。</li>
-</ol>
-<ul>
-<li>说明</li>
-</ul>
-<ol>
-<li><p>字典评分按照爆破成功记录次数和蜜罐记录次数来计算,master 端实时更新,koz node 每日定时更新。</p>
-</li>
-<li><p>淘汰机制具体为先去除一大部分普遍存在的弱口令,例如某一批次中,第一次使用 ubnt/ubnt 来爆破ssh服务,就能淘汰 15% 的任务,第二次使用 root/123456 能淘汰 3% 。</p>
-</li>
-</ol>
-<h3 id="表结构"><a href="#表结构" class="headerlink" title="表结构"></a>表结构</h3><p>pw_koz_level </p>
-<table>
-<thead>
-<tr>
-<th>列</th>
-<th>类型</th>
-<th>注释</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>id</td>
-<td>int(11)</td>
-<td>自动增量</td>
-</tr>
-<tr>
-<td>username</td>
-<td>varchar(255)</td>
-<td>用户名</td>
-</tr>
-<tr>
-<td>password</td>
-<td>varchar(255)</td>
-<td>密码</td>
-</tr>
-<tr>
-<td>type</td>
-<td>varchar(255)</td>
-<td>类型</td>
-</tr>
-<tr>
-<td>score</td>
-<td>int(11)</td>
-<td>评分</td>
-</tr>
-</tbody>
-</table>
-<h3 id="更新算法"><a href="#更新算法" class="headerlink" title="更新算法"></a>更新算法</h3><p>目前数据来源有四个<br>第一个  扫描器爆破成功记录  score 值为 10<br>第二个  蜜罐记录   score 值 为 1<br>第三个  渗透进去提取到的有效密码(例如windows 明文)  ,score 10<br>第四个  收集的各种工具扫描字典  score 值为 1</p>
-<p>扫描的时候工具score 值来排序,命中一次之后+10 </p>
-<p>例如如下字典列表</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/15228255230476.jpg" alt=""></p>
-<h4 id="master"><a href="#master" class="headerlink" title="master"></a>master</h4><p>推送任务之后使用无状态扫描工具扫描服务和指纹识别</p>
-<h4 id="koz-node"><a href="#koz-node" class="headerlink" title="koz node"></a>koz node</h4><p>KozTask 类来保存本地任务队列,接收处的代码为</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span>  <span class="title">pop_member</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">while</span> self.len() &gt;  <span class="number">0</span>:</div><div class="line">        str_member=self.pop()</div><div class="line">        koz_member=ast.literal_eval(str_member)</div><div class="line">        self.list_member[str(koz_member[<span class="string">'name'</span>])].append(koz_member)</div><div class="line">    util.log(<span class="string">"pop koz_member  done count:%d"</span>  % (self.count()),<span class="number">2</span>,<span class="string">'koztask'</span>)</div></pre></td></tr></table></figure>
-<p>本地队列处理完毕之后,开始foreach 循环用户名密码组合(根据score 大小优先级)</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">koz_levels=get_koz_level()</div><div class="line"><span class="keyword">for</span> koz_level  <span class="keyword">in</span>  koz_levels :</div><div class="line">    koz_queue.queue.clear()</div><div class="line">    <span class="comment">#member=&#123;'name': 'ssh', 'task_id': 1124, 'url': '', 'host': '168.167.45.250', 'version': '', 'type': 'service', 'port': 22&#125;</span></div><div class="line">    <span class="comment">#ncrack.scan(member,koz_level)</span></div><div class="line">    <span class="comment">#break</span></div><div class="line">    <span class="keyword">try</span> :</div><div class="line">        <span class="keyword">for</span> member  <span class="keyword">in</span>   koz_task.list_member[koz_level[<span class="string">'type'</span>]] :</div><div class="line">            koz_queue.put(&#123;<span class="string">'member'</span>:member,<span class="string">'level'</span>:koz_level&#125;)</div><div class="line"></div><div class="line">        work_manager = WorkManager(koz_queue, config.koz_thread)  <span class="comment"># thread</span></div><div class="line">        work_manager.wait_allcomplete()</div><div class="line">    <span class="keyword">except</span> Exception, e:</div><div class="line">        util.log(<span class="string">"error info:"</span>+str(e),<span class="number">3</span>,<span class="string">'koz_node'</span>)</div><div class="line">    util.log(<span class="string">'koz_member len:%d'</span> % (koz_task.count()),<span class="number">1</span>,<span class="string">'koz_node'</span>)</div></pre></td></tr></table></figure>
-<p>当扫描出来结果时,直接把它从 koz_member 队列里面remove 掉,如此循环往复,直到跑完所有的密码。<br>remove </p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">while</span>  <span class="number">1</span>:</div><div class="line">        <span class="keyword">if</span> self.work_queue.empty() == <span class="keyword">True</span>:</div><div class="line">            <span class="keyword">break</span></div><div class="line">        task = self.work_queue.get(block=<span class="keyword">False</span>)</div><div class="line">        <span class="keyword">if</span> ncrack.scan(task[<span class="string">'member'</span>],task[<span class="string">'level'</span>])  != <span class="keyword">False</span> :</div><div class="line">            koz_type=task[<span class="string">'member'</span>][<span class="string">'name'</span>]</div><div class="line">            koz_task.list_member[koz_type].remove(task[<span class="string">'member'</span>])</div></pre></td></tr></table></figure>
-<h3 id="爆破算法"><a href="#爆破算法" class="headerlink" title="爆破算法"></a>爆破算法</h3><p>负责爆破的为ncrack 模块,调用的爆破工具有  medusa,ncrack。<br>部分实现</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">scan</span><span class="params">(target,level)</span>:</span></div><div class="line">    <span class="keyword">if</span> target[<span class="string">'name'</span>]  == <span class="string">'ms-wbt-server'</span>  <span class="keyword">or</span>  target[<span class="string">'name'</span>]  == <span class="string">'telnet'</span> :</div><div class="line">        str_command = <span class="string">"ncrack --user %s --pass %s  %s:%d "</span>  %  (level[<span class="string">'username'</span>],level[<span class="string">'password'</span>],target[<span class="string">'host'</span>],target[<span class="string">'port'</span>])</div><div class="line">        str_ret=str(sys_exec([<span class="string">'ncrack'</span>, <span class="string">'--user'</span>,level[<span class="string">'username'</span>], <span class="string">'--pass'</span>, level[<span class="string">'password'</span>], target[<span class="string">'host'</span>]+<span class="string">':'</span>+ str(target[<span class="string">'port'</span>])]))</div><div class="line">    <span class="keyword">else</span> :</div><div class="line">        str_command = <span class="string">"medusa -u %s -p %s -h %s -n %d  -M %s"</span> % (level[<span class="string">'username'</span>], level[<span class="string">'password'</span>], target[<span class="string">'host'</span>], target[<span class="string">'port'</span>], target[<span class="string">'name'</span>])</div><div class="line">        str_ret=str(sys_exec([<span class="string">'medusa'</span>,<span class="string">'-u'</span>,level[<span class="string">'username'</span>],<span class="string">'-p'</span>,level[<span class="string">'password'</span>],<span class="string">'-h'</span>,target[<span class="string">'host'</span>],<span class="string">'-n'</span>,str(target[<span class="string">'port'</span>]),<span class="string">'-M'</span>,target[<span class="string">'name'</span>]]))</div><div class="line">    </div><div class="line">    util.log(str_command, <span class="number">2</span>, <span class="string">'ncrack'</span>)</div><div class="line">    <span class="comment">#need  change </span></div><div class="line">    <span class="keyword">if</span> <span class="string">'ACCOUNT FOUND'</span> <span class="keyword">in</span> str_ret  <span class="keyword">or</span>  <span class="string">'credentials'</span>  <span class="keyword">in</span> str_ret:</div><div class="line">        str_data=<span class="string">'[%s] %s %s:%s'</span>   %  (target[<span class="string">'name'</span>],target[<span class="string">'host'</span>],level[<span class="string">'username'</span>],level[<span class="string">'password'</span>])</div><div class="line">        util.log(<span class="string">'ncrack taskid:%d target:%s service:%s succeed'</span> % (target[<span class="string">'task_id'</span>], target[<span class="string">'host'</span>], target[<span class="string">'name'</span>]), <span class="number">1</span>, <span class="string">'ncrack'</span>)</div><div class="line">        <span class="keyword">return</span> report(target,str_data)</div><div class="line">        </div><div class="line">    <span class="keyword">else</span>  :</div><div class="line">        <span class="keyword">return</span> <span class="keyword">False</span></div></pre></td></tr></table></figure>
-<h3 id="爆破结果"><a href="#爆破结果" class="headerlink" title="爆破结果"></a>爆破结果</h3><p> 总览<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/14703046762519.png" alt=""></p>
-<p>图文分析</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/14703047183607.jpg" alt=""></p>
-<p>部分结果一览</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/147030475970560.jpg" alt="147030475970560"></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;在研发漏洞扫描器的弱口令破解模块时，发现传统的通过字典遍历用户名密码的算法效率过低，当需要大批量高速爆破时，难以满足此类需求，因此需要引入新
-    
-    </summary>
-    
-      <category term="web安全" scheme="http://www.future-sec.com/categories/web%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="密码爆破" scheme="http://www.future-sec.com/tags/%E5%AF%86%E7%A0%81%E7%88%86%E7%A0%B4/"/>
-    
-  </entry>
-  
-  <entry>
     <title>QARK工具的介绍和原理分析</title>
     <link href="http://www.future-sec.com/introducing-qark.html"/>
     <id>http://www.future-sec.com/introducing-qark.html</id>
@@ -1226,39 +1228,6 @@ H2 = 0
   </entry>
   
   <entry>
-    <title>Janus漏洞(CVE-2017-13156)分析</title>
-    <link href="http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html"/>
-    <id>http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html</id>
-    <published>2017-12-20T16:00:00.000Z</published>
-    <updated>2018-06-29T08:59:10.780Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签名，是没有办法安装到系统中的。Android通过数字签名来标识应用程序的作者和在应用程序之间建立信任关系，不是用来决定最终用户可以安装哪些应用程序。这个数字签名由应用程序的作者完成，并不需要权威的数字证书签名机构认证，它只是用来让应用程序包自我认证的。然而Google在本月4日发布的Android安全公告中编号为CVE-2017-13156，这个漏洞被称为Janus漏洞，利用该漏洞可修改app而不影响原始签名。</p>
-<h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h3 id="Android-app签名校验简单介绍"><a href="#Android-app签名校验简单介绍" class="headerlink" title="Android app签名校验简单介绍"></a>Android app签名校验简单介绍</h3><p>在Android源码中“frameworks/base/core/java/android/content/pm/PackageParser.java”中。PackageParser类的collectCertificates方法会对APK进行签名校验，并且遍历APK中的所有文件，对每个文件进行校验。下面是该方法的源码：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image002.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image004.jpg" alt="img"><br>APK是一个ZIP格式的文件，因此使用ZIP相关的类进行读写。在上面代码中调用了loadCertificates，这个方法会返回一个二维数组，当APK中的文件签名校验失败，loadCertificates方法会返回一个空数组（可能是null，可能是数组长度为0），那么依照上面代码的逻辑如果数组为空则会抛出异常。<br>loadCertificates方法的代码见下：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image006.jpg" alt="img"><br>其中is是JarFile.JarFileInputStream类的对象。loadCertificates调用了readFullyIgnoringContents，在readFullyIgnoringContents中会调用JarFile.JarFileInputStream.read（JarFile类在“libcore/luni/src/main/java/java/util/jar/JarFile.java”文件中）<br>读取APK中一项数据，在read方法中会校验读取到的数据项的签名，如果签名校验失败，则会抛出SecurityException类型的异常，即签名校验失败。<br>上面代码调用了StrictJarFile.getCertificateChains方法，在/ libcore / luni / src / main / java / java / util / jar / StrictJarFile.java里面。下面是它的代码：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image007.jpg" alt="img"><br>上面的isSigned在下面的代码里面获取的：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image009.jpg" alt="img"><br>当证书读取成功，而且APK经过了签名，isSigned为true。<br>回到StrictJarFile.getCertificateChains中，当isSigned为true时会调用JarVerifier.getCertificateChains方法，下面是它的代码：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image010.jpg" alt="img"><br>verifiedEntries的声明：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image012.jpg" alt="img"><br>verifiedEntries是一个键值对，键是APK中经过了签名的文件名，如：classes.dex文件，值是证书数组。如果向已经签过名的APK中新添加一个文件然后安装这个APK，当程序逻辑执行到JarVerifier.getCertificateChains中时，在verifiedEntries里面无法找到新添加的文件名（因为这个新文件是在APK签名之后添加），那么JarVerifier.getCertificateChains方法将返回null。<br>以上就是整个对于app签名的简单分析。</p>
-<h3 id="签名方案"><a href="#签名方案" class="headerlink" title="签名方案"></a>签名方案</h3><p>参考google官方文档获得:<br>APK 签名方案<br>Android 支持两种应用签名方案，一种是基于 JAR 签名的方案（v1 方案），另一种是 Android Nougat (Android 7.0) 中引入的 APK 签名方案 v2（v2 方案）。<br>JAR 签名（v1 方案）<br>v1 签名并非保护整个apk文件，例如 ZIP 元数据就不受保护。再者，APK 验证程序需要处理大量不可信（尚未经过验证）的数据结构，而不受签名保护的数据不在处理的行列中。这会导致相当大的受攻击面。此外，APK 验证程序必须解压所有已压缩的条目，而这需要花费更多时间和内存。为了解决这些问题，Android 7.0 中引入了 APK 签名方案 v2。<br>APK 签名方案 v2（v2 方案）<br>Android 7.0 中引入了 APK 签名方案 v2（v2 方案）。该方案会对 APK 的内容进行hash处理和签名，然后将生成的“APK 签名分块”插入到 APK 中。<br>在验证期间，v2 方案会将 APK 文件视为 Blob，并对整个文件进行签名检查。对 APK 进行的任何修改（包括对 ZIP 元数据进行的修改）都会使 APK 签名作废。这种形式的 APK 验证不仅速度要快得多，而且能够发现更多种未经授权的修改。<br>同时，新的签名格式向后兼容，使用这种新格式签名的 APK（必须也使用v1） 可在更低版本的 Android 设备上进行安装（会直接忽略添加到 APK 的额外数据）。</p>
-<h3 id="apk签名校验方式"><a href="#apk签名校验方式" class="headerlink" title="apk签名校验方式"></a>apk签名校验方式</h3><p>为了提高兼容性，应同时采用 v1 和 v2 这两种方案对应用进行签名。与只使用v1 方案签名的应用相比，经过 v2 方案签名的应用能够更快速地安装到 Android Nougat 以及更高版本的设备上。但是更低版本的 Android 平台会忽略 v2 签名，这就需要应用包含 v1 签名。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image014.jpg" alt="img"><br>验证程序会对照存储在“APK 签名分块”中的 v2 签名对 APK 的全文件hash进行验证。该hash涵盖除“APK 签名分块”（其中包含 v2 签名）之外的所有内容。在“APK 签名分块”以外对 APK 进行的任何修改都会使 APK 的 v2 签名作废。v2 签名被删除的 APK 也会被拒绝，因为 v1 签名指明相应 APK 带有 v2 签名，所以 Android Nougat 及更高版本会拒绝使用 v1 签名验证 APK。</p>
-<h2 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h2><p>Janus漏洞主要是向APK里面添加额外的DEX文件。一方面，APK文件是zip文件，可以包含初始时的任意字节，在它的zip条目（实际情况下更多是在zip条目里面）。但是JAR签名方案只考虑了zip入口。当计算或者校验apk的签名的时候，它忽略了其他字节。另一方面，在字符串、类、方法定义等常规部分之后，一个DEX文件可以包含任意的字节。综上所述，一个文件可以同时包含一个APK文件和一个DEX文件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image016.jpg" alt="img"><br>另一个关键点是Dalvik / ART虚拟机方面。android运行加载APK文件，提取它的DEX文件，然后运行它的代码。在实践中，虚拟机可以加载和执行APK文件。当它得到APK文件时，它仍然会查看header的magic字节来判断它是什么类型的文件，如果找到一个DEX类型的，就会将文件载入为DEX文件，否则就会将文件加载为一个APK文件，其中包括一个带有DEX的zip文件。因此，既可以读取DEX文件又可以读取APK文件。<br>所以攻击者可以利用着这种二元性，在不影响其签名的情况下将一个恶意DEX文件预先添加到APK文件里面，然后，android运行时接受APK文件作为一个合法的早期版本的应用程序的有效更新，但是Dalvik虚拟机从注入的DEX文件中加载代码，从而实现攻击。</p>
-<h2 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h2><p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image018.jpg" alt="img"><br>原来的apk主要代码<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image019.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image021.jpg" alt="img"><br>修改了dex文件，将Log.i(“janus”,”点击事件”);修改为Toast.makeText(getApplicationContext(),”I steal your car.”,Toast.LENGTH_LONG).show();<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image023.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image024.jpg" alt="img"><br>安装合并好的1.apk<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image026.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image027.jpg" alt="img"><br>测试<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image029.jpg" alt="img"><br>攻击完成</p>
-<h2 id="影响范围"><a href="#影响范围" class="headerlink" title="影响范围"></a>影响范围</h2><p>该漏洞仅影响基于 JAR 签名的方案（v1 方案）。不影响自Android 7.0 以来引入的 APK 签名方案 v2（v2 方案）。</p>
-<h2 id="漏洞危害"><a href="#漏洞危害" class="headerlink" title="漏洞危害"></a>漏洞危害</h2><p>可被添加恶意dex文件可以进行一些敏感性的操作，例如窃取用户数据、监控手机等高危操作。</p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://source.android.com/security/apksigning/v2#verification" rel="external nofollow noopener noreferrer" target="_blank">https://source.android.com/security/apksigning/v2#verification</a><br><a href="https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures" rel="external nofollow noopener noreferrer" target="_blank">https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签
-    
-    </summary>
-    
-      <category term="移动安全" scheme="http://www.future-sec.com/categories/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="移动安全" scheme="http://www.future-sec.com/tags/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
-    
-      <category term="app签名" scheme="http://www.future-sec.com/tags/app%E7%AD%BE%E5%90%8D/"/>
-    
-  </entry>
-  
-  <entry>
     <title>使用MITMF中间人攻击非80端口的HTTP</title>
     <link href="http://www.future-sec.com/using-MITMF-attack-not-80-port-http.html"/>
     <id>http://www.future-sec.com/using-MITMF-attack-not-80-port-http.html</id>
@@ -1296,6 +1265,39 @@ H2 = 0
       <category term="web安全" scheme="http://www.future-sec.com/tags/web%E5%AE%89%E5%85%A8/"/>
     
       <category term="MITMf" scheme="http://www.future-sec.com/tags/MITMf/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Janus漏洞(CVE-2017-13156)分析</title>
+    <link href="http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html"/>
+    <id>http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html</id>
+    <published>2017-12-20T16:00:00.000Z</published>
+    <updated>2018-06-29T08:59:10.780Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签名，是没有办法安装到系统中的。Android通过数字签名来标识应用程序的作者和在应用程序之间建立信任关系，不是用来决定最终用户可以安装哪些应用程序。这个数字签名由应用程序的作者完成，并不需要权威的数字证书签名机构认证，它只是用来让应用程序包自我认证的。然而Google在本月4日发布的Android安全公告中编号为CVE-2017-13156，这个漏洞被称为Janus漏洞，利用该漏洞可修改app而不影响原始签名。</p>
+<h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h3 id="Android-app签名校验简单介绍"><a href="#Android-app签名校验简单介绍" class="headerlink" title="Android app签名校验简单介绍"></a>Android app签名校验简单介绍</h3><p>在Android源码中“frameworks/base/core/java/android/content/pm/PackageParser.java”中。PackageParser类的collectCertificates方法会对APK进行签名校验，并且遍历APK中的所有文件，对每个文件进行校验。下面是该方法的源码：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image002.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image004.jpg" alt="img"><br>APK是一个ZIP格式的文件，因此使用ZIP相关的类进行读写。在上面代码中调用了loadCertificates，这个方法会返回一个二维数组，当APK中的文件签名校验失败，loadCertificates方法会返回一个空数组（可能是null，可能是数组长度为0），那么依照上面代码的逻辑如果数组为空则会抛出异常。<br>loadCertificates方法的代码见下：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image006.jpg" alt="img"><br>其中is是JarFile.JarFileInputStream类的对象。loadCertificates调用了readFullyIgnoringContents，在readFullyIgnoringContents中会调用JarFile.JarFileInputStream.read（JarFile类在“libcore/luni/src/main/java/java/util/jar/JarFile.java”文件中）<br>读取APK中一项数据，在read方法中会校验读取到的数据项的签名，如果签名校验失败，则会抛出SecurityException类型的异常，即签名校验失败。<br>上面代码调用了StrictJarFile.getCertificateChains方法，在/ libcore / luni / src / main / java / java / util / jar / StrictJarFile.java里面。下面是它的代码：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image007.jpg" alt="img"><br>上面的isSigned在下面的代码里面获取的：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image009.jpg" alt="img"><br>当证书读取成功，而且APK经过了签名，isSigned为true。<br>回到StrictJarFile.getCertificateChains中，当isSigned为true时会调用JarVerifier.getCertificateChains方法，下面是它的代码：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image010.jpg" alt="img"><br>verifiedEntries的声明：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image012.jpg" alt="img"><br>verifiedEntries是一个键值对，键是APK中经过了签名的文件名，如：classes.dex文件，值是证书数组。如果向已经签过名的APK中新添加一个文件然后安装这个APK，当程序逻辑执行到JarVerifier.getCertificateChains中时，在verifiedEntries里面无法找到新添加的文件名（因为这个新文件是在APK签名之后添加），那么JarVerifier.getCertificateChains方法将返回null。<br>以上就是整个对于app签名的简单分析。</p>
+<h3 id="签名方案"><a href="#签名方案" class="headerlink" title="签名方案"></a>签名方案</h3><p>参考google官方文档获得:<br>APK 签名方案<br>Android 支持两种应用签名方案，一种是基于 JAR 签名的方案（v1 方案），另一种是 Android Nougat (Android 7.0) 中引入的 APK 签名方案 v2（v2 方案）。<br>JAR 签名（v1 方案）<br>v1 签名并非保护整个apk文件，例如 ZIP 元数据就不受保护。再者，APK 验证程序需要处理大量不可信（尚未经过验证）的数据结构，而不受签名保护的数据不在处理的行列中。这会导致相当大的受攻击面。此外，APK 验证程序必须解压所有已压缩的条目，而这需要花费更多时间和内存。为了解决这些问题，Android 7.0 中引入了 APK 签名方案 v2。<br>APK 签名方案 v2（v2 方案）<br>Android 7.0 中引入了 APK 签名方案 v2（v2 方案）。该方案会对 APK 的内容进行hash处理和签名，然后将生成的“APK 签名分块”插入到 APK 中。<br>在验证期间，v2 方案会将 APK 文件视为 Blob，并对整个文件进行签名检查。对 APK 进行的任何修改（包括对 ZIP 元数据进行的修改）都会使 APK 签名作废。这种形式的 APK 验证不仅速度要快得多，而且能够发现更多种未经授权的修改。<br>同时，新的签名格式向后兼容，使用这种新格式签名的 APK（必须也使用v1） 可在更低版本的 Android 设备上进行安装（会直接忽略添加到 APK 的额外数据）。</p>
+<h3 id="apk签名校验方式"><a href="#apk签名校验方式" class="headerlink" title="apk签名校验方式"></a>apk签名校验方式</h3><p>为了提高兼容性，应同时采用 v1 和 v2 这两种方案对应用进行签名。与只使用v1 方案签名的应用相比，经过 v2 方案签名的应用能够更快速地安装到 Android Nougat 以及更高版本的设备上。但是更低版本的 Android 平台会忽略 v2 签名，这就需要应用包含 v1 签名。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image014.jpg" alt="img"><br>验证程序会对照存储在“APK 签名分块”中的 v2 签名对 APK 的全文件hash进行验证。该hash涵盖除“APK 签名分块”（其中包含 v2 签名）之外的所有内容。在“APK 签名分块”以外对 APK 进行的任何修改都会使 APK 的 v2 签名作废。v2 签名被删除的 APK 也会被拒绝，因为 v1 签名指明相应 APK 带有 v2 签名，所以 Android Nougat 及更高版本会拒绝使用 v1 签名验证 APK。</p>
+<h2 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h2><p>Janus漏洞主要是向APK里面添加额外的DEX文件。一方面，APK文件是zip文件，可以包含初始时的任意字节，在它的zip条目（实际情况下更多是在zip条目里面）。但是JAR签名方案只考虑了zip入口。当计算或者校验apk的签名的时候，它忽略了其他字节。另一方面，在字符串、类、方法定义等常规部分之后，一个DEX文件可以包含任意的字节。综上所述，一个文件可以同时包含一个APK文件和一个DEX文件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image016.jpg" alt="img"><br>另一个关键点是Dalvik / ART虚拟机方面。android运行加载APK文件，提取它的DEX文件，然后运行它的代码。在实践中，虚拟机可以加载和执行APK文件。当它得到APK文件时，它仍然会查看header的magic字节来判断它是什么类型的文件，如果找到一个DEX类型的，就会将文件载入为DEX文件，否则就会将文件加载为一个APK文件，其中包括一个带有DEX的zip文件。因此，既可以读取DEX文件又可以读取APK文件。<br>所以攻击者可以利用着这种二元性，在不影响其签名的情况下将一个恶意DEX文件预先添加到APK文件里面，然后，android运行时接受APK文件作为一个合法的早期版本的应用程序的有效更新，但是Dalvik虚拟机从注入的DEX文件中加载代码，从而实现攻击。</p>
+<h2 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h2><p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image018.jpg" alt="img"><br>原来的apk主要代码<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image019.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image021.jpg" alt="img"><br>修改了dex文件，将Log.i(“janus”,”点击事件”);修改为Toast.makeText(getApplicationContext(),”I steal your car.”,Toast.LENGTH_LONG).show();<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image023.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image024.jpg" alt="img"><br>安装合并好的1.apk<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image026.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image027.jpg" alt="img"><br>测试<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image029.jpg" alt="img"><br>攻击完成</p>
+<h2 id="影响范围"><a href="#影响范围" class="headerlink" title="影响范围"></a>影响范围</h2><p>该漏洞仅影响基于 JAR 签名的方案（v1 方案）。不影响自Android 7.0 以来引入的 APK 签名方案 v2（v2 方案）。</p>
+<h2 id="漏洞危害"><a href="#漏洞危害" class="headerlink" title="漏洞危害"></a>漏洞危害</h2><p>可被添加恶意dex文件可以进行一些敏感性的操作，例如窃取用户数据、监控手机等高危操作。</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://source.android.com/security/apksigning/v2#verification" rel="external nofollow noopener noreferrer" target="_blank">https://source.android.com/security/apksigning/v2#verification</a><br><a href="https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures" rel="external nofollow noopener noreferrer" target="_blank">https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签
+    
+    </summary>
+    
+      <category term="移动安全" scheme="http://www.future-sec.com/categories/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="移动安全" scheme="http://www.future-sec.com/tags/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+    
+      <category term="app签名" scheme="http://www.future-sec.com/tags/app%E7%AD%BE%E5%90%8D/"/>
     
   </entry>
   
@@ -1479,6 +1481,65 @@ H2 = 0
   </entry>
   
   <entry>
+    <title>浅谈现代化指纹识别及工具编写</title>
+    <link href="http://www.future-sec.com/yet-another-web-fingerprinter.html"/>
+    <id>http://www.future-sec.com/yet-another-web-fingerprinter.html</id>
+    <published>2017-11-26T16:00:00.000Z</published>
+    <updated>2018-06-29T09:01:09.765Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>对于庞大的网络空间来说，存在着各式各样的应用、设备等等资产，而对这些资产进行识别，无论拿来做扫描器还是批量分析，都是非常有价值的，高效的应用指纹识别是一个长久可研究的课题，本文主要探讨如何建立高效可靠的指纹识别方法。</p>
+<h2 id="传统的指纹识别"><a href="#传统的指纹识别" class="headerlink" title="传统的指纹识别"></a>传统的指纹识别</h2><p>一些扫描器里面使用的比较多的都是通过特殊路径  静态文件的md5 值或者大小 关键词等，例如使用比较广泛的一个指纹数据库 。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/15047737007020.jpg" alt="img"><br>存在几个问题</p>
+<ol>
+<li>效率太低，每一个路径都需要访问一次。容易被waf拦截</li>
+<li>目前很多网站的静态资源 cdn于gzip 压缩，md5 其实是不一样的 ，识别率很低 </li>
+</ol>
+<h2 id="现代化指纹识别"><a href="#现代化指纹识别" class="headerlink" title="现代化指纹识别"></a>现代化指纹识别</h2><p>怎么来快速的精确的指纹识别，观察了大部分的web系统发现，访问首页并且获取response header  能识别出80% 的app<br>例如WordPress，discuz  会把独特的cookie放到header 里面。<br>discuz  的关键词  _saltkey=<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/15109122240334.jpg" alt="img"></p>
+<p>默认首页也会有很多固定的关键词，  WordPress   wp-conetnt<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/15109123220322.jpg" alt="img"></p>
+<p>剩下的指纹再去特殊url提取，这样效率和准确率会提高很多很多。</p>
+<h2 id="现代化指纹识别方案"><a href="#现代化指纹识别方案" class="headerlink" title="现代化指纹识别方案"></a>现代化指纹识别方案</h2><h3 id="指纹库设计"><a href="#指纹库设计" class="headerlink" title="指纹库设计"></a>指纹库设计</h3><h4 id="数据库结构"><a href="#数据库结构" class="headerlink" title="数据库结构"></a>数据库结构</h4><p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/QQ截图20171127191426.jpg" alt="img"><br>指纹库类型目前有3种 ，当然后续还需要加上正则。<br>finger 规则是一个 string 之后的python 字典,里面有例如状态吗,规则等字段,例如  weblogic 的指纹规则</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123;<span class="string">'port'</span>:<span class="number">7001</span>,<span class="string">'url'</span>: <span class="string">'/console/login/LoginForm.jsp'</span>, <span class="string">'code'</span>: <span class="number">200</span>, <span class="string">'grep'</span>: <span class="string">'WebLogic Server'</span>&#125;</div></pre></td></tr></table></figure>
+<p>下面介绍每一种指纹库实例</p>
+<h4 id="指纹规则"><a href="#指纹规则" class="headerlink" title="指纹规则"></a>指纹规则</h4><h5 id="web-header-contain"><a href="#web-header-contain" class="headerlink" title="web_header_contain"></a>web_header_contain</h5><p>首页 response 里面的 header 查找特征符<br>速度最快,优先极最高。很多web cms 都会写特殊的cookie 键值。<br>例如 discuz,jboss,wordpress 等。<br>规则编写,以discuz 为例 </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">➜  tools  curl  -I    www.cctry.com</div><div class="line">HTTP/1.1 200 OK</div><div class="line">Server: Microsoft-IIS/6.0</div><div class="line">Connection: keep-alive</div><div class="line">Date: Thu, 07 Jan 2016 18:22:34 GMT</div><div class="line">Content-Type: text/html; charset=gbk</div><div class="line">Content-Length: 0</div><div class="line">X-Powered-By: PHP/5.2.17</div><div class="line">Set-Cookie: Vguy_2132_saltkey=O6srsEYk; expires=Sat, 06-Feb-2016 18:22:22 GMT; path=/; httponly</div><div class="line">Set-Cookie: Vguy_2132_lastvisit=1452187342; expires=Sat, 06-Feb-2016 18:22:22 GMT; path=/</div><div class="line">Set-Cookie: Vguy_2132_sid=MwE6e0; expires=Fri, 08-Jan-2016 18:22:22 GMT; path=/</div><div class="line">Set-Cookie: Vguy_2132_lastact=1452190942%09index.php%09; expires=Fri, 08-Jan-2016 18:22:22 GMT; path=/</div><div class="line">X-Daa-Tunnel: hop_count=1</div></pre></td></tr></table></figure>
+<p>经过分析,字符串 _saltkey=  为discuz  header 中的规则<br>具体规则如下<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/QQ截图20171127191240.jpg" alt="img"></p>
+<h5 id="web-index-contain"><a href="#web-index-contain" class="headerlink" title="web_index_contain"></a>web_index_contain</h5><p>在缓存的首页里面查找关键词或者正则匹配<br>优先级次之,只需要 get请求一次即可。<br>例如Office Anywhere   指纹 编写流程<br>数据包分析</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">➜  tools  curl  http://125.91.218.186:8000/   |  grep   <span class="string">'/images/tongda.ico'</span></div><div class="line">  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current</div><div class="line">                                 Dload  Upload   Total   Spent    Left  Speed</div><div class="line">100  2001  100  2001    0     0  11795      0 --:--:-- --:--:-- --:--:-- 11840</div><div class="line">&lt;link rel=<span class="string">"shortcut icon"</span> href=<span class="string">"/images/tongda.ico"</span>&gt;</div></pre></td></tr></table></figure>
+<p>规则编写<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/QQ截图20171127191233.jpg" alt="img"></p>
+<h5 id="web-url-contain"><a href="#web-url-contain" class="headerlink" title="web_url_contain"></a>web_url_contain</h5><p>特殊url 查找指定的关键词(返回状态码也指定)。<br>优先级最低。<br>例如  weblogic 的指纹 finger 过程<br>数据包分析</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">➜  tools  curl  -I     http://202.97.194.9:7001/console/login/LoginForm.jsp</div><div class="line">HTTP/1.1 200 OK</div><div class="line">Cache-Control: no-cache</div><div class="line">Date: Thu, 07 Jan 2016 18:53:28 GMT</div><div class="line">Pragma: no-cache</div><div class="line">Content-Type: text/html; charset=UTF-8</div><div class="line">Expires: Thu, 01 Jan 1970 00:00:00 GMT</div><div class="line">Set-Cookie: ADMINCONSOLESESSION=XQXrWT0LQTvpf8Jv75nMnQB9vN0cGppy7bTfJxfH9S673VTGP1Wl!1715621632; path=/</div><div class="line">Content-Language: zh-CN</div><div class="line">X-Powered-By: Servlet/2.5 JSP/2.1</div></pre></td></tr></table></figure>
+<p>规则</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123;<span class="string">'url'</span>: <span class="string">'/console/login/LoginForm.jsp'</span>, <span class="string">'code'</span>: <span class="number">200</span>, <span class="string">'grep'</span>: <span class="string">'WebLogic Server'</span>&#125;</div></pre></td></tr></table></figure>
+<p>表<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/QQ截图20171127191224.jpg" alt="img"></p>
+<h3 id="程序编写"><a href="#程序编写" class="headerlink" title="程序编写"></a>程序编写</h3><p>指纹识别模块代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># coding:utf-8</span></div><div class="line"><span class="string">"""</span></div><div class="line"> *@Projet  Yafinger</div><div class="line"> *@Author  yaseng@uauc.net</div><div class="line"> *@Desc    playweb finger modules</div><div class="line">"""</div><div class="line"><span class="keyword">import</span> ast,time</div><div class="line"><span class="keyword">import</span> config</div><div class="line"><span class="keyword">from</span>   lib                <span class="keyword">import</span> util</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_web_app</span><span class="params">(url)</span>:</span></div><div class="line">    rsp_index = util.http_get(url)</div><div class="line">    str_index = <span class="string">""</span></div><div class="line">    <span class="keyword">if</span> rsp_index == <span class="keyword">None</span> :</div><div class="line">        <span class="keyword">return</span> <span class="keyword">None</span></div><div class="line">    list_app=[]</div><div class="line">    fingers=config.get(<span class="string">'fingers'</span>);</div><div class="line">    <span class="keyword">for</span>  finger  <span class="keyword">in</span>   fingers :</div><div class="line">        rule = ast.literal_eval(finger[<span class="string">'finger'</span>])</div><div class="line">        <span class="keyword">if</span> finger[<span class="string">'type'</span>] == <span class="string">'web_index_contain'</span>: </div><div class="line">            <span class="comment"># limit header and  body and code  exp : &#123;'header':'jsessionid=','code': 200, 'grep': '.action'&#125;</span></div><div class="line">            <span class="keyword">if</span> rule.has_key(<span class="string">'header'</span>) <span class="keyword">and</span>  rule[<span class="string">'header'</span>] <span class="keyword">not</span> <span class="keyword">in</span>   str(rsp_index[<span class="string">'headers'</span>]).lower()  : </div><div class="line">                <span class="keyword">continue</span></div><div class="line">            <span class="keyword">if</span> rsp_index[<span class="string">'code'</span>] == rule[<span class="string">'code'</span>] <span class="keyword">and</span>  rule[<span class="string">'grep'</span>]  <span class="keyword">in</span> rsp_index[<span class="string">'data'</span>] :</div><div class="line">                list_app.append(&#123;<span class="string">'app_id'</span>:finger[<span class="string">'id'</span>], <span class="string">'url'</span>:url&#125;)</div><div class="line">                util.log(<span class="string">"url:%s app:%s"</span> % (url, finger[<span class="string">'app_name'</span>]))</div><div class="line">    </div><div class="line">        <span class="keyword">elif</span> finger[<span class="string">'type'</span>] == <span class="string">'web_url_contain'</span> :</div><div class="line">             rsp_tmp = util.http_get(url + rule[<span class="string">'url'</span>])</div><div class="line">             <span class="keyword">if</span> rsp_tmp == <span class="keyword">None</span> :</div><div class="line">                 <span class="keyword">continue</span></div><div class="line">             <span class="keyword">if</span> rsp_tmp[<span class="string">'code'</span>] == rule[<span class="string">'code'</span>] <span class="keyword">and</span>  rule[<span class="string">'grep'</span>]  <span class="keyword">in</span> rsp_tmp[<span class="string">'data'</span>] :</div><div class="line">                 list_app.append(&#123;<span class="string">'app_id'</span>:finger[<span class="string">'id'</span>], <span class="string">'url'</span>:url&#125;)</div><div class="line">                 util.log(<span class="string">"url:%s app:%s"</span> % (url + rule[<span class="string">'url'</span>], finger[<span class="string">'app_name'</span>]))</div><div class="line">        <span class="keyword">elif</span>  finger[<span class="string">'type'</span>] == <span class="string">'web_header_contain'</span> :</div><div class="line"></div><div class="line">            <span class="keyword">if</span>  rule[<span class="string">'grep'</span>]  <span class="keyword">in</span>  str(rsp_index[<span class="string">'headers'</span>]).lower() :</div><div class="line">                list_app.append(&#123;<span class="string">'app_id'</span>:finger[<span class="string">'id'</span>], <span class="string">'url'</span>:url&#125;)</div><div class="line">                util.log(<span class="string">"url:%s app:%s"</span> % (url , finger[<span class="string">'app_name'</span>]))</div><div class="line">                        </div><div class="line">            </div><div class="line">        time.sleep(<span class="number">0.01</span>)</div><div class="line">    <span class="keyword">return</span>  list_app</div></pre></td></tr></table></figure>
+<h3 id="单独识别"><a href="#单独识别" class="headerlink" title="单独识别"></a>单独识别</h3><p>简单调用指纹识别模块代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># coding:utf-8</span></div><div class="line"><span class="string">"""</span></div><div class="line"> *@Projet  Yafinger</div><div class="line"> *@Author  yaseng@uauc.net</div><div class="line"> *@Desc    yafinger test </div><div class="line">     __    __            ___                                         </div><div class="line">    /\ \  /\ \         /'___\  __                                    </div><div class="line">    \ `\`\\/'/   __   /\ \__/ /\_\     ___       __       __   _ __  </div><div class="line">     `\ `\ /'  /'__`\ \ \ ,__\\/\ \  /' _ `\   /'_ `\   /'__`\/\`'__\</div><div class="line">       `\ \ \ /\ \L\.\_\ \ \_/ \ \ \ /\ \/\ \ /\ \L\ \ /\  __/\ \ \/ </div><div class="line">         \ \_\\ \__/.\_\\ \_\   \ \_\\ \_\ \_\\ \____ \\ \____\\ \_\ </div><div class="line">          \/_/ \/__/\/_/ \/_/    \/_/ \/_/\/_/ \/___L\ \\/____/ \/_/ </div><div class="line">                                                 /\____/             </div><div class="line">                                                 \_/__/ </div><div class="line">"""</div><div class="line"><span class="keyword">import</span>   os, time, sys, Queue, threading, ast</div><div class="line"><span class="keyword">import</span> config</div><div class="line"><span class="keyword">from</span>   lib                <span class="keyword">import</span> util</div><div class="line"><span class="keyword">from</span>   lib.db             <span class="keyword">import</span> *</div><div class="line"><span class="keyword">from</span>   optparse           <span class="keyword">import</span> OptionParser</div><div class="line"><span class="keyword">from</span>   modules            <span class="keyword">import</span> finger</div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</div><div class="line">    usage= <span class="string">'''%prog --host  host --port  port --finger  &lt;all|app_name&gt;   \r\nExample:%prog  --url  http://127.0.0.1    --finger phpmyadmin  '''</span></div><div class="line">    parser = OptionParser(usage=usage)</div><div class="line">    parser.add_option(<span class="string">"-u"</span>, <span class="string">"--url"</span>, dest=<span class="string">"url"</span>, help=<span class="string">"target url"</span>)</div><div class="line">    parser.add_option(<span class="string">"-f"</span>, <span class="string">"--finger"</span>, dest=<span class="string">"finger"</span>, help=<span class="string">"finger_db app_name,default all "</span>, default=<span class="string">"all"</span>)</div><div class="line">    options, arguments = parser.parse_args()</div><div class="line">    <span class="keyword">if</span> options.url == <span class="keyword">None</span> :</div><div class="line">        parser.print_help() </div><div class="line">        exit(<span class="number">0</span>)</div><div class="line">    db = MySQL(config.db_config)</div><div class="line">    sql_finger_where=<span class="string">' '</span>  <span class="keyword">if</span> options.finger == <span class="string">'all'</span> <span class="keyword">else</span> <span class="string">"  and  app_name='%s' "</span>  % options.finger</div><div class="line">    db.query(<span class="string">"SELECT  * from  pw_finger_db  where  `enable`=1   %s "</span>  % sql_finger_where)</div><div class="line">    fingers = db.fetch_all()</div><div class="line">    <span class="keyword">if</span> len(fingers) == <span class="number">0</span> :</div><div class="line">        util.log(<span class="string">'finger app_name %s not found'</span> % options.finger ,<span class="number">3</span>,<span class="string">'finger'</span>) </div><div class="line">    config.set(<span class="string">"fingers"</span>,fingers)</div><div class="line">    util.log(<span class="string">"load fingers count %d"</span> % len(fingers),<span class="number">1</span>,<span class="string">'finger'</span>)</div><div class="line">    finger.get_web_app(options.url)</div></pre></td></tr></table></figure>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/15109322329056.jpg" alt="img"></p>
+<h3 id="批量识别"><a href="#批量识别" class="headerlink" title="批量识别"></a>批量识别</h3><p> 可以使用线程池来实现批量指纹识别。</p>
+<h3 id="指纹结果"><a href="#指纹结果" class="headerlink" title="指纹结果"></a>指纹结果</h3><p>融合到系统中指纹保存在数据库中，本模块可以快速整合到扫描器或者其他项目中。</p>
+<h2 id="yafinger"><a href="#yafinger" class="headerlink" title="yafinger"></a>yafinger</h2><p>yet another  web  fingerprinter<br><a href="https://github.com/yaseng/yafinger" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/yaseng/yafinger</a></p>
+<h2 id="issue"><a href="#issue" class="headerlink" title="issue"></a>issue</h2><ol>
+<li>指纹库需要补充</li>
+<li>可以不局限于web指纹</li>
+<li>某些情况可能目前的指纹规则不符合，还需要添加新的指纹规则，例如正则</li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;对于庞大的网络空间来说，存在着各式各样的应用、设备等等资产，而对这些资产进行识别，无论拿来做扫描器还是批量分析，都是非常有价值的，高效的应用
+    
+    </summary>
+    
+      <category term="web安全" scheme="http://www.future-sec.com/categories/web%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="指纹识别" scheme="http://www.future-sec.com/tags/%E6%8C%87%E7%BA%B9%E8%AF%86%E5%88%AB/"/>
+    
+  </entry>
+  
+  <entry>
     <title>物联网硬件安全分析基础-固件提取</title>
     <link href="http://www.future-sec.com/iot-security-hardware-obtain.html"/>
     <id>http://www.future-sec.com/iot-security-hardware-obtain.html</id>
@@ -1562,65 +1623,6 @@ H2 = 0
       <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
     
       <category term="硬件分析" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%88%86%E6%9E%90/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>浅谈现代化指纹识别及工具编写</title>
-    <link href="http://www.future-sec.com/yet-another-web-fingerprinter.html"/>
-    <id>http://www.future-sec.com/yet-another-web-fingerprinter.html</id>
-    <published>2017-11-26T16:00:00.000Z</published>
-    <updated>2018-06-29T09:01:09.765Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>对于庞大的网络空间来说，存在着各式各样的应用、设备等等资产，而对这些资产进行识别，无论拿来做扫描器还是批量分析，都是非常有价值的，高效的应用指纹识别是一个长久可研究的课题，本文主要探讨如何建立高效可靠的指纹识别方法。</p>
-<h2 id="传统的指纹识别"><a href="#传统的指纹识别" class="headerlink" title="传统的指纹识别"></a>传统的指纹识别</h2><p>一些扫描器里面使用的比较多的都是通过特殊路径  静态文件的md5 值或者大小 关键词等，例如使用比较广泛的一个指纹数据库 。</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/15047737007020.jpg" alt="img"><br>存在几个问题</p>
-<ol>
-<li>效率太低，每一个路径都需要访问一次。容易被waf拦截</li>
-<li>目前很多网站的静态资源 cdn于gzip 压缩，md5 其实是不一样的 ，识别率很低 </li>
-</ol>
-<h2 id="现代化指纹识别"><a href="#现代化指纹识别" class="headerlink" title="现代化指纹识别"></a>现代化指纹识别</h2><p>怎么来快速的精确的指纹识别，观察了大部分的web系统发现，访问首页并且获取response header  能识别出80% 的app<br>例如WordPress，discuz  会把独特的cookie放到header 里面。<br>discuz  的关键词  _saltkey=<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/15109122240334.jpg" alt="img"></p>
-<p>默认首页也会有很多固定的关键词，  WordPress   wp-conetnt<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/15109123220322.jpg" alt="img"></p>
-<p>剩下的指纹再去特殊url提取，这样效率和准确率会提高很多很多。</p>
-<h2 id="现代化指纹识别方案"><a href="#现代化指纹识别方案" class="headerlink" title="现代化指纹识别方案"></a>现代化指纹识别方案</h2><h3 id="指纹库设计"><a href="#指纹库设计" class="headerlink" title="指纹库设计"></a>指纹库设计</h3><h4 id="数据库结构"><a href="#数据库结构" class="headerlink" title="数据库结构"></a>数据库结构</h4><p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/QQ截图20171127191426.jpg" alt="img"><br>指纹库类型目前有3种 ，当然后续还需要加上正则。<br>finger 规则是一个 string 之后的python 字典,里面有例如状态吗,规则等字段,例如  weblogic 的指纹规则</p>
-<figure class="highlight xquery"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123;<span class="string">'port'</span>:<span class="number">7001</span>,<span class="string">'url'</span>: <span class="string">'/console/login/LoginForm.jsp'</span>, <span class="string">'code'</span>: <span class="number">200</span>, <span class="string">'grep'</span>: <span class="string">'WebLogic Server'</span>&#125;</div></pre></td></tr></table></figure>
-<p>下面介绍每一种指纹库实例</p>
-<h4 id="指纹规则"><a href="#指纹规则" class="headerlink" title="指纹规则"></a>指纹规则</h4><h5 id="web-header-contain"><a href="#web-header-contain" class="headerlink" title="web_header_contain"></a>web_header_contain</h5><p>首页 response 里面的 header 查找特征符<br>速度最快,优先极最高。很多web cms 都会写特殊的cookie 键值。<br>例如 discuz,jboss,wordpress 等。<br>规则编写,以discuz 为例 </p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">➜  tools  curl  -I    www.cctry.com</div><div class="line">HTTP/1.1 200 OK</div><div class="line">Server: Microsoft-IIS/6.0</div><div class="line">Connection: keep-alive</div><div class="line">Date: Thu, 07 Jan 2016 18:22:34 GMT</div><div class="line">Content-Type: text/html; charset=gbk</div><div class="line">Content-Length: 0</div><div class="line">X-Powered-By: PHP/5.2.17</div><div class="line">Set-Cookie: Vguy_2132_saltkey=O6srsEYk; expires=Sat, 06-Feb-2016 18:22:22 GMT; path=/; httponly</div><div class="line">Set-Cookie: Vguy_2132_lastvisit=1452187342; expires=Sat, 06-Feb-2016 18:22:22 GMT; path=/</div><div class="line">Set-Cookie: Vguy_2132_sid=MwE6e0; expires=Fri, 08-Jan-2016 18:22:22 GMT; path=/</div><div class="line">Set-Cookie: Vguy_2132_lastact=1452190942%09index.php%09; expires=Fri, 08-Jan-2016 18:22:22 GMT; path=/</div><div class="line">X-Daa-Tunnel: hop_count=1</div></pre></td></tr></table></figure>
-<p>经过分析,字符串 _saltkey=  为discuz  header 中的规则<br>具体规则如下<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/QQ截图20171127191240.jpg" alt="img"></p>
-<h5 id="web-index-contain"><a href="#web-index-contain" class="headerlink" title="web_index_contain"></a>web_index_contain</h5><p>在缓存的首页里面查找关键词或者正则匹配<br>优先级次之,只需要 get请求一次即可。<br>例如Office Anywhere   指纹 编写流程<br>数据包分析</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">➜  tools  curl  http://125.91.218.186:8000/   |  grep   <span class="string">'/images/tongda.ico'</span></div><div class="line">  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current</div><div class="line">                                 Dload  Upload   Total   Spent    Left  Speed</div><div class="line">100  2001  100  2001    0     0  11795      0 --:--:-- --:--:-- --:--:-- 11840</div><div class="line">&lt;link rel=<span class="string">"shortcut icon"</span> href=<span class="string">"/images/tongda.ico"</span>&gt;</div></pre></td></tr></table></figure>
-<p>规则编写<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/QQ截图20171127191233.jpg" alt="img"></p>
-<h5 id="web-url-contain"><a href="#web-url-contain" class="headerlink" title="web_url_contain"></a>web_url_contain</h5><p>特殊url 查找指定的关键词(返回状态码也指定)。<br>优先级最低。<br>例如  weblogic 的指纹 finger 过程<br>数据包分析</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">➜  tools  curl  -I     http://202.97.194.9:7001/console/login/LoginForm.jsp</div><div class="line">HTTP/1.1 200 OK</div><div class="line">Cache-Control: no-cache</div><div class="line">Date: Thu, 07 Jan 2016 18:53:28 GMT</div><div class="line">Pragma: no-cache</div><div class="line">Content-Type: text/html; charset=UTF-8</div><div class="line">Expires: Thu, 01 Jan 1970 00:00:00 GMT</div><div class="line">Set-Cookie: ADMINCONSOLESESSION=XQXrWT0LQTvpf8Jv75nMnQB9vN0cGppy7bTfJxfH9S673VTGP1Wl!1715621632; path=/</div><div class="line">Content-Language: zh-CN</div><div class="line">X-Powered-By: Servlet/2.5 JSP/2.1</div></pre></td></tr></table></figure>
-<p>规则</p>
-<figure class="highlight xquery"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123;<span class="string">'url'</span>: <span class="string">'/console/login/LoginForm.jsp'</span>, <span class="string">'code'</span>: <span class="number">200</span>, <span class="string">'grep'</span>: <span class="string">'WebLogic Server'</span>&#125;</div></pre></td></tr></table></figure>
-<p>表<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/QQ截图20171127191224.jpg" alt="img"></p>
-<h3 id="程序编写"><a href="#程序编写" class="headerlink" title="程序编写"></a>程序编写</h3><p>指纹识别模块代码</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># coding:utf-8</span></div><div class="line"><span class="string">"""</span></div><div class="line"> *@Projet  Yafinger</div><div class="line"> *@Author  yaseng@uauc.net</div><div class="line"> *@Desc    playweb finger modules</div><div class="line">"""</div><div class="line"><span class="keyword">import</span> ast,time</div><div class="line"><span class="keyword">import</span> config</div><div class="line"><span class="keyword">from</span>   lib                <span class="keyword">import</span> util</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_web_app</span><span class="params">(url)</span>:</span></div><div class="line">    rsp_index = util.http_get(url)</div><div class="line">    str_index = <span class="string">""</span></div><div class="line">    <span class="keyword">if</span> rsp_index == <span class="keyword">None</span> :</div><div class="line">        <span class="keyword">return</span> <span class="keyword">None</span></div><div class="line">    list_app=[]</div><div class="line">    fingers=config.get(<span class="string">'fingers'</span>);</div><div class="line">    <span class="keyword">for</span>  finger  <span class="keyword">in</span>   fingers :</div><div class="line">        rule = ast.literal_eval(finger[<span class="string">'finger'</span>])</div><div class="line">        <span class="keyword">if</span> finger[<span class="string">'type'</span>] == <span class="string">'web_index_contain'</span>: </div><div class="line">            <span class="comment"># limit header and  body and code  exp : &#123;'header':'jsessionid=','code': 200, 'grep': '.action'&#125;</span></div><div class="line">            <span class="keyword">if</span> rule.has_key(<span class="string">'header'</span>) <span class="keyword">and</span>  rule[<span class="string">'header'</span>] <span class="keyword">not</span> <span class="keyword">in</span>   str(rsp_index[<span class="string">'headers'</span>]).lower()  : </div><div class="line">                <span class="keyword">continue</span></div><div class="line">            <span class="keyword">if</span> rsp_index[<span class="string">'code'</span>] == rule[<span class="string">'code'</span>] <span class="keyword">and</span>  rule[<span class="string">'grep'</span>]  <span class="keyword">in</span> rsp_index[<span class="string">'data'</span>] :</div><div class="line">                list_app.append(&#123;<span class="string">'app_id'</span>:finger[<span class="string">'id'</span>], <span class="string">'url'</span>:url&#125;)</div><div class="line">                util.log(<span class="string">"url:%s app:%s"</span> % (url, finger[<span class="string">'app_name'</span>]))</div><div class="line">    </div><div class="line">        <span class="keyword">elif</span> finger[<span class="string">'type'</span>] == <span class="string">'web_url_contain'</span> :</div><div class="line">             rsp_tmp = util.http_get(url + rule[<span class="string">'url'</span>])</div><div class="line">             <span class="keyword">if</span> rsp_tmp == <span class="keyword">None</span> :</div><div class="line">                 <span class="keyword">continue</span></div><div class="line">             <span class="keyword">if</span> rsp_tmp[<span class="string">'code'</span>] == rule[<span class="string">'code'</span>] <span class="keyword">and</span>  rule[<span class="string">'grep'</span>]  <span class="keyword">in</span> rsp_tmp[<span class="string">'data'</span>] :</div><div class="line">                 list_app.append(&#123;<span class="string">'app_id'</span>:finger[<span class="string">'id'</span>], <span class="string">'url'</span>:url&#125;)</div><div class="line">                 util.log(<span class="string">"url:%s app:%s"</span> % (url + rule[<span class="string">'url'</span>], finger[<span class="string">'app_name'</span>]))</div><div class="line">        <span class="keyword">elif</span>  finger[<span class="string">'type'</span>] == <span class="string">'web_header_contain'</span> :</div><div class="line"></div><div class="line">            <span class="keyword">if</span>  rule[<span class="string">'grep'</span>]  <span class="keyword">in</span>  str(rsp_index[<span class="string">'headers'</span>]).lower() :</div><div class="line">                list_app.append(&#123;<span class="string">'app_id'</span>:finger[<span class="string">'id'</span>], <span class="string">'url'</span>:url&#125;)</div><div class="line">                util.log(<span class="string">"url:%s app:%s"</span> % (url , finger[<span class="string">'app_name'</span>]))</div><div class="line">                        </div><div class="line">            </div><div class="line">        time.sleep(<span class="number">0.01</span>)</div><div class="line">    <span class="keyword">return</span>  list_app</div></pre></td></tr></table></figure>
-<h3 id="单独识别"><a href="#单独识别" class="headerlink" title="单独识别"></a>单独识别</h3><p>简单调用指纹识别模块代码</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># coding:utf-8</span></div><div class="line"><span class="string">"""</span></div><div class="line"> *@Projet  Yafinger</div><div class="line"> *@Author  yaseng@uauc.net</div><div class="line"> *@Desc    yafinger test </div><div class="line">     __    __            ___                                         </div><div class="line">    /\ \  /\ \         /'___\  __                                    </div><div class="line">    \ `\`\\/'/   __   /\ \__/ /\_\     ___       __       __   _ __  </div><div class="line">     `\ `\ /'  /'__`\ \ \ ,__\\/\ \  /' _ `\   /'_ `\   /'__`\/\`'__\</div><div class="line">       `\ \ \ /\ \L\.\_\ \ \_/ \ \ \ /\ \/\ \ /\ \L\ \ /\  __/\ \ \/ </div><div class="line">         \ \_\\ \__/.\_\\ \_\   \ \_\\ \_\ \_\\ \____ \\ \____\\ \_\ </div><div class="line">          \/_/ \/__/\/_/ \/_/    \/_/ \/_/\/_/ \/___L\ \\/____/ \/_/ </div><div class="line">                                                 /\____/             </div><div class="line">                                                 \_/__/ </div><div class="line">"""</div><div class="line"><span class="keyword">import</span>   os, time, sys, Queue, threading, ast</div><div class="line"><span class="keyword">import</span> config</div><div class="line"><span class="keyword">from</span>   lib                <span class="keyword">import</span> util</div><div class="line"><span class="keyword">from</span>   lib.db             <span class="keyword">import</span> *</div><div class="line"><span class="keyword">from</span>   optparse           <span class="keyword">import</span> OptionParser</div><div class="line"><span class="keyword">from</span>   modules            <span class="keyword">import</span> finger</div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</div><div class="line">    usage= <span class="string">'''%prog --host  host --port  port --finger  &lt;all|app_name&gt;   \r\nExample:%prog  --url  http://127.0.0.1    --finger phpmyadmin  '''</span></div><div class="line">    parser = OptionParser(usage=usage)</div><div class="line">    parser.add_option(<span class="string">"-u"</span>, <span class="string">"--url"</span>, dest=<span class="string">"url"</span>, help=<span class="string">"target url"</span>)</div><div class="line">    parser.add_option(<span class="string">"-f"</span>, <span class="string">"--finger"</span>, dest=<span class="string">"finger"</span>, help=<span class="string">"finger_db app_name,default all "</span>, default=<span class="string">"all"</span>)</div><div class="line">    options, arguments = parser.parse_args()</div><div class="line">    <span class="keyword">if</span> options.url == <span class="keyword">None</span> :</div><div class="line">        parser.print_help() </div><div class="line">        exit(<span class="number">0</span>)</div><div class="line">    db = MySQL(config.db_config)</div><div class="line">    sql_finger_where=<span class="string">' '</span>  <span class="keyword">if</span> options.finger == <span class="string">'all'</span> <span class="keyword">else</span> <span class="string">"  and  app_name='%s' "</span>  % options.finger</div><div class="line">    db.query(<span class="string">"SELECT  * from  pw_finger_db  where  `enable`=1   %s "</span>  % sql_finger_where)</div><div class="line">    fingers = db.fetch_all()</div><div class="line">    <span class="keyword">if</span> len(fingers) == <span class="number">0</span> :</div><div class="line">        util.log(<span class="string">'finger app_name %s not found'</span> % options.finger ,<span class="number">3</span>,<span class="string">'finger'</span>) </div><div class="line">    config.set(<span class="string">"fingers"</span>,fingers)</div><div class="line">    util.log(<span class="string">"load fingers count %d"</span> % len(fingers),<span class="number">1</span>,<span class="string">'finger'</span>)</div><div class="line">    finger.get_web_app(options.url)</div></pre></td></tr></table></figure>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-fu/15109322329056.jpg" alt="img"></p>
-<h3 id="批量识别"><a href="#批量识别" class="headerlink" title="批量识别"></a>批量识别</h3><p> 可以使用线程池来实现批量指纹识别。</p>
-<h3 id="指纹结果"><a href="#指纹结果" class="headerlink" title="指纹结果"></a>指纹结果</h3><p>融合到系统中指纹保存在数据库中，本模块可以快速整合到扫描器或者其他项目中。</p>
-<h2 id="yafinger"><a href="#yafinger" class="headerlink" title="yafinger"></a>yafinger</h2><p>yet another  web  fingerprinter<br><a href="https://github.com/yaseng/yafinger" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/yaseng/yafinger</a></p>
-<h2 id="issue"><a href="#issue" class="headerlink" title="issue"></a>issue</h2><ol>
-<li>指纹库需要补充</li>
-<li>可以不局限于web指纹</li>
-<li>某些情况可能目前的指纹规则不符合，还需要添加新的指纹规则，例如正则</li>
-</ol>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;对于庞大的网络空间来说，存在着各式各样的应用、设备等等资产，而对这些资产进行识别，无论拿来做扫描器还是批量分析，都是非常有价值的，高效的应用
-    
-    </summary>
-    
-      <category term="web安全" scheme="http://www.future-sec.com/categories/web%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="指纹识别" scheme="http://www.future-sec.com/tags/%E6%8C%87%E7%BA%B9%E8%AF%86%E5%88%AB/"/>
     
   </entry>
   
