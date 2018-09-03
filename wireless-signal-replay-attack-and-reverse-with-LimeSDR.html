@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <title>LimeSDR 无线信号重放攻击和逆向分析 | 伏宸安全实验室-Future-Sec Information Security Lab</title>
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <meta name="description" content="概述在这篇文章中，我们将对某宝销量最高的一款无线门铃进行无线重放攻击和逆向分析其遥控信号的演示。 国内常见的无线遥控通常工作在315Mhz、433Mhz频率，欧美的采用868Mhz、915Mhz这2个频率。 拆开门铃，我们可以发现解码芯片为 华芯微HS1527 华芯微HS1527采用CMOS工艺制造,拥有20位地址码，可提供最多达1048576(2^20)种地址码，发射频率支持315Mhz与433">
+<meta name="keywords" content="LimeSDR,无线电重放攻击,无线门铃逆向">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LimeSDR 无线信号重放攻击和逆向分析">
+<meta property="og:url" content="http://www.future-sec.com/wireless-signal-replay-attack-and-reverse-with-LimeSDR.html">
+<meta property="og:site_name" content="伏宸安全实验室-Future-Sec Information Security Lab">
+<meta property="og:description" content="概述在这篇文章中，我们将对某宝销量最高的一款无线门铃进行无线重放攻击和逆向分析其遥控信号的演示。 国内常见的无线遥控通常工作在315Mhz、433Mhz频率，欧美的采用868Mhz、915Mhz这2个频率。 拆开门铃，我们可以发现解码芯片为 华芯微HS1527 华芯微HS1527采用CMOS工艺制造,拥有20位地址码，可提供最多达1048576(2^20)种地址码，发射频率支持315Mhz与433">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61bb3542766.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61c47b42c4e.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61c4807005a.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61bbfa80581.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7d72d138260.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61bd7500b2a.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61bd8141677.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7d91934831f.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7d74c2f234e.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61c0d148305.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7fd6a1160cc.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7fd6a532db7.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7d8115a717e.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7eebc9ca448.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7edc950cb72.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7ede054a84b.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7edf77e37ff.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b87c626ab7ac.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b87c87db56dc.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7ee0708914c.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b87d3ff70067.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b802837a51c2.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b87d80615055.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7fdbbc5459a.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7ffdc81f773.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b87dd528d421.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b87dea936e97.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b87e5bee87c4.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7ffe2d6f0fd.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7d614aa3bb7.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61ce4db8ce7.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61ce2710fdb.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7fffe2d0a51.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61cec8190b8.png">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b87ee11aee61.jpg">
+<meta property="og:updated_time" content="2018-09-03T10:02:25.718Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="LimeSDR 无线信号重放攻击和逆向分析">
+<meta name="twitter:description" content="概述在这篇文章中，我们将对某宝销量最高的一款无线门铃进行无线重放攻击和逆向分析其遥控信号的演示。 国内常见的无线遥控通常工作在315Mhz、433Mhz频率，欧美的采用868Mhz、915Mhz这2个频率。 拆开门铃，我们可以发现解码芯片为 华芯微HS1527 华芯微HS1527采用CMOS工艺制造,拥有20位地址码，可提供最多达1048576(2^20)种地址码，发射频率支持315Mhz与433">
+<meta name="twitter:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61bb3542766.png">
+  
+    <link rel="alternative" href="/atom.xml" title="伏宸安全实验室-Future-Sec Information Security Lab" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  
+
+  <!-- Global styles START -->   
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END --> 
+   
+  <!-- Page level plugin styles START -->
+  <link rel="stylesheet" href="/metronic/assets/pages/css/animate.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/owl.carousel/assets/owl.carousel.css">
+  <!-- Page level plugin styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/pages/css/components.css">
+  <link rel="stylesheet" href="/metronic/assets/pages/css/slider.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/pages/css/portfolio.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/red.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END -->
+</head>
+</html>
+<body class="corporate">
+  <!-- BEGIN HEADER -->
+<div class="header">
+  <div class="container">
+    <!--<a class="site-logo" href="/" id="logo">伏宸安全实验室-Future-Sec Information Security Lab</a>-->
+
+    <a class="site-logo" href="/">
+      <img src="/metronic/assets/corporate/img/logos/logo-corp-red.png" alt="Metronic FrontEnd">
+    </a>
+
+    <a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+
+    <!-- BEGIN NAVIGATION -->
+    <div class="header-navigation pull-right font-transform-inherit">
+      <ul>
+	
+	<li class="">
+	  <a href="/index.html">Home</a>
+	</li>
+	
+	<li class="">
+	  <a href="/archives/">Blog</a>
+	</li>
+	
+	<li class="">
+	  <a href="/vulnerabilities.html">Vulnerabilities</a>
+	</li>
+	
+	<li class="">
+	  <a href="/about/">About</a>
+	</li>
+	
+	<!-- BEGIN TOP SEARCH -->
+	<li class="menu-search">
+	  <span class="sep"></span>
+	  <i class="fa fa-search search-btn"></i>
+	  <div class="search-box">
+	   
+	    <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank" class="search-form">
+    <div class="input-group">
+		<input placeholder="Search" class="form-control st-default-search-input" name="word" maxlength="20" type="search">
+		  <input name="si" value="future-sec.com" type="hidden">
+  <input name="tn" value="bds" type="hidden">
+  <input name="cl" value="3" type="hidden">
+  <input name="ct" value="2097152" type="hidden">
+  <input name="s" value="on" type="hidden">
+		<span class="input-group-btn">
+		  <button class="btn btn-primary" type="submit">Search</button>
+		</span>
+	      </div>
+</form>
+	  </div> 
+	</li>
+	<!-- END TOP SEARCH -->
+      </ul>
+    </div>
+    <!-- END NAVIGATION -->
+  </div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/archives/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/wireless-signal-replay-attack-and-reverse-with-LimeSDR.html">LimeSDR 无线信号重放攻击和逆向分析</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-wireless-signal-replay-attack-and-reverse-with-LimeSDR" class="article article-type-post blog-item" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> BG7YWL</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2018-09-02T16:00:00.000Z" itemprop="datePublished">2018/09/03</time>
+
+	</li>
+	<li class="hidden-xs"><i class="fa fa-comments"></i>
+	  <a href="http://www.future-sec.com/wireless-signal-replay-attack-and-reverse-with-LimeSDR.html#disqus_thread" class="article-comment-link">Comments</a>
+	</li>
+	<li class="hidden-xs"><i class="fa fa-tags"></i> 
+	  
+  
+    <a href="/tags/LimeSDR/" title="LimeSDR">LimeSDR</a>,
+  
+    <a href="/tags/无线电重放攻击/" title="无线电重放攻击">无线电重放攻击</a>,
+  
+    <a href="/tags/无线门铃逆向/" title="无线门铃逆向">无线门铃逆向</a>
+  
+
+
+	</li>
+      </ul>
+      
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/无线电安全/">无线电安全</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      <!-- Table of Contents -->
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#录制信号"><span class="toc-number">2.</span> <span class="toc-text">录制信号</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#重放信号"><span class="toc-number">3.</span> <span class="toc-text">重放信号</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分析信号"><span class="toc-number">4.</span> <span class="toc-text">分析信号</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Audacity"><span class="toc-number">4.1.</span> <span class="toc-text">Audacity</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Inspectrum"><span class="toc-number">4.2.</span> <span class="toc-text">Inspectrum</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#绘制Bits数据信号的GRC流图"><span class="toc-number">4.2.1.</span> <span class="toc-text">绘制Bits数据信号的GRC流图</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Universal-Radio-Hacker-URH"><span class="toc-number">4.3.</span> <span class="toc-text">Universal Radio Hacker(URH)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#更多姿势重放信号"><span class="toc-number">5.</span> <span class="toc-text">更多姿势重放信号</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#DIY攻击设备"><span class="toc-number">5.1.</span> <span class="toc-text">DIY攻击设备</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RFcat"><span class="toc-number">5.2.</span> <span class="toc-text">RFcat</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EZ430-Chronos"><span class="toc-number">5.3.</span> <span class="toc-text">EZ430 Chronos</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GoodWatch"><span class="toc-number">5.4.</span> <span class="toc-text">GoodWatch</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#YARD-Stick-One"><span class="toc-number">5.5.</span> <span class="toc-text">YARD Stick One</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#PandwaRF"><span class="toc-number">5.6.</span> <span class="toc-text">PandwaRF</span></a></li></ol></li></ol>
+  </div>
+
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在这篇文章中，我们将对某宝销量最高的一款无线门铃进行无线重放攻击和逆向分析其遥控信号的演示。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61bb3542766.png" alt=""></p>
+<p>国内常见的无线遥控通常工作在315Mhz、433Mhz频率，欧美的采用868Mhz、915Mhz这2个频率。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61c47b42c4e.jpg" alt=""></p>
+<p>拆开门铃，我们可以发现解码芯片为 <a href="http://t.cn/RkWvAOk" title="华芯微HS1527" rel="external nofollow noopener noreferrer" target="_blank">华芯微HS1527</a></p>
+<p>华芯微HS1527采用CMOS工艺制造,拥有20位地址码，可提供最多达1048576(2^20)种地址码，发射频率支持315Mhz与433Mhz。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61c4807005a.png" alt=""></p>
+<p>我们可以用电视棒、HackRF One、LimeSDR等SDR硬件进一步确定遥控的工作频率，打开SDR软件设置频率为315Mhz或433Mhz，然后按下遥控器，能在瀑布图上看到明显的反应：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61bbfa80581.png" alt=""></p>
+<p>确定无线遥控工作的中心频率为：433950000</p>
+<h2 id="录制信号"><a href="#录制信号" class="headerlink" title="录制信号"></a>录制信号</h2><p>Grc流程图下载地址：<a href="https://1drv.ms/f/s!AsE4BpolygfCjGfspV7_Gno3rpy5" rel="external nofollow noopener noreferrer" target="_blank">https://1drv.ms/f/s!AsE4BpolygfCjGfspV7_Gno3rpy5</a><br>用GNU Radio搭一个简单的接收流图，一方面将接收信号保存为Cfile文件，另一方面将信号以瀑布图显示作为实时反馈。因为遥控信号是433MHz，中心频率设在这个附近都可以，采样率2M就够了。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7d72d138260.png" alt=""></p>
+<p>osmocom Source使用LimeSDR接收433MHz无线信号,采样率为2M，右上QT GUI Sink将捕获的无线信号通过瀑布图显示，右下角File Sink将捕获到的无线数据包储存到test.cfile文件中。<br>执行流图可看到如下效果图：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61bd7500b2a.png" alt=""></p>
+<p>按下遥控：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61bd8141677.png" alt=""></p>
+<p>结束GnuRadio流图后，查看Music目录下的test.cfile:<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7d91934831f.png" alt=""></p>
+<h2 id="重放信号"><a href="#重放信号" class="headerlink" title="重放信号"></a>重放信号</h2><p>接下来再用GNU Radio写个重放信号的流图：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7d74c2f234e.png" alt=""></p>
+<p>左侧File Source调用录制到的test.cfile信号文件，与此同时QT GUI Time Sink、QT GUI Frequency Sink模块分别在屏幕上显示时间轴（时间域）、频率幅度（频率域），osmocom Sink调用LimeSDR将信号发射出去，执行流图：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61c0d148305.png" alt=""></p>
+<p>如果听见铃声响起，那说明这段信号是有效的，如果没有响起，可能是录制指定的频率不对或采样到的信号样本不完整，可多次尝试录制，如果是车钥匙等其他设备，其信号只有一次或几次有效性，俗称滚动码，这点请注意。</p>
+<h2 id="分析信号"><a href="#分析信号" class="headerlink" title="分析信号"></a>分析信号</h2><h3 id="Audacity"><a href="#Audacity" class="headerlink" title="Audacity"></a>Audacity</h3><p>Audacity是一款跨平台的音频处理软件，我们可以拿来分析射频信号。导入录制的音频信号文件进行信号分析，然后通过其展现信号波形图来判断信号的调制方式并加以分析。</p>
+<p>不过这种方式需要肉眼将波形转化成0跟1，看起来比较容易眼花。只有<strong>老司机</strong>才能很快很准确地用这种方式完成分析任务。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7fd6a1160cc.png" alt=""></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7fd6a532db7.png" alt=""></p>
+<p>导入成功后显示如下图：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7d8115a717e.png" alt=""></p>
+<p>发现存在多段信号脉冲，我们选择一段信号后点击放大镜来进一步观察信号特征。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7eebc9ca448.png" alt=""></p>
+<p>我们将第一个宽度的蓝色条状物当作标准宽度1，空白区域当作0，空白区域的宽度能容纳几个标准宽度蓝条，就代表有几个0，以此类推，较宽的蓝色条状物能容纳几个标准宽度蓝条就代表有几个1。经验比较丰富的朋友可以通过图形，把无线射频信号转换成二进制数据</p>
+<p><code>0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0</code></p>
+<h3 id="Inspectrum"><a href="#Inspectrum" class="headerlink" title="Inspectrum"></a>Inspectrum</h3><p>Inspectrum是一款分析无线信号的工具，基于Linux和OSX。它兼容GNURadio、Osmocom_fft还有各类SDR设备导出的IQ文件格式（例如RTL-SDR、HackRF、BladeRF）。</p>
+<p>安装Inspectrum，参考Wiki：<a href="https://github.com/miek/inspectrum/wiki/Build" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/miek/inspectrum/wiki/Build</a></p>
+<p>澳大利亚无线黑客 <a href="https://github.com/tresacton" title="tresacton" rel="external nofollow noopener noreferrer" target="_blank">tresacton</a> 在 Inspectrum 的基础上做了界面优化和升级，有兴趣的朋友也可以安装 <a href="https://github.com/tresacton/dspectrumgui" title="DSpectrumGUI" rel="external nofollow noopener noreferrer" target="_blank">DSpectrumGUI</a><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> sudo apt-get install qt5-default libfftw3-dev cmake pkg-config automake autoconf</span></div><div class="line"><span class="meta">$</span><span class="bash"> git <span class="built_in">clone</span> https://github.com/jgaeddert/liquid-dsp.git</span></div><div class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> liquid-dsp</span></div><div class="line"><span class="meta">$</span><span class="bash"> ./bootstrap.sh</span></div><div class="line"><span class="meta">$</span><span class="bash"> ./configure</span></div><div class="line"><span class="meta">$</span><span class="bash"> make</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo make install</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo ldconfig</span></div><div class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> ~</span></div><div class="line"><span class="meta">$</span><span class="bash"> git <span class="built_in">clone</span> https://github.com/miek/inspectrum.git</span></div><div class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> inspectrum &amp;&amp; mkdir build &amp;&amp; <span class="built_in">cd</span> build</span></div><div class="line"><span class="meta">$</span><span class="bash"> cmake ..</span></div><div class="line"><span class="meta">$</span><span class="bash"> make</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo make install</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo ldconfig</span></div></pre></td></tr></table></figure></p>
+<p>打开Inspectrum，导入我们录制的test.cfile文件。设置采样率为录制时的采样率2M，水平拖动，找到有信号的区域。然后可以通过左侧Spectrogram参数的调节、缩放工具，实现波形图的放大缩小，颜色深浅调节。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7edc950cb72.png" alt=""></p>
+<p>在原始信号上右键添加采样图，Add derived plot -&gt; Add sample plot 用鼠标拖动，调节中心频率的位置和宽度；<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7ede054a84b.png" alt=""></p>
+<p>然后在下面的采样图右键添加阈值图，Add derived plot -&gt; Add threshold plot<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7edf77e37ff.png" alt=""></p>
+<p>左侧栏的Time selection可对波形进行划分，这里我们以一位<strong>“内码”</strong>信号的宽度为标准。接着对Symbols数值进行递增，直至囊括一帧信号的波形区域：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b87c626ab7ac.png" alt=""></p>
+<p>参考 <a href="http://t.cn/RkWvAOk" title="华芯微HS1527" rel="external nofollow noopener noreferrer" target="_blank">华芯微HS1527</a> 资料文档，可以得知<strong>HS1527码型</strong>：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b87c87db56dc.jpg" alt=""></p>
+<p>现在我们知道在 inspectrum 里面看到的信号是什么意思了，总结下：一帧信号的编码格式为<strong>“≥8位同步码 + 20位内码 + 4位数据码”</strong><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7ee0708914c.jpg" alt=""></p>
+<p>然后在阈值图右键导出解码的数据，<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b87d3ff70067.png" alt=""></p>
+<p>导出的解码数据：<br><code>0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0</code></p>
+<h4 id="绘制Bits数据信号的GRC流图"><a href="#绘制Bits数据信号的GRC流图" class="headerlink" title="绘制Bits数据信号的GRC流图"></a>绘制Bits数据信号的GRC流图</h4><p>前面说过一帧信号共有32位码。现在我们要绘制GRC流图，执行流图从而让LimeSDR发射出Bits数据信号。这32位码，每个码都有相应的时序进行表示。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b802837a51c2.jpg" alt=""></p>
+<p><code>0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0</code></p>
+<p>解码数据换算后得到的Bits数据：</p>
+<p><code>1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0</code></p>
+<p>一个高电平或低电平对应4LCK，在采样率为2MHz的情况下占用时间宽度为1.114ms除以4。要每个电平占用1.114ms/4LCK，则需要让每个电平点插值1.114ms/4*2MHz≈557次<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b87d80615055.png" alt=""></p>
+<ul>
+<li>“Vector Source”作为标准的向量输出源模块，可以输出自定义矢量，如门铃的序列。参量Repeat决定是否重复地产生整组矢量数据。</li>
+<li>“Repeat”模块是将输入的矢量进行插值复制，即将<code>&lt;a,b,c,~~~&gt;</code>复制为<code>&lt;a,a,b,b,c,c,~~~&gt;</code>。</li>
+<li>“osmocom Sink”模块是作为发射机的数据信宿。</li>
+<li>“WX GUI Scope Sink”模块用于查看发射出去的信号。</li>
+</ul>
+<h3 id="Universal-Radio-Hacker-URH"><a href="#Universal-Radio-Hacker-URH" class="headerlink" title="Universal Radio Hacker(URH)"></a>Universal Radio Hacker(URH)</h3><p>URH相⽐Audacity和Inspectrum这2款软件，特点是使用特别⽅便，包括采样、解码、重放、模拟环境等功能都可以直接在URH上面完成。而且URH⽀持市面上大多数SDR设备，支持Linux、OSX、Windows平台。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7fdbbc5459a.png" alt=""></p>
+<p>参考Wiki进行安装:<a href="https://github.com/jopohl/urh" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/jopohl/urh</a> ，安装完成后打开如下图。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7ffdc81f773.png" alt=""></p>
+<p>打开“File”菜单,可以直接录制信号或导入录制的信号<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b87dd528d421.png" alt=""></p>
+<p>我们点击“Record signal”进行信号录制，按下遥控，右侧会显示信号频谱。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b87dea936e97.png" alt=""></p>
+<p>保存我们录制的信号文件，软件会自动打开文件然后回到首页。左下角我们可以设置把信号实时解调为Bits、HEX、ASCII数据流。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b87e5bee87c4.png" alt=""></p>
+<p>还可以重放信号，实时调试。更多功能可以查看 <a href="https://github.com/jopohl/urh/releases/download/v2.0.0/userguide.pdf" title="操作使用手册" rel="external nofollow noopener noreferrer" target="_blank">操作使用手册</a> 进行学习。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7ffe2d6f0fd.png" alt=""></p>
+<h2 id="更多姿势重放信号"><a href="#更多姿势重放信号" class="headerlink" title="更多姿势重放信号"></a>更多姿势重放信号</h2><p>通过上述方式，我们已对SDR捕获到的无线信号进行分析，并把信号文件转换成了二进制数据，可使用GnuRadio对数据进行重放、修改测试。接下介绍几款硬件，可以DIY便携式信号录制、重放设备。</p>
+<h3 id="DIY攻击设备"><a href="#DIY攻击设备" class="headerlink" title="DIY攻击设备"></a>DIY攻击设备</h3><p>我们可以使用Arduino开发板和很常见的超再生模块或者CC1101模块配合RC-Switch库制作一款便携式射频接收/重放设备。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7d614aa3bb7.jpg" alt=""></p>
+<h3 id="RFcat"><a href="#RFcat" class="headerlink" title="RFcat"></a>RFcat</h3><p>RFCat USB Radio Dongle能够在300 - 928MHz之间的频率上发射，接收，频谱分析，使用户能够嗅探或攻击在这些频率范围内传输的任何无线数据协议。其中包括：家庭自动化系统，智能电表，SCADA系统，“物联网”设备，移动设备等等。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61ce4db8ce7.jpg" alt=""></p>
+<h3 id="EZ430-Chronos"><a href="#EZ430-Chronos" class="headerlink" title="EZ430 Chronos"></a>EZ430 Chronos</h3><p>德州仪器生产的EZ430 Chronos手表由于采用了MSP430芯片，该芯片支持发射1GHz以下频率的无线信号,覆盖市面上各种常见的无线遥控频率（315MHz、433MHz、868MHz、915MHz）<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61ce2710fdb.jpg" alt=""></p>
+<h3 id="GoodWatch"><a href="#GoodWatch" class="headerlink" title="GoodWatch"></a>GoodWatch</h3><p>GoodWatch是逆向工程师和业余无线电爱好者必备的一款手表，它包括RPN计算器，十六进制编辑器，反汇编器和距离70厘米的无线电收发器。它由Casio 3208系列 计算器手表改装而成。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b7fffe2d0a51.jpg" alt=""></p>
+<h3 id="YARD-Stick-One"><a href="#YARD-Stick-One" class="headerlink" title="YARD Stick One"></a>YARD Stick One</h3><p>Great Scott Gadgets 的YARD Stick One一款由美国无线电专家Michael Ossmann 最新研发的一款无线电DONGLE, 与PC通过USB端口连接，它可以用来接收、发射低于1GHz的数字无线信号,主要性能规格如下：<br>-半双工发射和接收<br>-正式操作频段：300-348 MHz, 391-464 MHz, 782-928 MHz<br>-非正式操作频段：281-361 MHz, 378-481 MHz, 749-962 MHz<br>-调制方式： ASK, OOK, GFSK, 2-FSK, 4-FSK, MSK<br>-数据传输率：高达500 kbps<br>-USB 2.0全速传输<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b61cec8190b8.png" alt=""></p>
+<h3 id="PandwaRF"><a href="#PandwaRF" class="headerlink" title="PandwaRF"></a>PandwaRF</h3><p>PandwaRF是一款射频分析工具，由手机或PC控制的低于1 GHz的无线收发器。 其目的是非常容易地捕获，显示和传输RF数据。 它可以使用BLE或USB连接到Android智能手机，使用USB连接到Linux。 它基于着名的RfCat＆Yard Stick One工具和德州仪器CC1111 RF收发器，但具有许多新功能，使PandwaRF成为完美的便携式RF分析工具。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/sdrcf/5b87ee11aee61.jpg" alt=""></p>
+
+      
+    </div>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/ChipWhisperer-introduce.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">芯片物理攻击平台 ChipWhisperer 初探</div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+
+
+
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- CATEGORIES START -->
+<h2 class="no-top-space">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/芯片安全/">芯片安全 (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/无线电安全/">无线电安全 (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/移动安全/">移动安全 (4)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/系统安全/">系统安全 (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/硬件安全/">硬件安全 (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/web安全/">web安全 (7)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- BEGIN BLOG TAGS -->
+<div class="blog-tags margin-bottom-20">
+  <h2>Tags</h2>
+  
+  <div class="widget-wrap">
+    <div class="widget">
+      
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/"><i class="fa fa-tags"></i>Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BROADCOM-WI-FI/"><i class="fa fa-tags"></i>BROADCOM WI-FI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ChipWhisperer/"><i class="fa fa-tags"></i>ChipWhisperer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LimeSDR/"><i class="fa fa-tags"></i>LimeSDR</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MITMf/"><i class="fa fa-tags"></i>MITMf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Poc/"><i class="fa fa-tags"></i>Poc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/QARK/"><i class="fa fa-tags"></i>QARK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/"><i class="fa fa-tags"></i>Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UART串口调试/"><i class="fa fa-tags"></i>UART串口调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/app签名/"><i class="fa fa-tags"></i>app签名</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goahead/"><i class="fa fa-tags"></i>goahead</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/"><i class="fa fa-tags"></i>https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/"><i class="fa fa-tags"></i>python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/"><i class="fa fa-tags"></i>ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web安全/"><i class="fa fa-tags"></i>web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/侧信道攻击/"><i class="fa fa-tags"></i>侧信道攻击</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网渗透/"><i class="fa fa-tags"></i>内网渗透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/密码爆破/"><i class="fa fa-tags"></i>密码爆破</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/指纹识别/"><i class="fa fa-tags"></i>指纹识别</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/无线电/"><i class="fa fa-tags"></i>无线电</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/无线电重放攻击/"><i class="fa fa-tags"></i>无线电重放攻击</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/无线门铃逆向/"><i class="fa fa-tags"></i>无线门铃逆向</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/智能锁/"><i class="fa fa-tags"></i>智能锁</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/条形码/"><i class="fa fa-tags"></i>条形码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/毛刺攻击/"><i class="fa fa-tags"></i>毛刺攻击</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/物理攻击/"><i class="fa fa-tags"></i>物理攻击</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件分析/"><i class="fa fa-tags"></i>硬件分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬件安全/"><i class="fa fa-tags"></i>硬件安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/硬改/"><i class="fa fa-tags"></i>硬改</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/移动安全/"><i class="fa fa-tags"></i>移动安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/系统安全/"><i class="fa fa-tags"></i>系统安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化检测/"><i class="fa fa-tags"></i>自动化检测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/芯片安全/"><i class="fa fa-tags"></i>芯片安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/蓝牙攻击/"><i class="fa fa-tags"></i>蓝牙攻击</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/贝叶斯分类/"><i class="fa fa-tags"></i>贝叶斯分类</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/远程代码执行/"><i class="fa fa-tags"></i>远程代码执行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/验证码/"><i class="fa fa-tags"></i>验证码</a></li></ul>
+    </div>
+  </div>
+
+
+</div>
+<!-- END BLOG TAGS -->
+
+
+<!-- BEGIN FEATURED POSTS -->                            
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->                            
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>伏宸安全实验室<br><br> 伏宸安全实验室是广东安创信息科技开发有限公司旗下的以网络安全研究为核心的专业实验室，主攻前沿安全技术，包括：渗透测试、黑产对抗、威胁情报、智能硬件与无线电安全等。</p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              广州市越秀区寺右新马路108号丰伟大厦15B、C单元<br>
+              BC 15/F Fengwei Buiding NO.108 Siyouxinma Road<br>
+              Guangzhou,China Code:510600<br>
+              Phone: 020-87392713<br>
+              Email: <a href="mailto:admin@future-sec.com" rel="external nofollow noopener noreferrer" target="_blank">admin@future-sec.com</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2018 伏宸安全实验室-Future-Sec Information Security Lab<br>
+ <a href="javascript:;">Future-sec</a> | <a href="javascript:;">广东安创信息科技开发有限公司</a>
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      <li><a href="https://github.com/Future-Sec/" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-github"></i></a></li>
+    
+      <li><a href="https://weibo.com/futuresec" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weibo"></i></a></li>
+    
+      <li><a href="https://mp.weixin.qq.com/s/QuDKBrMist8GL16EEO-u4Q" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-weixin"></i></a></li>
+    
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+    
+      <li><a href="http://yaseng.org/" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-yahoo"></i></a></li>
+    
+  </ul>  
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]--> 
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/plugins/owl.carousel/owl.carousel.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/wow.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();    
+        Layout.initOWL();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling(); 
+	new WOW().init();
+    });
+</script>
+ <script>
+        // 给图片添加链接
+        $(document).ready(function() {
+            $("p img").each(function() {
+                var strA = "<a class='fancybox' href='" + this.src + "'></a>";
+                $(this).wrapAll(strA);
+            });
+        });
+    
+        // fancybox
+        $(".fancybox").fancybox({
+                                  openEffect    : 'elastic',
+                                  closeEffect   : 'elastic',
+                              });
+    </script>
+    <script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?a224b8ad11f845d05c44aadb8c4c3ace";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- END CORE PLUGINS -->
+
+<!-- BEGIN PAGE-SPECIFIC PLUGINS --> 
+
+
+
+
+
+
+
+<!-- END PAGE-SPECIFIC PLUGINS --> 
+
+<!-- BEGIN INTEGRATIONS -->
+
+
+
+
+
+<!-- END INTEGRATIONS -->
+
+</body>
+

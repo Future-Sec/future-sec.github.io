@@ -2,9 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://www.future-sec.com/wireless-signal-replay-attack-and-reverse-with-LimeSDR.html</loc>
+    
+    <lastmod>2018-09-03T10:02:25.718Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://www.future-sec.com/ChipWhisperer-introduce.html</loc>
     
-    <lastmod>2018-08-20T11:22:22.409Z</lastmod>
+    <lastmod>2018-08-21T04:57:40.808Z</lastmod>
     
   </url>
   
@@ -226,14 +233,14 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/404.html</loc>
+    <loc>http://www.future-sec.com/index.html</loc>
     
     <lastmod>2016-04-26T13:44:54.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/projects/index.html</loc>
+    <loc>http://www.future-sec.com/404.html</loc>
     
     <lastmod>2016-04-26T13:44:54.000Z</lastmod>
     
@@ -247,7 +254,7 @@
   </url>
   
   <url>
-    <loc>http://www.future-sec.com/index.html</loc>
+    <loc>http://www.future-sec.com/projects/index.html</loc>
     
     <lastmod>2016-04-26T13:44:54.000Z</lastmod>
     
