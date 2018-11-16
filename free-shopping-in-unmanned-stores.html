@@ -7,37 +7,39 @@
 <head>
   <meta charset="utf-8">
   
-  <title>QARK工具的介绍和原理分析 | 伏宸安全实验室-Future-Sec Information Security Lab</title>
+  <title>无人商店0元购 | 伏宸安全实验室-Future-Sec Information Security Lab</title>
 
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <meta name="description" content="简介QARK的核心是一个静态代码分析工具，旨在识别基于Java的Android应用程序的潜在安全漏洞和关注点。QARK还试图提供动态生成的ADB（Android调试桥）命令，以帮助验证其检测到的潜在漏洞。它甚至可以动态地创建一个定制的测试应用程序，以即用APK的形式，专门设计来展示它发现的潜在问题。QARK的设计是基于社区的，可供所有人免费使用。QARK被设计出来的主要目的和大多数的自动化检测工具">
-<meta name="keywords" content="QARK">
+  <meta name="description" content="前言新零售概念 新零售概念提出后，零售行业创新加速，伴随着人工智能和物联网在各个领域的渗透，无人售货便利店、无人售货机的概念进入大众视野，自2016年亚马逊宣布其无人便利店项目Amazon Go准备问世以来，无人便利店像雨后春笋般涌现，在以消费者为中心的商业时代，无人便利店以其高效率、优质的服务体验和低人力成本等等优势，在未来将得到巨大市场发展。   无人零售多采用人工智能、物联网RFID、二维码">
+<meta name="keywords" content="UHF,无人商店,物理安全">
 <meta property="og:type" content="article">
-<meta property="og:title" content="QARK工具的介绍和原理分析">
-<meta property="og:url" content="http://www.future-sec.com/introducing-qark.html">
+<meta property="og:title" content="无人商店0元购">
+<meta property="og:url" content="http://www.future-sec.com/free-shopping-in-unmanned-stores.html">
 <meta property="og:site_name" content="伏宸安全实验室-Future-Sec Information Security Lab">
-<meta property="og:description" content="简介QARK的核心是一个静态代码分析工具，旨在识别基于Java的Android应用程序的潜在安全漏洞和关注点。QARK还试图提供动态生成的ADB（Android调试桥）命令，以帮助验证其检测到的潜在漏洞。它甚至可以动态地创建一个定制的测试应用程序，以即用APK的形式，专门设计来展示它发现的潜在问题。QARK的设计是基于社区的，可供所有人免费使用。QARK被设计出来的主要目的和大多数的自动化检测工具">
-<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image001.png">
-<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image002.png">
-<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image003.png">
-<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image004.png">
-<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image005.png">
-<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image006.png">
-<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image007.png">
-<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image008.png">
-<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image009.png">
-<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image010.png">
-<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image011.png">
-<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image012.png">
-<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image013.png">
-<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image014.png">
-<meta property="og:updated_time" content="2018-06-29T09:01:13.691Z">
+<meta property="og:description" content="前言新零售概念 新零售概念提出后，零售行业创新加速，伴随着人工智能和物联网在各个领域的渗透，无人售货便利店、无人售货机的概念进入大众视野，自2016年亚马逊宣布其无人便利店项目Amazon Go准备问世以来，无人便利店像雨后春笋般涌现，在以消费者为中心的商业时代，无人便利店以其高效率、优质的服务体验和低人力成本等等优势，在未来将得到巨大市场发展。   无人零售多采用人工智能、物联网RFID、二维码">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image7.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image8.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image14.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/640.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/6401.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/6403.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image15.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image16.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image17.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image18.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image19.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image20.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image21.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image22.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/20181116172418.jpg">
+<meta property="og:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/20181116172423.jpg">
+<meta property="og:updated_time" content="2018-11-16T10:13:13.935Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="QARK工具的介绍和原理分析">
-<meta name="twitter:description" content="简介QARK的核心是一个静态代码分析工具，旨在识别基于Java的Android应用程序的潜在安全漏洞和关注点。QARK还试图提供动态生成的ADB（Android调试桥）命令，以帮助验证其检测到的潜在漏洞。它甚至可以动态地创建一个定制的测试应用程序，以即用APK的形式，专门设计来展示它发现的潜在问题。QARK的设计是基于社区的，可供所有人免费使用。QARK被设计出来的主要目的和大多数的自动化检测工具">
-<meta name="twitter:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image001.png">
+<meta name="twitter:title" content="无人商店0元购">
+<meta name="twitter:description" content="前言新零售概念 新零售概念提出后，零售行业创新加速，伴随着人工智能和物联网在各个领域的渗透，无人售货便利店、无人售货机的概念进入大众视野，自2016年亚马逊宣布其无人便利店项目Amazon Go准备问世以来，无人便利店像雨后春笋般涌现，在以消费者为中心的商业时代，无人便利店以其高效率、优质的服务体验和低人力成本等等优势，在未来将得到巨大市场发展。   无人零售多采用人工智能、物联网RFID、二维码">
+<meta name="twitter:image" content="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image7.jpg">
   
     <link rel="alternative" href="/atom.xml" title="伏宸安全实验室-Future-Sec Information Security Lab" type="application/atom+xml">
   
@@ -138,13 +140,13 @@
   <section id="main">
     
     <h2 itemprop="name">
-      <a class="article-title" href="/introducing-qark.html">QARK工具的介绍和原理分析</a>
+      <a class="article-title" href="/free-shopping-in-unmanned-stores.html">无人商店0元购</a>
     </h2>
 
 
     <div class="row">
 <div class="col-md-9 col-sm-9 blog-posts">
-<article id="post-introducing-qark" class="article article-type-post blog-item" itemscope="" itemprop="blogPost">
+<article id="post-free-shopping-in-unmanned-stores" class="article article-type-post blog-item" itemscope="" itemprop="blogPost">
   <div class="article-meta">
   </div>
   <div class="article-inner">
@@ -152,18 +154,22 @@
     
     <header class="article-header">
       <ul class="blog-info">
-	<li><i class="fa fa-user"></i> 小马哥历险记</li>
+	<li><i class="fa fa-user"></i> BG7YWL</li>
 	<li><i class="fa fa-calendar"></i>
-	  <time datetime="2018-04-07T16:00:00.000Z" itemprop="datePublished">2018/04/08</time>
+	  <time datetime="2018-10-25T16:00:00.000Z" itemprop="datePublished">2018/10/26</time>
 
 	</li>
 	<li class="hidden-xs"><i class="fa fa-comments"></i>
-	  <a href="http://www.future-sec.com/introducing-qark.html#disqus_thread" class="article-comment-link">Comments</a>
+	  <a href="http://www.future-sec.com/free-shopping-in-unmanned-stores.html#disqus_thread" class="article-comment-link">Comments</a>
 	</li>
 	<li class="hidden-xs"><i class="fa fa-tags"></i> 
 	  
   
-    <a href="/tags/QARK/" title="QARK">QARK</a>
+    <a href="/tags/UHF/" title="UHF">UHF</a>,
+  
+    <a href="/tags/无人商店/" title="无人商店">无人商店</a>,
+  
+    <a href="/tags/物理安全/" title="物理安全">物理安全</a>
   
 
 
@@ -174,7 +180,7 @@
     
     Category: 
     
-    <a class="article-category-link" href="/categories/移动安全/">移动安全</a>
+    <a class="article-category-link" href="/categories/物理安全/">物理安全</a>
   </div>
   <br>
 
@@ -187,17 +193,56 @@
 
   <div id="toc" class="toc-article">
     <strong class="toc-title">文章目录</strong>
-    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#前提条件"><span class="toc-number">2.</span> <span class="toc-text">前提条件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#功能"><span class="toc-number">3.</span> <span class="toc-text">功能</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#原理分析"><span class="toc-number">4.</span> <span class="toc-text">原理分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#操作步骤"><span class="toc-number">5.</span> <span class="toc-text">操作步骤</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">6.</span> <span class="toc-text">总结</span></a></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#新零售概念"><span class="toc-number">1.1.</span> <span class="toc-text">新零售概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#行业发展"><span class="toc-number">1.2.</span> <span class="toc-text">行业发展</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安全现状"><span class="toc-number">1.3.</span> <span class="toc-text">安全现状</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UHF标签"><span class="toc-number">2.</span> <span class="toc-text">UHF标签</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#UHF超高频远距离RFID"><span class="toc-number">2.1.</span> <span class="toc-text">UHF超高频远距离RFID</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UHF电子标签安全问题"><span class="toc-number">2.2.</span> <span class="toc-text">UHF电子标签安全问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#攻击设备"><span class="toc-number">3.</span> <span class="toc-text">攻击设备</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#效果演示"><span class="toc-number">4.</span> <span class="toc-text">效果演示</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-number">5.</span> <span class="toc-text">参考</span></a></li></ol>
   </div>
 
-        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>QARK的核心是一个静态代码分析工具，旨在识别基于Java的Android应用程序的潜在安全漏洞和关注点。QARK还试图提供动态生成的ADB（Android调试桥）命令，以帮助验证其检测到的潜在漏洞。它甚至可以动态地创建一个定制的测试应用程序，以即用APK的形式，专门设计来展示它发现的潜在问题。<br>QARK的设计是基于社区的，可供所有人免费使用。QARK被设计出来的主要目的和大多数的自动化检测工具一样是教育开发人员和信息安全人员了解与Android应用程序安全相关的潜在风险 ，相应的开发人员和评估人员就可以在开发和检测阶段，针对于APP移动应用进行检测，及时修改相应的风险点。</p>
-<h2 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h2><p>•    python 2.7.<br>•    JRE 1.6+（最好1.7+）<br>•    Ubuntu环境（最好）<br>•    未加固的测试APK；<br>•    一台root过的手机<br>在前提条件中，有提到未加固的APK，从简介中，我们就提到该工具就是一个静态代码分析的工具，在其中QARK的脚本中是没有脱壳的脚本，所以是需要未加固的APK，其中的ubuntu环境不是唯一的，但是我只在ubuntu成功过，所以我建议试用该环境。</p>
-<h2 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h2><p>QARK是一款易于使用的工具，能够找到Android应用程序中的常见安全漏洞。与商业产品不同，它可以100％免费使用。QARK提供教育信息，允许安全审查人员找到对漏洞的精确和深入的解释。在反编译APK时，QARK可以自动使用多个反编译器，利用它们的组合输出来产生出色的结果。最后，QARK与传统工具相比的主要优势仅仅是指出可能存在的漏洞，它可以产生ADB命令甚至功能齐全的APK，将假设的漏洞转化为“POC”漏洞利用。<br>包含在此工具尝试查找的安全漏洞类型中的有：<br>•    无意中导出的组件<br>•    未妥善保护的导出组件<br>•    易受拦截或窃听的intent<br>•    不正确的x.509证书验证<br>•    创建事件可读或事件可写的文件<br>•    可能泄漏数据的Activity<br>•    粘滞的intent的使用<br>•    不安全地创建了Pending Intents<br>•    发送不安全的广播Intent<br>•    嵌入在源中的私钥<br>•    弱密码学使用不当或不适用<br>•    潜在可利用的WebView配置<br>•    导出偏好活动<br>•    Tapjacking<br>•    启用备份的应用程序<br>•    可调试的应用程序<br>•    支持过时API版本的应用程序，具有已知的漏洞</p>
-<h2 id="原理分析"><a href="#原理分析" class="headerlink" title="原理分析"></a>原理分析</h2><p>前面我们说过该工具就是静态代码分析的工具，所以首先我打开相应的qark.py脚本文件,其可以发现刚开始就使用到unpackAPK脚本，然后打开相应的unpackAPK,py，发现相应aapt和dex2jar，这里就可以知道还是老方法，对apk进行反编译，然后在进行相应的dex2jar把dex转换为jar文件，之后在进行查看源码。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image001.png" alt=""><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image002.png" alt=""><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image003.png" alt=""> </p>
-<p>然后就是相应的代码静态分析，这里就需要对于检测项目的了解，其实说到底就是一个关键代码查找和匹配，因为这些检测项目大部分引起的原因就是编写代码没有注意到相关的安全措施，例如其中的组件暴露就是，组件的属性exported：设置为ture或者没有设置，则默认为true，这就会导致相应的组件暴露。<br>我们查看下mouble文件夹里面，基本上所有的检测项目都是这里的检测检测脚本。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image004.png" alt=""><br>我们就分析其中的cryptoFlaws.py这个脚本，从字面意思就是密码缺陷，那这个部分就是针对于移动应用加解密子之类的风险。我们直接打开来查看其中方法。<br>这里我们看到相应的寻找ECB的特殊关键字，这个是检测AES和DES是否存在弱加密（ECB模式）的风险。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image005.png" alt=""><br>这个地方是匹配PRIVATE\sKEY的1特殊关键字，寻找相应的加密算法的私钥，这个地方的私钥如果存在且是以明文形式存在，这个就是加密算法的密钥硬编码风险，会导致相关的加密算法被破解。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image006.png" alt=""><br>这里还有一个地方，但是方法被注释掉了，这个是匹配SecureRandom.setseed（）方法，这个是伪随机数的一个风险点。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image007.png" alt=""><br> 大部分的原理都是类似的。所以其他的脚本就看各位自己去分析。</p>
-<h2 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h2><p>QARK有两种模式：1.交互模式 2.无缝模式<br>交互模式使用户能够交互地一个接一个地选择选项。而无缝模式允许我们用一个命令完成整个工作。<br>我们主要看看交互模式的实际应用。<br>输入python qark.py<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image008.png" alt=""><br>接着会有选择apk或者soure，这些都是通过数字来进行选择。继续下去会有输入路径或者通过设备来进行检测。我们选择1，然后底下就开始提示是否导出mainfirst文件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image009.png" alt=""><br>接下来就直接导出相应的mainfist文件，这其实就是直接反编译获取到的。接下来就是先从mainfirst文件进行分析，分析相应组件暴露和allowback和debuggable等相关的风险点。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image010.png" alt=""><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image011.png" alt=""><br>接下里，我们继续查看，直接检测broadcast广播是否有附带相应的敏感信息，然后就是相应的脚本进行检测，例如x509证书检验，这些都是该工具具有的代码静态分析。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image012.png" alt=""><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image013.png" alt=""><br>最后会在qark的本身目录中的report.html文件，这个文件类似于mobsf生成的界面。这里面就是会把刚刚经过检测的所有风险都以报告的形式打印出来，都会在相应的选项中，详细的告诉你风险点存在的位置，以及相应的危害。<br>但是在这里我们只是看到很稀少的数据，其实这些数据只是mainfist文件暴露出来的风险点，但是代码中的分析根本没有进行分析。问题出在于apk本身，这是一个有进行加固的apk，我之前说过这个工具无法进行相应的脱壳，所以导致无法获取到相应的代码，就无法进行相应的分析，所以其他数据就是空的。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在安装的过程会有一个问题就是python no module named _curses的问题，这个问题最后解决了，经过对比python2.6 ，终于发现，原来 pythong2.7/lib-dynload 里没有相应的 curses 库，_curses_panel.so，_curses.so。说到底就是去缺少文件，所以此时你将python2.6 的 这2个so文件拷贝到 pythong2.7 的lib-dynload 文件夹下， 就解决了问题。或者你可以下载ncurses文件，然后重新跑下python就可以了。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image014.png" alt=""><br>我们前面也说过这款工具是为了教育开发人员和信息安全人员了解与Android应用程序安全相关的潜在风险 ，相应的开发人员和评估人员就可以在开发和检测阶段，针对于APP移动应用进行检测，及时修改相应的风险点。<br>其实通过对于QARK的了解，我们不难看出这就是和大多数自动化工具一样就是，感觉就像个多了些脚步的Mobsf，作为一个安全评估人员，其实再多的检测工具也是辅助，我们仍然需要进行自己的分析，有些风险点也不一定是准确的，所以我们是需要好好利用该工具。</p>
-<p>参考的文章：<br><a href="http://resources.infosecinstitute.com/qark-a-tool-for-automated-android-app-assessments/#gref" rel="external nofollow noopener noreferrer" target="_blank">http://resources.infosecinstitute.com/qark-a-tool-for-automated-android-app-assessments/#gref</a><br><a href="https://github.com/linkedin/qark" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/linkedin/qark</a><br>工具下载链接：<br><a href="https://github.com/linkedin/qark" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/linkedin/qark</a></p>
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><h3 id="新零售概念"><a href="#新零售概念" class="headerlink" title="新零售概念"></a>新零售概念</h3><p> 新零售概念提出后，零售行业创新加速，伴随着人工智能和物联网在各个领域的渗透，无人售货便利店、无人售货机的概念进入大众视野，自2016年亚马逊宣布其无人便利店项目Amazon Go准备问世以来，无人便利店像雨后春笋般涌现，在以消费者为中心的商业时代，无人便利店以其高效率、优质的服务体验和低人力成本等等优势，在未来将得到巨大市场发展。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image7.jpg" alt="image7"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image8.jpg" alt="image8"></p>
+<p>无人零售多采用人工智能、物联网RFID、二维码识别等技术，但是正因为新技术的引入，而导致攻击面随之扩大，RFID标签的篡改、识别信号拦截、人工智能算法欺骗、云端通信拦截等等都有可能导致大量的盗损，并因其利用简单、攻击成本低、攻击难以检测等特点，比传统商店所面临的盗损风险更大，从而严重威胁到市场发展，因此安全是无人零售行业长足发展的基石。</p>
+<h3 id="行业发展"><a href="#行业发展" class="headerlink" title="行业发展"></a>行业发展</h3><p>2016年 新零售”一词由马云在2016年杭州云栖大会上首次提及，与新制造、新金融、新技术、新能源一起被称为未来五大新趋势。“新零售”概念强调的是线上与线下将深度结合，在现代物流加持下，结合大数据、云计算等创新技术构成的新商业模式。<br>2017年下半年，无人零售以其超前的购物体验成为新零售最受资本和消费者关注的形态之一。7月1日，F5未来商店完成3000万元A+轮融资；7月3日缤果盒子完成超1亿元A轮融资；7月8日阿里巴巴无人超市“淘咖啡”的落地亮相2017年淘宝造物节。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image14.jpg" alt="image14"></p>
+<p>截至2017年9月底我国每年无人零售企业成立数。</p>
+<h3 id="安全现状"><a href="#安全现状" class="headerlink" title="安全现状"></a>安全现状</h3><ul>
+<li>上海一无人超市一周遭盗窃6次防盗成了大难题</li>
+<li>成都批捕首例无人超市盗窃嫌疑人</li>
+<li>浙江多次盗窃无人超市 三男子被刑拘</li>
+<li>东莞两月盗窃无人超市11次 “贪心”男被刑拘</li>
+</ul>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/640.jpg" alt="640"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/6401.jpg" alt="6401"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/6403.jpg" alt="6403"></p>
+<p>无人商店最大问题是开放式零售形态可能面临少数顾客逃避付款，而难以完全保证商户利益的问题。</p>
+<h2 id="UHF标签"><a href="#UHF标签" class="headerlink" title="UHF标签"></a>UHF标签</h2><h3 id="UHF超高频远距离RFID"><a href="#UHF超高频远距离RFID" class="headerlink" title="UHF超高频远距离RFID"></a>UHF超高频远距离RFID</h3><p>特高频Ultra High Frequency(UHF)是指频率为300~3000MHz，波长在1m~1dm的无线电波。该波段的无线电波又称为分米波。UHF标签是RFID电子标签中的一种。属于无源电子标签，在阅读器的读出范围之外时，电子标签处于无源状态，在阅读器的读出范围之内时，电子标签从阅读器发出的射频能量中提取其工作所需的电源。在我国 800/900MHz 频段 UHF 技术的具体使用频率为 840-845MHz 和920-925MHz。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image15.jpg" alt="image15"></p>
+<p>UHF电子标签具有识别距离远、识读率高、防冲突能力强、可扩展性好等特点，读卡距离达3－10米，每秒可读100张卡，因此UHF技术大量应用在仓储、物流盘点等场所，随着无人商店的发展，UHF技术开始广泛应用于店内的商品标识上。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image16.jpg" alt="image16"></p>
+<h3 id="UHF电子标签安全问题"><a href="#UHF电子标签安全问题" class="headerlink" title="UHF电子标签安全问题"></a>UHF电子标签安全问题</h3><p>目前无人商店使用的UHF电子标签大部分采用基于EPC Class1 Gen2（简称G2）协议的标签， EPC标签内置的芯片存储有具体的数据信息，其Tag memory（标签内存）分为Reserved（保留），EPC（电子产品代码），TID（标签识别号）和User（用户）四个独立的存储区块（Bank）。 其中</p>
+<ul>
+<li>Reserved区，存储Kill Password（灭活口令）和Access Password（访问口令）。</li>
+<li>EPC区：存储EPC号码等，可以对供应链中的对象（包括物品、货箱、货盘、位置等）进行全球唯一的标识，无人商店中商品的唯一识别ID即存储于EPC区。</li>
+<li>TID区：存储标签识别号码，每个TID号码应该是唯一的。 </li>
+<li>User区：存储用户自定义的数据。 </li>
+</ul>
+<p>此外还有各区块的Lock（锁定）状态位等用到的也是存储性质的单元。<br>标签收到连续波（CW）照射即上电（Power-up）以后，标签可处于Ready（准备），Arbitrate（裁断），Reply（回令），Acknowledged（应答），Open（公开），Secured（保护），Killed（灭活）七种状态之一。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image17.jpg" alt="image17"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image18.jpg" alt="image18"></p>
+<p>EPC区存储的唯一标识，如果标签没有进行灭活（Killed），或者没有进行锁定（Lock）或加密码保护（Secured），就能通过读写器再次进行修改，而在实际生产环节，厂商出于成本和便捷性考虑，并没有进行灭活（Killed）、锁定（Lock）、保护（Secured）等标签数据防护手段，这就导致了可以通过外部读写器改变商品标识的风险，利用专用工具，可以把高价商品的标识与低价商品标识互换，或者把已经购买过的商品标识换到未购买过的商品上，即可轻松绕过店内的监控报警系统。</p>
+<h2 id="攻击设备"><a href="#攻击设备" class="headerlink" title="攻击设备"></a>攻击设备</h2><p>基于修改EPC区唯一标识的方法，自制了隐蔽标签修改器，把读写器天线、电池、读写模块集成在一起，然后隐藏在手机壳内部，在通过耳机接口与手机通信，在APP里面进行数据操作修改，实现最大程度的隐蔽攻击。相比传统从网络层或通信层的攻击，操作简单，没有技术门槛，任何人只要掌握了工具的操作方式，即可实现攻击，危害性和影响力更为广泛。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image19.jpg" alt="image19"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image20.jpg" alt="image20"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image21.jpg" alt="image21"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/image22.jpg" alt="image22"></p>
+<h2 id="效果演示"><a href="#效果演示" class="headerlink" title="效果演示"></a>效果演示</h2><p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/20181116172418.jpg" alt="微信图片_20181116172418"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/lo95jrf43d/20181116172423.jpg" alt="微信图片_20181116172423"></p>
+<p>Geekpwn 2018 上海站实验室无人商店“0元购”演讲，并现场对该设备进行展示。</p>
+<p>视频演示：  <a href="https://www.bilibili.com/video/av36079154/" rel="external nofollow noopener noreferrer" target="_blank">https://www.bilibili.com/video/av36079154/</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><p>无人超市“零元购” | 挥一挥衣袖，不花钱带走一个超市<br><a href="https://mp.weixin.qq.com/s/NQ9r1kLhZ33SEGZykf9fHw" rel="external nofollow noopener noreferrer" target="_blank">https://mp.weixin.qq.com/s/NQ9r1kLhZ33SEGZykf9fHw</a></p>
+</li>
+<li><p>物联网安全百科<br><a href="https://iot-security.wiki/" rel="external nofollow noopener noreferrer" target="_blank">https://iot-security.wiki/</a></p>
+</li>
+</ul>
 
       
     </div>
@@ -206,19 +251,10 @@
     
 <nav id="article-nav">
   
-    <a href="/bayesian-classifier.html" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          贝叶斯分类器
-        
-      </div>
-    </a>
   
-  
-    <a href="/king-of-zombie.html" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/wireless-signal-replay-attack-and-reverse-with-LimeSDR.html" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">谁是僵尸之王-如何进行高效的分布式爆破</div>
+      <div class="article-nav-title">LimeSDR 无线信号重放攻击和逆向分析</div>
     </a>
   
 </nav>
