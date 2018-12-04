@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.future-sec.com/"/>
-  <updated>2018-11-16T10:13:13.935Z</updated>
+  <updated>2018-12-04T11:50:41.979Z</updated>
   <id>http://www.future-sec.com/</id>
   
   <author>
@@ -14,6 +14,139 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>智能锁具攻防系列一初探</title>
+    <link href="http://www.future-sec.com/intelligent-lock-attack-and-defense-1.html"/>
+    <id>http://www.future-sec.com/intelligent-lock-attack-and-defense-1.html</id>
+    <published>2018-12-03T16:00:00.000Z</published>
+    <updated>2018-12-04T11:50:41.979Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>从原始公有制的瓦解到私有制意识的萌芽，人类社会逐渐从愚昧走向了文明，而伴随着私有制的诞生，锁具也应运而生，作为保护私有财产的重要手段，锁具随着文明的发展，也走过了近5000个年头，而锁具的发展，从某个程度上也体现出了科学技术的进步，正因为锁具在现实生活中的重要地位，作为人身财产安全的保护神，其安全可靠性就是其生命力所在，不安全锁具无疑是给生活留下了极大的安全隐患，本篇是锁具安全系列开篇之作，通过行业分析和实战经验，简单总结了锁具面临的主要安全风险，其中恐多谬误之处，以待后续完善。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/werwet.png" alt="werwet"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image19.jpg" alt="image19"></p>
+<h2 id="锁具分类和发展"><a href="#锁具分类和发展" class="headerlink" title="锁具分类和发展"></a>锁具分类和发展</h2><h3 id="锁具发展历程"><a href="#锁具发展历程" class="headerlink" title="锁具发展历程"></a>锁具发展历程</h3><p> 公元前3000年的中国仰韶文化遗址中，就留存有装在木结构框架建筑上的木锁。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image17.jpg" alt="image17"></p>
+<p> 汉代时，中国铁制三簧锁的技术已具有相当高的水平。三簧锁前后沿用了1000多年。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image18.jpg" alt="image18"></p>
+<p>公元18世纪，英国人丹尼克·波特发明出凸轮转片锁，锁内金属叶片利用弹簧控制转动，钥匙插入锁内必须先转动叶片接触到锁舌缺口才开启。叶片锁的钥匙造型美观大方，被公认为锁和钥匙的标志。</p>
+<p>1848年，美国人 L.耶尔发明采用圆柱形销栓的弹子锁，人类从此进入现代锁时代，该锁通过对弹子的组合排列，使锁的编号由原有的2500种变化达到百万种，从而大大提高锁的保密与安全性能，已成为世界上使用最普遍的锁。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image20.jpg" alt="image20"></p>
+<p>20世纪70年代，随着微电子技术的应用，出现了磁控锁、声控锁、超声波锁、红外线锁、电磁波锁、电子卡片锁、八佰指纹锁、视网膜锁、遥控锁等。近些年随着物联网的发展，WIFI锁、蓝牙锁等新型锁具不断涌现。这些锁具有机械结构所无法比拟的高保密性能。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image21.jpg" alt="image21"></p>
+<h3 id="智能锁的发展"><a href="#智能锁的发展" class="headerlink" title="智能锁的发展"></a>智能锁的发展</h3><p>随着物联网各类技术的逐步进步，越来越多的智能设备出现在我们生活中，智能锁在锁具市场上所占的份额将会越来越大，甚至超过传统锁，成为主流。<br>2016年全球市场智能锁产业规模达到1100万套。其中日本达到150万套，韩国达到170万套，欧美市场达到250万套，中国达到350万套，其它等市场约200万套， 预计到2020年全球智能锁产业规模将达到5100万套 。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/11.png" alt="11"></p>
+<h3 id="锁具的分类"><a href="#锁具的分类" class="headerlink" title="锁具的分类"></a>锁具的分类</h3><h4 id="机械锁"><a href="#机械锁" class="headerlink" title="机械锁"></a>机械锁</h4><p>在我国，根据公安部门在1994年颁布的GA/T73-94《机械防盗锁》标准规定。从技术开启的时长来确定，防盗门锁分为两个等级：A级锁、B级锁，在民间因锁具企业的宣传造势，存在有超B级、C级锁的说法，国家尚不承认这两个分级。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image23.jpg" alt="image23"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image22.jpg" alt="image22"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/45555.png" alt="45555"></p>
+<h4 id="智能锁"><a href="#智能锁" class="headerlink" title="智能锁"></a>智能锁</h4><p>智能锁大多数采用密码、指纹、手机等多种识别方式。其中，半导体指纹识别和光学指纹识别，是目前智能锁行业最主流的的指纹识别技术。 随着智能锁相关技术的日益成熟和发展，人脸识别、手机开锁、虹膜开锁、物联网技术等相继诞生，智能锁产品的功能和应用将更加丰富多元，也将进一步促进未来智能锁与智能家居的同步发展和高度融合。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/769856456.jpg" alt="769856456"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/7686789768987.jpg" alt="7686789768987"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/3245324534.jpg" alt="3245324534"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/34253215345.jpg" alt="34253215345"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/547686785687.jpg" alt="547686785687"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/201811051236.png" alt="图片1"></p>
+<h3 id="锁具市场需求分析"><a href="#锁具市场需求分析" class="headerlink" title="锁具市场需求分析"></a>锁具市场需求分析</h3><p>锁的目的是保护财产和人身安全，正因如此，锁具的安全与切身利益是紧密相关的，根据消费者购买智能门锁考虑因素的调查结果显示，86.8%的消费者重视智能门锁的安全性，其次消费者考虑最多的便是实用性和便捷性，再有就是质量。根据消费者的考虑因素以及智能门锁行业的发展趋势，安全、便捷和适用将会成为产品主流，行业将会出现以消费者主导的消费者品牌，而不是行业品牌，这就要求相关企业要足够洞悉消费者的心理，而最受消费者在意的安全性，将会得到进一步的强化，逐渐在真正意义上彰显智能门锁是人们隐私的保护神这一角色。</p>
+<p> <img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/222.png" alt="222"></p>
+<h2 id="锁具安全问题"><a href="#锁具安全问题" class="headerlink" title="锁具安全问题"></a>锁具安全问题</h2><h3 id="锁具破解"><a href="#锁具破解" class="headerlink" title="锁具破解"></a>锁具破解</h3><p> 从古至今，对锁具的攻防就从未停止过，古来就有梁上君子溜门撬锁的记载，各类开锁工具随着锁的发展也不断推陈出新，从最简单的单勾到后来的锡纸和软硬开工具，针对不同锁具有不同的开锁工具，攻击锁的思路与web攻击的思路其实是共通的，在传统安全中，有一个公认的原则，那就是一切外部输入都是有害的，越安全性的系统，封闭性就越强，web攻击的思路就是找输入点，找漏洞在注入，锁具破解同理，通过暴露在外的锁孔、锁柱、锁体、按键等等，找一切可以输入的点，结合特定的工具，使弹珠复位或拨动锁体，实现破解目的，随着智能锁的涌现，锁具的攻击面也随之扩大，面临的安全风险也更多。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image25.gif" alt="image25"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image37.jpg" alt="image37"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image44.jpg" alt="image44"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image28.jpg" alt="image28"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image36.jpg" alt="image36"></p>
+<h3 id="智能锁具安全风险"><a href="#智能锁具安全风险" class="headerlink" title="智能锁具安全风险"></a>智能锁具安全风险</h3><h4 id="物理层"><a href="#物理层" class="headerlink" title="物理层"></a>物理层</h4><p>锁芯抗技术开启的时长不达标，存在一定的设计和选材用料上的缺陷，导致在短时间内被技术开启；</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image40.png" alt="image40"></p>
+<p>单钩开锁。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/1201171605_clip.gif" alt="1201171605_clip"></p>
+<p>锡纸开锁。</p>
+<p>锁具在安装之后，存在结构薄弱点，直接暴露锁簧或锁体结构的薄弱点，甚至可以通过外部拨动锁体；</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image24.jpg" alt="image23"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/sdgdsry87908.jpg" alt="图片1"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/1_clip.gif" alt="媒体1_clip"></p>
+<p>如图为一种专门针对市面上大部分智能锁以及指纹锁一类的插片开启工具，工具用法简单，直接在外门面板缝中插入该工具，碰到带动杆就能直接转开了，既简单实用又廉价。</p>
+<p>锁具的整体材料强度不达标准，无法抵抗一般的暴力开锁手段，关键结构点没有械加固，锁芯不具备空转结构或分体设计等功能。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image23.png" alt="image23"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/TB2XPjucLiSBuNkSnhJXXbDcpXa_!!25616172.jpg" alt="TB2XPjucLiSBuNkSnhJXXbDcpXa_!!25616172"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/clip.gif" alt="暴力开锁_clip"></p>
+<p>如上图尽管官方宣传该款锁的U形环可以抵抗10T液压钳，但在锁体关键连接部位采用一般铝合金材质，使用常见工具短时间内即可暴力开锁。</p>
+<h4 id="电路层"><a href="#电路层" class="headerlink" title="电路层"></a>电路层</h4><p>智能锁内部集成电路在PCB设计、布线、物料选型、抗干扰设计上存在缺陷，以传统电路设计为主导，未充分考虑基于物联网的安全性设计，导致存在安全隐患。</p>
+<p>没有做好充分的电磁防护设计，使用外部磁场或强电压可以进行信号干扰。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image25.jpg" alt="image25"></p>
+<p>通过电磁注入，产生重置信号，实现开锁。（来源 DPLSLAB）</p>
+<p>某款共享单车电路设计和机械构造存在问题，可以从外部截断输入锁体的电源线，在用一个高电压的脉冲电压作为输入电源，即可开锁。其原因在于电路设计和电机控制芯片选型存在缺陷，没有做充分的过载保护和断路保护，使控制锁柱运动的电机异常工作。</p>
+<h4 id="硬件通信层"><a href="#硬件通信层" class="headerlink" title="硬件通信层"></a>硬件通信层</h4><p>锁具内部电路的各接口和引脚信号存在未经加密或验证的输入输出信号，存在可能暴露内部逻辑的调试信号，可以通过I2C、SPI、UART、JTAG等协议进行数据窃取和劫持，获取锁具芯片访问权和固件程序；</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/5b8feecd02a39.jpg" alt="5b8feecd02a39"><br>spi通信</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/5b8fef1f084b2.jpg" alt="5b8fef1f084b2"><br>I2C通信</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/5b8ff2ea3e6d5.jpg" alt="5b8ff2ea3e6d5"><br>UART通信</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/20181019165050.png" alt="微信截图_20181019165050"><br>逻辑分析仪抓取spi通信数据分析</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/20180930114820.jpg" alt="微信图片_20180930114820"><br>通过 SBW 和 GDB 调试锁具芯片。</p>
+<p>芯片未做加密保护，容易被拆解提取固件。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/5b352394427b3.jpg" alt="5b352394427b3"></p>
+<p>拆下芯片通过调试器直接读取锁具固件。</p>
+<h4 id="固件层"><a href="#固件层" class="headerlink" title="固件层"></a>固件层</h4><p>芯片固件存在逻辑算法漏洞，没有进行严格的代码审计，存在代码层的安全漏洞。</p>
+<p>下面是对某款声波锁的固件逆向过程。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/IMG_3505.jpg" alt="IMG_3505"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/IMG_3506.jpg" alt="IMG_3506"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/IMG_3507.jpg" alt="IMG_3507"></p>
+<p>进行固件逆向分析，可以得到密码验证算法，通过数学计算可以算出相应的密钥。</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/1538279364702.png" alt="1538279364702"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image46.jpg" alt="image46"></p>
+<p>声音通过傅里叶算法，实现AD相互转换，利用逆向的算法生成开锁声波。</p>
+<p>对于固件更新，没有进行签名和完整性检验，可以对固件进行修改和重打包。</p>
+<p>空中升级固件，加密算法强度不够，抵御不了高阶的侧信道攻击。</p>
+<h4 id="移动APP层"><a href="#移动APP层" class="headerlink" title="移动APP层"></a>移动APP层</h4><p>存在被逆向、反编译源码的可能；<br>可能存在底层代码漏洞和敏感信息泄露；<br>APP自身业务存在逻辑问题，如异常开锁、异常登录等。</p>
+<h4 id="身份识别层"><a href="#身份识别层" class="headerlink" title="身份识别层"></a>身份识别层</h4><h5 id="指纹模块"><a href="#指纹模块" class="headerlink" title="指纹模块"></a>指纹模块</h5><p>指纹模块的算法安全性不达标，对错误指纹、非活体指纹、假指纹等的识别率偏低；</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/[00_00_02][20180930-120632-0].jpg" alt="媒体3[00_00_02][20180930-120632-0]"></p>
+<p>一般光学或电容指纹模块，没有进行活体检测，容易被假指纹欺骗。</p>
+<p>指纹数据能被提取，通过指纹复制，制作假指纹；</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/20180226135.jpg" alt="图片2"></p>
+<p>通过简单材料可以伪造出指纹模型。</p>
+<p>指纹模板和数据存在被盗取或替换的隐患；<br>指纹模块本身存在被替换的问题。</p>
+<h5 id="RFID"><a href="#RFID" class="headerlink" title="RFID"></a>RFID</h5><p>RFID 卡片可以被远程嗅探、复制；<br>RFID 卡片可以被近程伪造，锁具读卡器被欺骗</p>
+<h5 id="密码键盘"><a href="#密码键盘" class="headerlink" title="密码键盘"></a>密码键盘</h5><p>密码键盘是否存在被偷窥风险<br>可能存在不同按键声音可能，存在泄露密码的风险<br>不具备主动探测的防拆机制，可能存在安装物理攻击设备窃取密码的风险</p>
+<h5 id="其他认证方式"><a href="#其他认证方式" class="headerlink" title="其他认证方式"></a>其他认证方式</h5><p>虹膜、人脸识别存在被高清图像，3D打印等非活体手段绕过的风险<br>声音包括超声波存在被录制重放的风险</p>
+<h4 id="通信层"><a href="#通信层" class="headerlink" title="通信层"></a>通信层</h4><h5 id="无线电通信"><a href="#无线电通信" class="headerlink" title="无线电通信"></a>无线电通信</h5><p>WiFi通信可能存在中间人攻击；</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image80.jpg" alt="image80"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image84.png" alt="image84"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image83.png" alt="image83"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/01_clip.gif" alt="序列 01_clip"></p>
+<p>某款保险柜存在被 wifi 中间人劫持攻击的漏洞。</p>
+<p>蓝牙与APP通信连接过程的加密和验证强度不够，容易进行蓝牙抓包、劫持、重放等攻击；</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/5b9fe0fd21e76.jpg" alt="5b9fe0fd21e76"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/vlcsnap-2018-09-30-12h03m29s219.png" alt="vlcsnap-2018-09-30-12h03m29s219"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/2_clip.gif" alt="媒体2_clip"></p>
+<p>某款蓝牙采用AES加密，数据不改变，无签名校验，抓包重放即可开锁 </p>
+<p>无线遥控开锁在信号广播发送过程中存在被抓包、解码、重放破解的风险；</p>
+<p>无线通信加密算法未考虑侧信道防护，存在被侧信道分析破解的可能；</p>
+<p>芯片层没有做有效的数模信号隔离，可能导致关键密钥信息通过无线载波发射出来，并通过侧信道破解算法。</p>
+<h5 id="云端通信"><a href="#云端通信" class="headerlink" title="云端通信"></a>云端通信</h5><p>APP与云端的通信没有使用安全通信，容易被抓包、劫持；</p>
+<p>客户端与服务端没有对数据进行有效的合法性校验，容易通过中间人攻击；</p>
+<p>采用 GMS 通信存在被伪基站劫持的风险；</p>
+<h4 id="云服务层"><a href="#云服务层" class="headerlink" title="云服务层"></a>云服务层</h4><p>云端服务器存在安全漏洞，可能有SQL注入、XSS跨站脚本攻击、CSRF跨站请求伪造、越权访问等等安全问题，导致用户数据被泄露；</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image71.jpg" alt="image71"></p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/image72.jpg" alt="image72"></p>
+<p>某款锁可以遍历云端存储的所有开锁密码和用户信息。</p>
+<h2 id="安全解决方案"><a href="#安全解决方案" class="headerlink" title="安全解决方案"></a>安全解决方案</h2><h3 id="锁具安全模型"><a href="#锁具安全模型" class="headerlink" title="锁具安全模型"></a>锁具安全模型</h3><p>木桶原理在智能锁安全中的新诠释</p>
+<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/suo3vcf/333.png" alt="333"></p>
+<p>整体的安全性不仅由木桶最短的木板决定，更取决于木桶底部是否完好，如果底部存在漏洞，木板在高也是没有意义的，都是空谈，物理安全在智能锁具安全层面就相当于木桶的底部。通过研究锁具在声、光、电、磁、机械构造等各方面的物理安全隐患，可以切实提高锁具的整体安全性，并且物理安全对于所有物联网安全研究同样具有重要意义，可以作为物联网安全模型的基石。</p>
+<h2 id="展望"><a href="#展望" class="headerlink" title="展望"></a>展望</h2><p>随着智能锁不断推出陈新，更多的新技术会运用到锁具中，与此同时面临的风险也会更多，本章作为智能锁安全系列的开篇之作，简单概括了目前行业的发展和安全态势，今后将会从更多实战的角度分析智能锁的安全问题。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;从原始公有制的瓦解到私有制意识的萌芽，人类社会逐渐从愚昧走向了文明，而伴随着私有制的诞生，锁具也应运而生，作为保护私有财产的重要手段，锁具随
+    
+    </summary>
+    
+      <category term="锁具安全" scheme="http://www.future-sec.com/categories/%E9%94%81%E5%85%B7%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="硬件分析" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%88%86%E6%9E%90/"/>
+    
+      <category term="锁具安全" scheme="http://www.future-sec.com/tags/%E9%94%81%E5%85%B7%E5%AE%89%E5%85%A8/"/>
+    
+  </entry>
   
   <entry>
     <title>无人商店0元购</title>
@@ -539,6 +672,36 @@
   </entry>
   
   <entry>
+    <title>QARK工具的介绍和原理分析</title>
+    <link href="http://www.future-sec.com/introducing-qark.html"/>
+    <id>http://www.future-sec.com/introducing-qark.html</id>
+    <published>2018-04-07T16:00:00.000Z</published>
+    <updated>2018-06-29T09:01:13.691Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>QARK的核心是一个静态代码分析工具，旨在识别基于Java的Android应用程序的潜在安全漏洞和关注点。QARK还试图提供动态生成的ADB（Android调试桥）命令，以帮助验证其检测到的潜在漏洞。它甚至可以动态地创建一个定制的测试应用程序，以即用APK的形式，专门设计来展示它发现的潜在问题。<br>QARK的设计是基于社区的，可供所有人免费使用。QARK被设计出来的主要目的和大多数的自动化检测工具一样是教育开发人员和信息安全人员了解与Android应用程序安全相关的潜在风险 ，相应的开发人员和评估人员就可以在开发和检测阶段，针对于APP移动应用进行检测，及时修改相应的风险点。</p>
+<h2 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h2><p>•    python 2.7.<br>•    JRE 1.6+（最好1.7+）<br>•    Ubuntu环境（最好）<br>•    未加固的测试APK；<br>•    一台root过的手机<br>在前提条件中，有提到未加固的APK，从简介中，我们就提到该工具就是一个静态代码分析的工具，在其中QARK的脚本中是没有脱壳的脚本，所以是需要未加固的APK，其中的ubuntu环境不是唯一的，但是我只在ubuntu成功过，所以我建议试用该环境。</p>
+<h2 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h2><p>QARK是一款易于使用的工具，能够找到Android应用程序中的常见安全漏洞。与商业产品不同，它可以100％免费使用。QARK提供教育信息，允许安全审查人员找到对漏洞的精确和深入的解释。在反编译APK时，QARK可以自动使用多个反编译器，利用它们的组合输出来产生出色的结果。最后，QARK与传统工具相比的主要优势仅仅是指出可能存在的漏洞，它可以产生ADB命令甚至功能齐全的APK，将假设的漏洞转化为“POC”漏洞利用。<br>包含在此工具尝试查找的安全漏洞类型中的有：<br>•    无意中导出的组件<br>•    未妥善保护的导出组件<br>•    易受拦截或窃听的intent<br>•    不正确的x.509证书验证<br>•    创建事件可读或事件可写的文件<br>•    可能泄漏数据的Activity<br>•    粘滞的intent的使用<br>•    不安全地创建了Pending Intents<br>•    发送不安全的广播Intent<br>•    嵌入在源中的私钥<br>•    弱密码学使用不当或不适用<br>•    潜在可利用的WebView配置<br>•    导出偏好活动<br>•    Tapjacking<br>•    启用备份的应用程序<br>•    可调试的应用程序<br>•    支持过时API版本的应用程序，具有已知的漏洞</p>
+<h2 id="原理分析"><a href="#原理分析" class="headerlink" title="原理分析"></a>原理分析</h2><p>前面我们说过该工具就是静态代码分析的工具，所以首先我打开相应的qark.py脚本文件,其可以发现刚开始就使用到unpackAPK脚本，然后打开相应的unpackAPK,py，发现相应aapt和dex2jar，这里就可以知道还是老方法，对apk进行反编译，然后在进行相应的dex2jar把dex转换为jar文件，之后在进行查看源码。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image001.png" alt=""><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image002.png" alt=""><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image003.png" alt=""> </p>
+<p>然后就是相应的代码静态分析，这里就需要对于检测项目的了解，其实说到底就是一个关键代码查找和匹配，因为这些检测项目大部分引起的原因就是编写代码没有注意到相关的安全措施，例如其中的组件暴露就是，组件的属性exported：设置为ture或者没有设置，则默认为true，这就会导致相应的组件暴露。<br>我们查看下mouble文件夹里面，基本上所有的检测项目都是这里的检测检测脚本。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image004.png" alt=""><br>我们就分析其中的cryptoFlaws.py这个脚本，从字面意思就是密码缺陷，那这个部分就是针对于移动应用加解密子之类的风险。我们直接打开来查看其中方法。<br>这里我们看到相应的寻找ECB的特殊关键字，这个是检测AES和DES是否存在弱加密（ECB模式）的风险。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image005.png" alt=""><br>这个地方是匹配PRIVATE\sKEY的1特殊关键字，寻找相应的加密算法的私钥，这个地方的私钥如果存在且是以明文形式存在，这个就是加密算法的密钥硬编码风险，会导致相关的加密算法被破解。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image006.png" alt=""><br>这里还有一个地方，但是方法被注释掉了，这个是匹配SecureRandom.setseed（）方法，这个是伪随机数的一个风险点。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image007.png" alt=""><br> 大部分的原理都是类似的。所以其他的脚本就看各位自己去分析。</p>
+<h2 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h2><p>QARK有两种模式：1.交互模式 2.无缝模式<br>交互模式使用户能够交互地一个接一个地选择选项。而无缝模式允许我们用一个命令完成整个工作。<br>我们主要看看交互模式的实际应用。<br>输入python qark.py<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image008.png" alt=""><br>接着会有选择apk或者soure，这些都是通过数字来进行选择。继续下去会有输入路径或者通过设备来进行检测。我们选择1，然后底下就开始提示是否导出mainfirst文件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image009.png" alt=""><br>接下来就直接导出相应的mainfist文件，这其实就是直接反编译获取到的。接下来就是先从mainfirst文件进行分析，分析相应组件暴露和allowback和debuggable等相关的风险点。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image010.png" alt=""><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image011.png" alt=""><br>接下里，我们继续查看，直接检测broadcast广播是否有附带相应的敏感信息，然后就是相应的脚本进行检测，例如x509证书检验，这些都是该工具具有的代码静态分析。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image012.png" alt=""><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image013.png" alt=""><br>最后会在qark的本身目录中的report.html文件，这个文件类似于mobsf生成的界面。这里面就是会把刚刚经过检测的所有风险都以报告的形式打印出来，都会在相应的选项中，详细的告诉你风险点存在的位置，以及相应的危害。<br>但是在这里我们只是看到很稀少的数据，其实这些数据只是mainfist文件暴露出来的风险点，但是代码中的分析根本没有进行分析。问题出在于apk本身，这是一个有进行加固的apk，我之前说过这个工具无法进行相应的脱壳，所以导致无法获取到相应的代码，就无法进行相应的分析，所以其他数据就是空的。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在安装的过程会有一个问题就是python no module named _curses的问题，这个问题最后解决了，经过对比python2.6 ，终于发现，原来 pythong2.7/lib-dynload 里没有相应的 curses 库，_curses_panel.so，_curses.so。说到底就是去缺少文件，所以此时你将python2.6 的 这2个so文件拷贝到 pythong2.7 的lib-dynload 文件夹下， 就解决了问题。或者你可以下载ncurses文件，然后重新跑下python就可以了。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image014.png" alt=""><br>我们前面也说过这款工具是为了教育开发人员和信息安全人员了解与Android应用程序安全相关的潜在风险 ，相应的开发人员和评估人员就可以在开发和检测阶段，针对于APP移动应用进行检测，及时修改相应的风险点。<br>其实通过对于QARK的了解，我们不难看出这就是和大多数自动化工具一样就是，感觉就像个多了些脚步的Mobsf，作为一个安全评估人员，其实再多的检测工具也是辅助，我们仍然需要进行自己的分析，有些风险点也不一定是准确的，所以我们是需要好好利用该工具。</p>
+<p>参考的文章：<br><a href="http://resources.infosecinstitute.com/qark-a-tool-for-automated-android-app-assessments/#gref" rel="external nofollow noopener noreferrer" target="_blank">http://resources.infosecinstitute.com/qark-a-tool-for-automated-android-app-assessments/#gref</a><br><a href="https://github.com/linkedin/qark" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/linkedin/qark</a><br>工具下载链接：<br><a href="https://github.com/linkedin/qark" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/linkedin/qark</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;简介&quot;&gt;&lt;a href=&quot;#简介&quot; class=&quot;headerlink&quot; title=&quot;简介&quot;&gt;&lt;/a&gt;简介&lt;/h2&gt;&lt;p&gt;QARK的核心是一个静态代码分析工具，旨在识别基于Java的Android应用程序的潜在安全漏洞和关注点。QARK还试图提供动态生成的ADB
+    
+    </summary>
+    
+      <category term="移动安全" scheme="http://www.future-sec.com/categories/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="QARK" scheme="http://www.future-sec.com/tags/QARK/"/>
+    
+  </entry>
+  
+  <entry>
     <title>贝叶斯分类器</title>
     <link href="http://www.future-sec.com/bayesian-classifier.html"/>
     <id>http://www.future-sec.com/bayesian-classifier.html</id>
@@ -945,36 +1108,6 @@ H2 = 0
   </entry>
   
   <entry>
-    <title>QARK工具的介绍和原理分析</title>
-    <link href="http://www.future-sec.com/introducing-qark.html"/>
-    <id>http://www.future-sec.com/introducing-qark.html</id>
-    <published>2018-04-07T16:00:00.000Z</published>
-    <updated>2018-06-29T09:01:13.691Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>QARK的核心是一个静态代码分析工具，旨在识别基于Java的Android应用程序的潜在安全漏洞和关注点。QARK还试图提供动态生成的ADB（Android调试桥）命令，以帮助验证其检测到的潜在漏洞。它甚至可以动态地创建一个定制的测试应用程序，以即用APK的形式，专门设计来展示它发现的潜在问题。<br>QARK的设计是基于社区的，可供所有人免费使用。QARK被设计出来的主要目的和大多数的自动化检测工具一样是教育开发人员和信息安全人员了解与Android应用程序安全相关的潜在风险 ，相应的开发人员和评估人员就可以在开发和检测阶段，针对于APP移动应用进行检测，及时修改相应的风险点。</p>
-<h2 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h2><p>•    python 2.7.<br>•    JRE 1.6+（最好1.7+）<br>•    Ubuntu环境（最好）<br>•    未加固的测试APK；<br>•    一台root过的手机<br>在前提条件中，有提到未加固的APK，从简介中，我们就提到该工具就是一个静态代码分析的工具，在其中QARK的脚本中是没有脱壳的脚本，所以是需要未加固的APK，其中的ubuntu环境不是唯一的，但是我只在ubuntu成功过，所以我建议试用该环境。</p>
-<h2 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h2><p>QARK是一款易于使用的工具，能够找到Android应用程序中的常见安全漏洞。与商业产品不同，它可以100％免费使用。QARK提供教育信息，允许安全审查人员找到对漏洞的精确和深入的解释。在反编译APK时，QARK可以自动使用多个反编译器，利用它们的组合输出来产生出色的结果。最后，QARK与传统工具相比的主要优势仅仅是指出可能存在的漏洞，它可以产生ADB命令甚至功能齐全的APK，将假设的漏洞转化为“POC”漏洞利用。<br>包含在此工具尝试查找的安全漏洞类型中的有：<br>•    无意中导出的组件<br>•    未妥善保护的导出组件<br>•    易受拦截或窃听的intent<br>•    不正确的x.509证书验证<br>•    创建事件可读或事件可写的文件<br>•    可能泄漏数据的Activity<br>•    粘滞的intent的使用<br>•    不安全地创建了Pending Intents<br>•    发送不安全的广播Intent<br>•    嵌入在源中的私钥<br>•    弱密码学使用不当或不适用<br>•    潜在可利用的WebView配置<br>•    导出偏好活动<br>•    Tapjacking<br>•    启用备份的应用程序<br>•    可调试的应用程序<br>•    支持过时API版本的应用程序，具有已知的漏洞</p>
-<h2 id="原理分析"><a href="#原理分析" class="headerlink" title="原理分析"></a>原理分析</h2><p>前面我们说过该工具就是静态代码分析的工具，所以首先我打开相应的qark.py脚本文件,其可以发现刚开始就使用到unpackAPK脚本，然后打开相应的unpackAPK,py，发现相应aapt和dex2jar，这里就可以知道还是老方法，对apk进行反编译，然后在进行相应的dex2jar把dex转换为jar文件，之后在进行查看源码。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image001.png" alt=""><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image002.png" alt=""><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image003.png" alt=""> </p>
-<p>然后就是相应的代码静态分析，这里就需要对于检测项目的了解，其实说到底就是一个关键代码查找和匹配，因为这些检测项目大部分引起的原因就是编写代码没有注意到相关的安全措施，例如其中的组件暴露就是，组件的属性exported：设置为ture或者没有设置，则默认为true，这就会导致相应的组件暴露。<br>我们查看下mouble文件夹里面，基本上所有的检测项目都是这里的检测检测脚本。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image004.png" alt=""><br>我们就分析其中的cryptoFlaws.py这个脚本，从字面意思就是密码缺陷，那这个部分就是针对于移动应用加解密子之类的风险。我们直接打开来查看其中方法。<br>这里我们看到相应的寻找ECB的特殊关键字，这个是检测AES和DES是否存在弱加密（ECB模式）的风险。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image005.png" alt=""><br>这个地方是匹配PRIVATE\sKEY的1特殊关键字，寻找相应的加密算法的私钥，这个地方的私钥如果存在且是以明文形式存在，这个就是加密算法的密钥硬编码风险，会导致相关的加密算法被破解。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image006.png" alt=""><br>这里还有一个地方，但是方法被注释掉了，这个是匹配SecureRandom.setseed（）方法，这个是伪随机数的一个风险点。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image007.png" alt=""><br> 大部分的原理都是类似的。所以其他的脚本就看各位自己去分析。</p>
-<h2 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h2><p>QARK有两种模式：1.交互模式 2.无缝模式<br>交互模式使用户能够交互地一个接一个地选择选项。而无缝模式允许我们用一个命令完成整个工作。<br>我们主要看看交互模式的实际应用。<br>输入python qark.py<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image008.png" alt=""><br>接着会有选择apk或者soure，这些都是通过数字来进行选择。继续下去会有输入路径或者通过设备来进行检测。我们选择1，然后底下就开始提示是否导出mainfirst文件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image009.png" alt=""><br>接下来就直接导出相应的mainfist文件，这其实就是直接反编译获取到的。接下来就是先从mainfirst文件进行分析，分析相应组件暴露和allowback和debuggable等相关的风险点。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image010.png" alt=""><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image011.png" alt=""><br>接下里，我们继续查看，直接检测broadcast广播是否有附带相应的敏感信息，然后就是相应的脚本进行检测，例如x509证书检验，这些都是该工具具有的代码静态分析。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image012.png" alt=""><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image013.png" alt=""><br>最后会在qark的本身目录中的report.html文件，这个文件类似于mobsf生成的界面。这里面就是会把刚刚经过检测的所有风险都以报告的形式打印出来，都会在相应的选项中，详细的告诉你风险点存在的位置，以及相应的危害。<br>但是在这里我们只是看到很稀少的数据，其实这些数据只是mainfist文件暴露出来的风险点，但是代码中的分析根本没有进行分析。问题出在于apk本身，这是一个有进行加固的apk，我之前说过这个工具无法进行相应的脱壳，所以导致无法获取到相应的代码，就无法进行相应的分析，所以其他数据就是空的。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在安装的过程会有一个问题就是python no module named _curses的问题，这个问题最后解决了，经过对比python2.6 ，终于发现，原来 pythong2.7/lib-dynload 里没有相应的 curses 库，_curses_panel.so，_curses.so。说到底就是去缺少文件，所以此时你将python2.6 的 这2个so文件拷贝到 pythong2.7 的lib-dynload 文件夹下， 就解决了问题。或者你可以下载ncurses文件，然后重新跑下python就可以了。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic-3/image014.png" alt=""><br>我们前面也说过这款工具是为了教育开发人员和信息安全人员了解与Android应用程序安全相关的潜在风险 ，相应的开发人员和评估人员就可以在开发和检测阶段，针对于APP移动应用进行检测，及时修改相应的风险点。<br>其实通过对于QARK的了解，我们不难看出这就是和大多数自动化工具一样就是，感觉就像个多了些脚步的Mobsf，作为一个安全评估人员，其实再多的检测工具也是辅助，我们仍然需要进行自己的分析，有些风险点也不一定是准确的，所以我们是需要好好利用该工具。</p>
-<p>参考的文章：<br><a href="http://resources.infosecinstitute.com/qark-a-tool-for-automated-android-app-assessments/#gref" rel="external nofollow noopener noreferrer" target="_blank">http://resources.infosecinstitute.com/qark-a-tool-for-automated-android-app-assessments/#gref</a><br><a href="https://github.com/linkedin/qark" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/linkedin/qark</a><br>工具下载链接：<br><a href="https://github.com/linkedin/qark" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/linkedin/qark</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;简介&quot;&gt;&lt;a href=&quot;#简介&quot; class=&quot;headerlink&quot; title=&quot;简介&quot;&gt;&lt;/a&gt;简介&lt;/h2&gt;&lt;p&gt;QARK的核心是一个静态代码分析工具，旨在识别基于Java的Android应用程序的潜在安全漏洞和关注点。QARK还试图提供动态生成的ADB
-    
-    </summary>
-    
-      <category term="移动安全" scheme="http://www.future-sec.com/categories/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="QARK" scheme="http://www.future-sec.com/tags/QARK/"/>
-    
-  </entry>
-  
-  <entry>
     <title>谁是僵尸之王-如何进行高效的分布式爆破</title>
     <link href="http://www.future-sec.com/king-of-zombie.html"/>
     <id>http://www.future-sec.com/king-of-zombie.html</id>
@@ -1301,39 +1434,6 @@ H2 = 0
   </entry>
   
   <entry>
-    <title>Janus漏洞(CVE-2017-13156)分析</title>
-    <link href="http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html"/>
-    <id>http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html</id>
-    <published>2017-12-20T16:00:00.000Z</published>
-    <updated>2018-06-29T08:59:10.780Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签名，是没有办法安装到系统中的。Android通过数字签名来标识应用程序的作者和在应用程序之间建立信任关系，不是用来决定最终用户可以安装哪些应用程序。这个数字签名由应用程序的作者完成，并不需要权威的数字证书签名机构认证，它只是用来让应用程序包自我认证的。然而Google在本月4日发布的Android安全公告中编号为CVE-2017-13156，这个漏洞被称为Janus漏洞，利用该漏洞可修改app而不影响原始签名。</p>
-<h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h3 id="Android-app签名校验简单介绍"><a href="#Android-app签名校验简单介绍" class="headerlink" title="Android app签名校验简单介绍"></a>Android app签名校验简单介绍</h3><p>在Android源码中“frameworks/base/core/java/android/content/pm/PackageParser.java”中。PackageParser类的collectCertificates方法会对APK进行签名校验，并且遍历APK中的所有文件，对每个文件进行校验。下面是该方法的源码：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image002.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image004.jpg" alt="img"><br>APK是一个ZIP格式的文件，因此使用ZIP相关的类进行读写。在上面代码中调用了loadCertificates，这个方法会返回一个二维数组，当APK中的文件签名校验失败，loadCertificates方法会返回一个空数组（可能是null，可能是数组长度为0），那么依照上面代码的逻辑如果数组为空则会抛出异常。<br>loadCertificates方法的代码见下：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image006.jpg" alt="img"><br>其中is是JarFile.JarFileInputStream类的对象。loadCertificates调用了readFullyIgnoringContents，在readFullyIgnoringContents中会调用JarFile.JarFileInputStream.read（JarFile类在“libcore/luni/src/main/java/java/util/jar/JarFile.java”文件中）<br>读取APK中一项数据，在read方法中会校验读取到的数据项的签名，如果签名校验失败，则会抛出SecurityException类型的异常，即签名校验失败。<br>上面代码调用了StrictJarFile.getCertificateChains方法，在/ libcore / luni / src / main / java / java / util / jar / StrictJarFile.java里面。下面是它的代码：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image007.jpg" alt="img"><br>上面的isSigned在下面的代码里面获取的：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image009.jpg" alt="img"><br>当证书读取成功，而且APK经过了签名，isSigned为true。<br>回到StrictJarFile.getCertificateChains中，当isSigned为true时会调用JarVerifier.getCertificateChains方法，下面是它的代码：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image010.jpg" alt="img"><br>verifiedEntries的声明：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image012.jpg" alt="img"><br>verifiedEntries是一个键值对，键是APK中经过了签名的文件名，如：classes.dex文件，值是证书数组。如果向已经签过名的APK中新添加一个文件然后安装这个APK，当程序逻辑执行到JarVerifier.getCertificateChains中时，在verifiedEntries里面无法找到新添加的文件名（因为这个新文件是在APK签名之后添加），那么JarVerifier.getCertificateChains方法将返回null。<br>以上就是整个对于app签名的简单分析。</p>
-<h3 id="签名方案"><a href="#签名方案" class="headerlink" title="签名方案"></a>签名方案</h3><p>参考google官方文档获得:<br>APK 签名方案<br>Android 支持两种应用签名方案，一种是基于 JAR 签名的方案（v1 方案），另一种是 Android Nougat (Android 7.0) 中引入的 APK 签名方案 v2（v2 方案）。<br>JAR 签名（v1 方案）<br>v1 签名并非保护整个apk文件，例如 ZIP 元数据就不受保护。再者，APK 验证程序需要处理大量不可信（尚未经过验证）的数据结构，而不受签名保护的数据不在处理的行列中。这会导致相当大的受攻击面。此外，APK 验证程序必须解压所有已压缩的条目，而这需要花费更多时间和内存。为了解决这些问题，Android 7.0 中引入了 APK 签名方案 v2。<br>APK 签名方案 v2（v2 方案）<br>Android 7.0 中引入了 APK 签名方案 v2（v2 方案）。该方案会对 APK 的内容进行hash处理和签名，然后将生成的“APK 签名分块”插入到 APK 中。<br>在验证期间，v2 方案会将 APK 文件视为 Blob，并对整个文件进行签名检查。对 APK 进行的任何修改（包括对 ZIP 元数据进行的修改）都会使 APK 签名作废。这种形式的 APK 验证不仅速度要快得多，而且能够发现更多种未经授权的修改。<br>同时，新的签名格式向后兼容，使用这种新格式签名的 APK（必须也使用v1） 可在更低版本的 Android 设备上进行安装（会直接忽略添加到 APK 的额外数据）。</p>
-<h3 id="apk签名校验方式"><a href="#apk签名校验方式" class="headerlink" title="apk签名校验方式"></a>apk签名校验方式</h3><p>为了提高兼容性，应同时采用 v1 和 v2 这两种方案对应用进行签名。与只使用v1 方案签名的应用相比，经过 v2 方案签名的应用能够更快速地安装到 Android Nougat 以及更高版本的设备上。但是更低版本的 Android 平台会忽略 v2 签名，这就需要应用包含 v1 签名。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image014.jpg" alt="img"><br>验证程序会对照存储在“APK 签名分块”中的 v2 签名对 APK 的全文件hash进行验证。该hash涵盖除“APK 签名分块”（其中包含 v2 签名）之外的所有内容。在“APK 签名分块”以外对 APK 进行的任何修改都会使 APK 的 v2 签名作废。v2 签名被删除的 APK 也会被拒绝，因为 v1 签名指明相应 APK 带有 v2 签名，所以 Android Nougat 及更高版本会拒绝使用 v1 签名验证 APK。</p>
-<h2 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h2><p>Janus漏洞主要是向APK里面添加额外的DEX文件。一方面，APK文件是zip文件，可以包含初始时的任意字节，在它的zip条目（实际情况下更多是在zip条目里面）。但是JAR签名方案只考虑了zip入口。当计算或者校验apk的签名的时候，它忽略了其他字节。另一方面，在字符串、类、方法定义等常规部分之后，一个DEX文件可以包含任意的字节。综上所述，一个文件可以同时包含一个APK文件和一个DEX文件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image016.jpg" alt="img"><br>另一个关键点是Dalvik / ART虚拟机方面。android运行加载APK文件，提取它的DEX文件，然后运行它的代码。在实践中，虚拟机可以加载和执行APK文件。当它得到APK文件时，它仍然会查看header的magic字节来判断它是什么类型的文件，如果找到一个DEX类型的，就会将文件载入为DEX文件，否则就会将文件加载为一个APK文件，其中包括一个带有DEX的zip文件。因此，既可以读取DEX文件又可以读取APK文件。<br>所以攻击者可以利用着这种二元性，在不影响其签名的情况下将一个恶意DEX文件预先添加到APK文件里面，然后，android运行时接受APK文件作为一个合法的早期版本的应用程序的有效更新，但是Dalvik虚拟机从注入的DEX文件中加载代码，从而实现攻击。</p>
-<h2 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h2><p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image018.jpg" alt="img"><br>原来的apk主要代码<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image019.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image021.jpg" alt="img"><br>修改了dex文件，将Log.i(“janus”,”点击事件”);修改为Toast.makeText(getApplicationContext(),”I steal your car.”,Toast.LENGTH_LONG).show();<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image023.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image024.jpg" alt="img"><br>安装合并好的1.apk<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image026.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image027.jpg" alt="img"><br>测试<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image029.jpg" alt="img"><br>攻击完成</p>
-<h2 id="影响范围"><a href="#影响范围" class="headerlink" title="影响范围"></a>影响范围</h2><p>该漏洞仅影响基于 JAR 签名的方案（v1 方案）。不影响自Android 7.0 以来引入的 APK 签名方案 v2（v2 方案）。</p>
-<h2 id="漏洞危害"><a href="#漏洞危害" class="headerlink" title="漏洞危害"></a>漏洞危害</h2><p>可被添加恶意dex文件可以进行一些敏感性的操作，例如窃取用户数据、监控手机等高危操作。</p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://source.android.com/security/apksigning/v2#verification" rel="external nofollow noopener noreferrer" target="_blank">https://source.android.com/security/apksigning/v2#verification</a><br><a href="https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures" rel="external nofollow noopener noreferrer" target="_blank">https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签
-    
-    </summary>
-    
-      <category term="移动安全" scheme="http://www.future-sec.com/categories/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="移动安全" scheme="http://www.future-sec.com/tags/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
-    
-      <category term="app签名" scheme="http://www.future-sec.com/tags/app%E7%AD%BE%E5%90%8D/"/>
-    
-  </entry>
-  
-  <entry>
     <title>使用MITMF中间人攻击非80端口的HTTP</title>
     <link href="http://www.future-sec.com/using-MITMF-attack-not-80-port-http.html"/>
     <id>http://www.future-sec.com/using-MITMF-attack-not-80-port-http.html</id>
@@ -1371,6 +1471,39 @@ H2 = 0
       <category term="web安全" scheme="http://www.future-sec.com/tags/web%E5%AE%89%E5%85%A8/"/>
     
       <category term="MITMf" scheme="http://www.future-sec.com/tags/MITMf/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Janus漏洞(CVE-2017-13156)分析</title>
+    <link href="http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html"/>
+    <id>http://www.future-sec.com/Janus-CVE-2017-13156-analysis.html</id>
+    <published>2017-12-20T16:00:00.000Z</published>
+    <updated>2018-06-29T08:59:10.780Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签名，是没有办法安装到系统中的。Android通过数字签名来标识应用程序的作者和在应用程序之间建立信任关系，不是用来决定最终用户可以安装哪些应用程序。这个数字签名由应用程序的作者完成，并不需要权威的数字证书签名机构认证，它只是用来让应用程序包自我认证的。然而Google在本月4日发布的Android安全公告中编号为CVE-2017-13156，这个漏洞被称为Janus漏洞，利用该漏洞可修改app而不影响原始签名。</p>
+<h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h3 id="Android-app签名校验简单介绍"><a href="#Android-app签名校验简单介绍" class="headerlink" title="Android app签名校验简单介绍"></a>Android app签名校验简单介绍</h3><p>在Android源码中“frameworks/base/core/java/android/content/pm/PackageParser.java”中。PackageParser类的collectCertificates方法会对APK进行签名校验，并且遍历APK中的所有文件，对每个文件进行校验。下面是该方法的源码：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image002.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image004.jpg" alt="img"><br>APK是一个ZIP格式的文件，因此使用ZIP相关的类进行读写。在上面代码中调用了loadCertificates，这个方法会返回一个二维数组，当APK中的文件签名校验失败，loadCertificates方法会返回一个空数组（可能是null，可能是数组长度为0），那么依照上面代码的逻辑如果数组为空则会抛出异常。<br>loadCertificates方法的代码见下：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image006.jpg" alt="img"><br>其中is是JarFile.JarFileInputStream类的对象。loadCertificates调用了readFullyIgnoringContents，在readFullyIgnoringContents中会调用JarFile.JarFileInputStream.read（JarFile类在“libcore/luni/src/main/java/java/util/jar/JarFile.java”文件中）<br>读取APK中一项数据，在read方法中会校验读取到的数据项的签名，如果签名校验失败，则会抛出SecurityException类型的异常，即签名校验失败。<br>上面代码调用了StrictJarFile.getCertificateChains方法，在/ libcore / luni / src / main / java / java / util / jar / StrictJarFile.java里面。下面是它的代码：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image007.jpg" alt="img"><br>上面的isSigned在下面的代码里面获取的：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image009.jpg" alt="img"><br>当证书读取成功，而且APK经过了签名，isSigned为true。<br>回到StrictJarFile.getCertificateChains中，当isSigned为true时会调用JarVerifier.getCertificateChains方法，下面是它的代码：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image010.jpg" alt="img"><br>verifiedEntries的声明：<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image012.jpg" alt="img"><br>verifiedEntries是一个键值对，键是APK中经过了签名的文件名，如：classes.dex文件，值是证书数组。如果向已经签过名的APK中新添加一个文件然后安装这个APK，当程序逻辑执行到JarVerifier.getCertificateChains中时，在verifiedEntries里面无法找到新添加的文件名（因为这个新文件是在APK签名之后添加），那么JarVerifier.getCertificateChains方法将返回null。<br>以上就是整个对于app签名的简单分析。</p>
+<h3 id="签名方案"><a href="#签名方案" class="headerlink" title="签名方案"></a>签名方案</h3><p>参考google官方文档获得:<br>APK 签名方案<br>Android 支持两种应用签名方案，一种是基于 JAR 签名的方案（v1 方案），另一种是 Android Nougat (Android 7.0) 中引入的 APK 签名方案 v2（v2 方案）。<br>JAR 签名（v1 方案）<br>v1 签名并非保护整个apk文件，例如 ZIP 元数据就不受保护。再者，APK 验证程序需要处理大量不可信（尚未经过验证）的数据结构，而不受签名保护的数据不在处理的行列中。这会导致相当大的受攻击面。此外，APK 验证程序必须解压所有已压缩的条目，而这需要花费更多时间和内存。为了解决这些问题，Android 7.0 中引入了 APK 签名方案 v2。<br>APK 签名方案 v2（v2 方案）<br>Android 7.0 中引入了 APK 签名方案 v2（v2 方案）。该方案会对 APK 的内容进行hash处理和签名，然后将生成的“APK 签名分块”插入到 APK 中。<br>在验证期间，v2 方案会将 APK 文件视为 Blob，并对整个文件进行签名检查。对 APK 进行的任何修改（包括对 ZIP 元数据进行的修改）都会使 APK 签名作废。这种形式的 APK 验证不仅速度要快得多，而且能够发现更多种未经授权的修改。<br>同时，新的签名格式向后兼容，使用这种新格式签名的 APK（必须也使用v1） 可在更低版本的 Android 设备上进行安装（会直接忽略添加到 APK 的额外数据）。</p>
+<h3 id="apk签名校验方式"><a href="#apk签名校验方式" class="headerlink" title="apk签名校验方式"></a>apk签名校验方式</h3><p>为了提高兼容性，应同时采用 v1 和 v2 这两种方案对应用进行签名。与只使用v1 方案签名的应用相比，经过 v2 方案签名的应用能够更快速地安装到 Android Nougat 以及更高版本的设备上。但是更低版本的 Android 平台会忽略 v2 签名，这就需要应用包含 v1 签名。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image014.jpg" alt="img"><br>验证程序会对照存储在“APK 签名分块”中的 v2 签名对 APK 的全文件hash进行验证。该hash涵盖除“APK 签名分块”（其中包含 v2 签名）之外的所有内容。在“APK 签名分块”以外对 APK 进行的任何修改都会使 APK 的 v2 签名作废。v2 签名被删除的 APK 也会被拒绝，因为 v1 签名指明相应 APK 带有 v2 签名，所以 Android Nougat 及更高版本会拒绝使用 v1 签名验证 APK。</p>
+<h2 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h2><p>Janus漏洞主要是向APK里面添加额外的DEX文件。一方面，APK文件是zip文件，可以包含初始时的任意字节，在它的zip条目（实际情况下更多是在zip条目里面）。但是JAR签名方案只考虑了zip入口。当计算或者校验apk的签名的时候，它忽略了其他字节。另一方面，在字符串、类、方法定义等常规部分之后，一个DEX文件可以包含任意的字节。综上所述，一个文件可以同时包含一个APK文件和一个DEX文件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image016.jpg" alt="img"><br>另一个关键点是Dalvik / ART虚拟机方面。android运行加载APK文件，提取它的DEX文件，然后运行它的代码。在实践中，虚拟机可以加载和执行APK文件。当它得到APK文件时，它仍然会查看header的magic字节来判断它是什么类型的文件，如果找到一个DEX类型的，就会将文件载入为DEX文件，否则就会将文件加载为一个APK文件，其中包括一个带有DEX的zip文件。因此，既可以读取DEX文件又可以读取APK文件。<br>所以攻击者可以利用着这种二元性，在不影响其签名的情况下将一个恶意DEX文件预先添加到APK文件里面，然后，android运行时接受APK文件作为一个合法的早期版本的应用程序的有效更新，但是Dalvik虚拟机从注入的DEX文件中加载代码，从而实现攻击。</p>
+<h2 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h2><p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image018.jpg" alt="img"><br>原来的apk主要代码<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image019.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image021.jpg" alt="img"><br>修改了dex文件，将Log.i(“janus”,”点击事件”);修改为Toast.makeText(getApplicationContext(),”I steal your car.”,Toast.LENGTH_LONG).show();<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image023.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image024.jpg" alt="img"><br>安装合并好的1.apk<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image026.jpg" alt="img"><br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image027.jpg" alt="img"><br>测试<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/pic2/image029.jpg" alt="img"><br>攻击完成</p>
+<h2 id="影响范围"><a href="#影响范围" class="headerlink" title="影响范围"></a>影响范围</h2><p>该漏洞仅影响基于 JAR 签名的方案（v1 方案）。不影响自Android 7.0 以来引入的 APK 签名方案 v2（v2 方案）。</p>
+<h2 id="漏洞危害"><a href="#漏洞危害" class="headerlink" title="漏洞危害"></a>漏洞危害</h2><p>可被添加恶意dex文件可以进行一些敏感性的操作，例如窃取用户数据、监控手机等高危操作。</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://source.android.com/security/apksigning/v2#verification" rel="external nofollow noopener noreferrer" target="_blank">https://source.android.com/security/apksigning/v2#verification</a><br><a href="https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures" rel="external nofollow noopener noreferrer" target="_blank">https://www.guardsquare.com/en/blog/new-android-vulnerability-allows-attackers-modify-apps-without-affecting-their-signatures</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;Android系统要求每一个Android应用程序必须要经过数字签名才能够安装到系统中，也就是说如果一个Android应用程序没有经过数字签
+    
+    </summary>
+    
+      <category term="移动安全" scheme="http://www.future-sec.com/categories/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+    
+    
+      <category term="移动安全" scheme="http://www.future-sec.com/tags/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/"/>
+    
+      <category term="app签名" scheme="http://www.future-sec.com/tags/app%E7%AD%BE%E5%90%8D/"/>
     
   </entry>
   
@@ -1550,93 +1683,6 @@ H2 = 0
       <category term="智能锁" scheme="http://www.future-sec.com/tags/%E6%99%BA%E8%83%BD%E9%94%81/"/>
     
       <category term="蓝牙攻击" scheme="http://www.future-sec.com/tags/%E8%93%9D%E7%89%99%E6%94%BB%E5%87%BB/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>物联网硬件安全分析基础-固件提取</title>
-    <link href="http://www.future-sec.com/iot-security-hardware-obtain.html"/>
-    <id>http://www.future-sec.com/iot-security-hardware-obtain.html</id>
-    <published>2017-11-26T16:00:00.000Z</published>
-    <updated>2018-06-29T10:47:15.653Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上节初步介绍一些硬件基础知识和分析硬件所需要的基本工具，本篇将讲述利用编程器直接读取芯片固件的方法。<br>为了读取Flash芯片的内容，有以下两种常用方式：</p>
-<p>1、直接将导线连接到芯片的引脚，在通过飞线连接编程器，进行在线读取固件；</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image34.jpg" alt=""></p>
-<p>2、把芯片拆焊下来，通过烧录座编程器，离线读取固件。</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/dce974d6b8fae7f6/20180606_154759.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/5b2d35d6e7f9a.jpg" alt=""></p>
-<h2 id="飞线法读取"><a href="#飞线法读取" class="headerlink" title="飞线法读取"></a>飞线法读取</h2><p>通过夹具夹住芯片引脚，然后连接编程器读取芯片内容，通过编程器连接芯片需要注意引脚的顺序，在IC芯片上都会有一个小点，大多数情况下，小点对应的引脚即为芯片的第一脚，而连接编程器的导线也需要插入编程器上相应的引脚。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image36.jpg" alt=""></p>
-<h3 id="案例一：读取中控F7门禁固件"><a href="#案例一：读取中控F7门禁固件" class="headerlink" title="案例一：读取中控F7门禁固件"></a>案例一：读取中控F7门禁固件</h3><p>拆掉门禁外壳，通过电路图和芯片印字分析，在主板上有一颗FM25F04A存储芯片，通过夹具连接芯片到编程器，在通过专用编程器软件，对该芯片进行读取。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image37.jpg" alt=""></p>
-<p>连接完成，确定引脚接线正确后，打开编程器对应软件，通过智能识别芯片ID，即可开始读取固件工作。<br>如无法识别，可根据印字说明，尝试类似的型号，一般情况下兼容。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image38.jpg" alt=""></p>
-<p>点击读取，即可开始固件提取，成功之后会保存为BIN格式文件，打开即可看到16进制的内容，为下一步分析提供基础。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image39.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image40.jpg" alt=""></p>
-<h3 id="案例二：读取某智能摄像头固件"><a href="#案例二：读取某智能摄像头固件" class="headerlink" title="案例二：读取某智能摄像头固件"></a>案例二：读取某智能摄像头固件</h3><p>拆掉摄像头外壳，通过分析PCB上的各个IC，找到Flash存储芯片。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image41.jpg" alt=""></p>
-<p>在显微镜下，可以看到是一颗25L64型号的Flash芯片。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image118.jpg" alt=""></p>
-<p>用夹具连接各引脚，并和编程器连接，进行固件读取。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image42.jpg" alt=""></p>
-<p>识别到芯片型号为GD25Q64，点击读取，读取完毕后按照提示保存到文件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image43.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image44.jpg" alt=""></p>
-<p>打开保存的BIN文件或者查看缓冲区，即可看到固件内容。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image45.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image46.jpg" alt=""></p>
-<p>在Ubuntu中，用binwalk解包固件，做进一步分析。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image116.jpg" alt=""></p>
-<h3 id="案例三：读取某智能摄像头固件"><a href="#案例三：读取某智能摄像头固件" class="headerlink" title="案例三：读取某智能摄像头固件"></a>案例三：读取某智能摄像头固件</h3><p>打开外壳，在PCB背面发现一颗FLASH存储芯片<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image47.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image48.jpg" alt=""></p>
-<p>通过显微镜发现芯片型号为25L128。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image120.jpg" alt=""></p>
-<p>连接编程器读取固件并保存。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image49.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image50.jpg" alt=""></p>
-<h3 id="案例四：读取某路由器固件"><a href="#案例四：读取某路由器固件" class="headerlink" title="案例四：读取某路由器固件"></a>案例四：读取某路由器固件</h3><p>打开外壳，发现PCB上有一颗Flash存储器，但厂商出于安全考虑，把芯片印字涂抹掉了。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image52.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image119.jpg" alt=""></p>
-<p>在不知道芯片型号的情况下，我们连接该芯片，让编程器去尝试读取。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image51.jpg" alt=""></p>
-<p>通过智能识别，发现编程器无法识别出具体型号，而因为Flash存储芯片的种类多样，通过查找又无法获得该路由器的具体参数，这时我们通过UART串口，读取出UBOOT启动信息，串口输出里面发现了该芯片型号为W25Q128BV。（下一篇将会重点介绍关于串口调试的方法）<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image54.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image53.jpg" alt=""></p>
-<p>在编程器中选择该型号，成功提取出固件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image55.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image56.jpg" alt=""></p>
-<p>用binwalk解包固件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image115.jpg" alt=""></p>
-<h3 id="案例五：读取某智能电饭锅固件"><a href="#案例五：读取某智能电饭锅固件" class="headerlink" title="案例五：读取某智能电饭锅固件"></a>案例五：读取某智能电饭锅固件</h3><p>拆掉外壳，背面嵌有一块PCB，反面是WIFI处理芯片，正面为存储器，连接编程器。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image57.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image58.jpg" alt=""></p>
-<p>通过印字分析为25芯片，存储大小为2M字节，尝试该型号芯片，成功读取固件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image59.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image60.jpg" alt=""></p>
-<h3 id="案例六：读取某网络监控摄像机固件"><a href="#案例六：读取某网络监控摄像机固件" class="headerlink" title="案例六：读取某网络监控摄像机固件"></a>案例六：读取某网络监控摄像机固件</h3><p>在PCB上找到一块25L128型号的Flash存储芯片。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image62.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image121.jpg" alt=""></p>
-<p>通过夹具连接编程器。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image61.jpg" alt=""></p>
-<p>识别到芯片为MX25L128，选择其中一种，成功提取固件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image63.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image64.jpg" alt=""></p>
-<p>用binwalk解包固件内容。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/image117.jpg" alt=""></p>
-<h2 id="拆焊芯片读取固件"><a href="#拆焊芯片读取固件" class="headerlink" title="拆焊芯片读取固件"></a>拆焊芯片读取固件</h2><p>一般情况下，对于TSOP8封装的闪存芯片，可以用上述方法来读取，但可能存在在线读取成功率不高或数据丢失的情况，对于更多引脚和封装格式的芯片，飞线的难度更高，有一定锡焊基础的建议采用拆焊芯片，用烧录座离线读取的方法。</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/20180628165648.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/20180628165631.jpg" alt=""></p>
-<p>热风枪设置在适合的温度，吹下芯片，周围的元件可以用铝箔或锡箔纸适当保护。</p>
-<p>拆下的闪存芯片放在烧录座上，在连接编程器进行读写，芯片放置的引脚方向要注意对齐编程器和烧录座的第一脚。</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/20180628165637.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/20180628165659.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/20180628165651.jpg" alt=""></p>
-<p>读取完成，用点焊法把芯片焊上焊盘即可。</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/20180628165634.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/688535e77168b873/20180628171222.jpg" alt=""></p>
-<p>更多芯片焊接修改操作请参考2.4.2 硬件修改一节</p>
-<h2 id="jtag提取固件"><a href="#jtag提取固件" class="headerlink" title="jtag提取固件"></a>jtag提取固件</h2><h3 id="拆焊芯片"><a href="#拆焊芯片" class="headerlink" title="拆焊芯片"></a>拆焊芯片</h3><p>首先用热风枪拆下智能锁主控芯片，该单片机型号为：Stm32F103R6。</p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/872bc42054768e0f/5b3522b3bcebf.jpg" alt=""></p>
-<h3 id="烧录座连接Jlink"><a href="#烧录座连接Jlink" class="headerlink" title="烧录座连接Jlink"></a>烧录座连接Jlink</h3><p>芯片第一脚对齐烧录座第一脚，然后把Jlink插入烧录座引出的JTAG接口。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/872bc42054768e0f/5b352394427b3.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/872bc42054768e0f/5b3523a551154.jpg" alt=""></p>
-<h3 id="读取固件"><a href="#读取固件" class="headerlink" title="读取固件"></a>读取固件</h3><p>电脑上安装好Jlink驱动，打开J-Flash客户端，设置好参数，主要在配置栏选择正确的芯片型号，然后点击连接，在点击Target-&gt;Read Back-&gt;Entire trip即可读写固件。<br><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/872bc42054768e0f/5b3524c6c08bb.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/872bc42054768e0f/5b3524ced11a4.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/872bc42054768e0f/5b3524d65ced7.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/872bc42054768e0f/5b3524db79b3c.jpg" alt=""></p>
-<p><img src="https://img-1253984064.cos.ap-guangzhou.myqcloud.com/872bc42054768e0f/5b3524f327ac3.jpg" alt=""></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;上节初步介绍一些硬件基础知识和分析硬件所需要的基本工具，本篇将讲述利用编程器直接读取芯片固件的方法。&lt;br&gt;为了读取Flash芯片的内容，有
-    
-    </summary>
-    
-      <category term="硬件安全" scheme="http://www.future-sec.com/categories/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
-    
-    
-      <category term="硬件安全" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%AE%89%E5%85%A8/"/>
-    
-      <category term="硬件分析" scheme="http://www.future-sec.com/tags/%E7%A1%AC%E4%BB%B6%E5%88%86%E6%9E%90/"/>
     
   </entry>
   
